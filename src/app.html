@@ -1724,10 +1724,11 @@ function drawSlash(){
 function chooseSlash(t){
   const p=(SL.bid&&pageOfBlock(SL.bid))||cur(),plus=SL.plus,turn=SL.turn,b=p.blocks.find(x=>x.id===SL.bid);closeSlash();
   if(plus){const nb=B('p','');if(b)insertAfter(p,b,nb);else{p.blocks.push(nb);save()}applyType(nb,p,t);return}
-  if(!b)return;if(!turn||['table','divider','spacer','dblink',...WIDGETS].includes(t))b.text='';applyType(b,p,t);
+  if(!b)return;if(turn&&b.type===t)return;const wasBlank=['spacer','divider'].includes(b.type);if(wasBlank)b.text='';
+  if(!turn||['table','divider','spacer','dblink',...WIDGETS].includes(t))b.text='';applyType(b,p,t);
 }
 function applyType(b,p,t,keepText){
-  let focusId=b.id;
+  let focusId=b.id;const fromBlank=['spacer','divider'].includes(b.type);
   if(t==='table'){b.type='table';b.rows=[['Column 1','Column 2','Column 3'],['','',''],['','','']]}
   else if(t==='toggle'){b.type='toggle';b.body=b.body||'';b.open=true}
   else if(t==='callout'){b.type='callout';b.icon='💡'}
@@ -1738,7 +1739,7 @@ function applyType(b,p,t,keepText){
   else if(t==='dbinline'){const db=newDB((b.text||'').replace(/\n/g,' ').trim(),p.id);b.text='';b.type='database';b.dbid=db.id}
   else if(t==='dbpage'){const np=newPage(null);np.parent=p.id;np.kind='gdb';np.icon='🗂️';np.title=(b.text||'').replace(/\n/g,' ').trim();b.text='';np.blocks=[];np.dbid=newDB(np.title,np.id).id;b.type='pagelink';b.pid=np.id;p.open=true}
   else b.type=t;
-  if(['divider','spacer','table','pagelink','database',...WIDGETS].includes(b.type)){const nb=B('p','');insertAfter(p,b,nb);focusId=nb.id}
+  if(['divider','spacer','table','pagelink','database',...WIDGETS].includes(b.type)&&!(fromBlank&&['divider','spacer'].includes(b.type))){const nb=B('p','');insertAfter(p,b,nb);focusId=nb.id}
   save();renderTree();renderPage();focusBlock(focusId);
 }
 document.addEventListener('mousedown',e=>{if(SL.open&&!e.target.closest('#slash')&&!e.target.closest('.gut,.addb,.fab'))closeSlash()});
@@ -3952,7 +3953,7 @@ function openBlockMenu(anchor,b,p){
     pop.innerHTML=`<div class="lb3">${esc(blockLabel(b.type))}</div>`
       +(['quote','callout'].includes(b.type)?it('color','Color','<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/>'):'')
       +(TEXTUAL.includes(b.type)?it('tstyle','Text style','<path d="M4 7V5h16v2M12 5v14M9 19h6"/>'):'')
-      +(TEXTUAL.includes(b.type)?it('turn','Turn into…','<path d="M4 7h11l-3-3M20 17H9l3 3"/>'):'')
+      +([...TEXTUAL,'spacer','divider'].includes(b.type)?it('turn','Turn into…','<path d="M4 7h11l-3-3M20 17H9l3 3"/>'):'')
       +it('dup','Duplicate',IC.dup)
       +it('spl','Add empty space on the left','<rect x="3" y="5" width="7" height="14" rx="1.5" stroke-dasharray="3 2"/><rect x="14" y="5" width="7" height="14" rx="1.5"/>')
       +it('spr','Add empty space on the right','<rect x="3" y="5" width="7" height="14" rx="1.5"/><rect x="14" y="5" width="7" height="14" rx="1.5" stroke-dasharray="3 2"/>')
