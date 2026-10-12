@@ -36,7 +36,7 @@
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}
 :root{--fs:15px;--pw:1000px;--dim:.3}
 .pop,.slash,.dmenu,.cpanel,.tpanel,.cdlg,.mbox{color:var(--fg)}
-html,body{min-height:100%}
+html,body{min-height:100%;margin:0;padding:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;overscroll-behavior-y:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 button:focus-visible,select:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
@@ -102,7 +102,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[contenteditable]:
 .pico{background:none;-webkit-tap-highlight-color:transparent;transition:transform .15s;display:inline-block}
 .pico:hover{transform:scale(1.05)}
 .pico:focus{outline:none}.pico:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-.ptitle{font-family:var(--display);font-weight:700;font-size:38px;line-height:1.15;letter-spacing:-.02em;margin:10px 0 18px 28px;outline:none;text-wrap:balance;word-break:break-word}
+.ptitle{white-space:pre-wrap;font-family:var(--display);font-weight:700;font-size:38px;line-height:1.15;letter-spacing:-.02em;margin:10px 0 18px 28px;outline:none;text-wrap:balance;word-break:break-word}
 .ptitle:empty::before{content:"Untitled";color:var(--muted)}
 .meta{margin:-8px 0 20px 28px;font-size:12px;color:var(--muted);font-family:var(--mono)}
 /* blocks */
@@ -153,7 +153,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,[contenteditable]:
 .slash{position:fixed;z-index:40;width:270px;max-height:320px;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:6px}
 .slash h6{margin:4px 8px 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
 .si{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:6px 8px;border-radius:6px}
-.si.on,.si:hover{background:var(--hover)}
+.si.on{background:var(--hover)}@media (hover:hover){.si:hover{background:var(--hover)}}
+.si.cur b{color:var(--accent)}.sicheck{margin-left:auto;font-style:normal;color:var(--accent);font-weight:700;padding-right:4px}
 .si .sg{width:34px;height:34px;flex:none;border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;font-family:var(--mono);font-size:12px;background:var(--surface)}
 .si b{display:block;font-weight:500;font-size:14px}
 .si small{color:var(--muted);font-size:12px}
@@ -649,7 +650,8 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 @media (max-width:640px){.peek{top:0;right:0;bottom:0;width:100%;border-radius:0;border:0}}
 @media (prefers-reduced-motion:reduce){.peek.in{animation:none}}
 /* keep the page steady while a menu or panel is open */
-html{scrollbar-gutter:stable}
+html{scrollbar-gutter:stable;overscroll-behavior:none;overflow-x:clip}body{overflow-x:clip}
+[contenteditable]:focus{white-space:pre-wrap}
 .slash,.pop,.dmenu,.cbody,.tbody2,.egrid,.optlist,.ctrl,.xp-area,#trList,.tree{overscroll-behavior:contain}
 html:has(#slash:not([hidden])),html:has(#pop:not([hidden])),html:has(#dmenu:not([hidden])),html:has(#cpanel:not([hidden])),html:has(#tpanel:not([hidden])),html:has(#spanel:not([hidden])),html:has(#trash:not([hidden])),html:has(#modal:not([hidden])),html:has(#cdlg:not([hidden])),html:has(.lbox){overflow:hidden}
 .slash,.pop,.dmenu,.cbody,.tbody2,.xp-area,#trList{touch-action:pan-y}
@@ -708,7 +710,7 @@ body.splitting .canvas,body.splitting .main .fab{visibility:hidden}
 .srsep{width:22px;height:1px;background:var(--line);margin:4px 0}
 body.splitting .top{display:none}
 body.splitting .panes{padding-left:0}
-.app.collapsed .side.float{visibility:visible;position:fixed;left:8px;top:8px;bottom:8px;height:auto;width:268px;z-index:44;border-radius:16px;border:1px solid var(--line);box-shadow:0 26px 60px rgba(0,0,0,.24),0 6px 16px rgba(0,0,0,.08)}
+.app.collapsed .side.float{visibility:visible;position:fixed;left:0;top:0;bottom:0;height:auto;width:268px;z-index:44;border-radius:0;border:0;border-right:1px solid var(--line);box-shadow:0 26px 60px rgba(0,0,0,.24),0 6px 16px rgba(0,0,0,.08)}
 .side.float.fin{animation:sidein .22s cubic-bezier(.2,.8,.2,1)}
 @keyframes sidein{from{transform:translateX(-18px);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.side.float.fin{animation:none}}
@@ -1686,11 +1688,13 @@ const TYPES=[
   {t:'code',l:'Code',h:'Code snippet',g:'</>'},{t:'table',l:'Table',h:'Rows and columns',g:'▦'},{t:'divider',l:'Divider',h:'Visual separator',g:'—'},{t:'spacer',l:'Empty space',h:'Blank block to push others aside',g:'⬚'},{t:'page',l:'Page',h:'New page inside this one',g:'↳'},{t:'dbinline',l:'Database – Inline',h:'Table, board and calendar on this page',g:'▤'},{t:'dbpage',l:'Database – Full page',h:'A database as its own page',g:'▦'},{t:'dblink',l:'Linked database',h:'Show a database you already made',g:'⇢'},{t:'w_clock',l:'Clock widget',h:'Live time and date, any time zone',g:'◷'},{t:'w_gallery',l:'Gallery widget',h:'Photos in a grid or slideshow',g:'▣'},{t:'w_cal',l:'Calendar widget',h:'Month view with dates from your databases',g:'▦'}];
 const SL={open:false,bid:null,filter:'',sel:0,items:[],plus:false};
 const narrow=()=>innerWidth<=820||matchMedia('(hover:none)').matches;
-function openSlash(bid,plus,turn){SL.open=true;SL.bid=bid;SL.filter='';SL.sel=0;SL.plus=plus;SL.turn=!!turn;SL.built=false;drawSlash()}
+function openSlash(bid,plus,turn){SL.open=true;SL.bid=bid;SL.filter='';SL.sel=0;SL.plus=plus;SL.turn=!!turn;SL.built=false;SL.cur=null;
+  if(turn){const p=pageOfBlock(bid)||cur(),b=p&&p.blocks.find(x=>x.id===bid);SL.cur=b?b.type:null;const k=TYPES.findIndex(x=>x.t===SL.cur);if(k>=0)SL.sel=k}
+  drawSlash()}
 function openPicker(afterId){openSlash(afterId,true)}
 function closeSlash(){SL.open=false;$('#slash').hidden=true;$('#pscrim').hidden=true}
 function slashItems(){
-  return SL.items.length?SL.items.map((x,i)=>`<button class="si${i===SL.sel?' on':''}" data-t="${x.t}"><span class="sg">${x.g}</span><span><b>${x.l}</b><small>${x.h}</small></span></button>`).join(''):'<div class="none">No matching blocks</div>';
+  return SL.items.length?SL.items.map((x,i)=>`<button class="si${i===SL.sel?' on':''}${SL.turn&&x.t===SL.cur?' cur':''}" data-t="${x.t}"><span class="sg">${x.g}</span><span><b>${x.l}</b><small>${x.h}</small></span>${SL.turn&&x.t===SL.cur?'<i class="sicheck">✓</i>':''}</button>`).join(''):'<div class="none">No matching blocks</div>';
 }
 function drawSlash(){
   const m=$('#slash'),f=SL.filter.toLowerCase();
