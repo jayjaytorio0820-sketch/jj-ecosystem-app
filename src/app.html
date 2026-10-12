@@ -313,6 +313,16 @@ body.lockshow .main .fab{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
 .hdl{touch-action:none;cursor:grab}
 .colrow{display:grid;gap:20px;margin:2px 0;align-items:start}
 .colrow>.bcol{min-width:0}
+.bcol.vdl,.blk.vdl>.bc{border-left:1.5px solid color-mix(in srgb,var(--fg) 14%,transparent);padding-left:14px}
+.bcol.vdr,.blk.vdr>.bc{border-right:1.5px solid color-mix(in srgb,var(--fg) 14%,transparent);padding-right:14px}
+.dlabel{font-size:11.5px;color:var(--muted);padding:4px 10px 4px;letter-spacing:.02em}
+.vdseg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:0 6px 4px}
+.vdseg button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:8px;font-size:12px;color:var(--fg);border:1px solid transparent}
+.vdseg button span{line-height:1.2}
+.vdseg button.on{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+@media (hover:hover){.vdseg button:hover{background:var(--hover)}}
+@media (max-width:640px){.bcol.vdl,.bcol.vdr{border-left:0;border-right:0;padding-left:0;padding-right:0}}
+
 .colrow.divs>.bcol+.bcol{border-left:1.5px solid color-mix(in srgb,var(--fg) 14%,transparent);padding-left:14px;margin-left:-6px}
 @media (max-width:640px){.colrow.divs>.bcol+.bcol{border-left:0;padding-left:0;margin-left:0;border-top:1.5px solid color-mix(in srgb,var(--fg) 14%,transparent);padding-top:8px;margin-top:6px}}
 .colrow .blk{grid-template-columns:46px minmax(0,1fr)}
@@ -1615,7 +1625,7 @@ function edEl(b,p,field){
   return el;
 }
 function blockEl(b,p,n){
-  const w=document.createElement('div');w.className='blk t-'+b.type;w.dataset.bid=b.id;
+  const w=document.createElement('div');w.className='blk t-'+b.type+(!b.grp&&b.vd?(b.vd.includes('l')?' vdl':'')+(b.vd.includes('r')?' vdr':''):'');w.dataset.bid=b.id;
   const g=document.createElement('button');g.className='gut';g.setAttribute('aria-label','Add a block below');
   g.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
   g.onmousedown=e=>e.preventDefault();
@@ -3412,7 +3422,7 @@ function renderBlocks(p,w){
     if(!b.grp){n=b.type==='number'?n+1:0;w.appendChild(blockEl(b,p,n));i++;continue}
     const g=b.grp,bs=[];while(i<p.blocks.length&&p.blocks[i].grp===g){bs.push(p.blocks[i]);i++}
     const nc=Math.max(...bs.map(x=>x.ci))+1,row=document.createElement('div');row.className='colrow'+(p.colDiv&&p.colDiv[g]?' divs':'');row.style.gridTemplateColumns=`repeat(${nc},minmax(0,1fr))`;
-    for(let c=0;c<nc;c++){const col=document.createElement('div');col.className='bcol';let k=0;bs.filter(x=>x.ci===c).forEach(x=>{k=x.type==='number'?k+1:0;col.appendChild(blockEl(x,p,k))});row.appendChild(col)}
+    for(let c=0;c<nc;c++){const col=document.createElement('div');const vl=((p.colLines||{})[g]||{})[c]||'';col.className='bcol'+(vl.includes('l')?' vdl':'')+(vl.includes('r')?' vdr':'');let k=0;bs.filter(x=>x.ci===c).forEach(x=>{k=x.type==='number'?k+1:0;col.appendChild(blockEl(x,p,k))});row.appendChild(col)}
     w.appendChild(row);n=0;
   }
 }
@@ -3947,6 +3957,9 @@ $('#railReset').onclick=resetSizes;$('#backSplit').onclick=backToSplit;
 /* ---------- block options ---------- */
 const TEXTUAL=['p','h1','h2','h3','todo','bullet','number','toggle','callout','quote','code'];
 function blockLabel(t){return ({database:'Database',pagelink:'Page link'})[t]||(TYPES.find(x=>x.t===t)||{}).l||'Block'}
+/* vertical divider on the left / right of a block (or of its column) */
+function vdGet(b,p){return b.grp?(((p.colLines||{})[b.grp]||{})[b.ci]||''):(b.vd||'')}
+function vdSet(b,p,v){if(b.grp){p.colLines=p.colLines||{};const m=p.colLines[b.grp]=p.colLines[b.grp]||{};if(v)m[b.ci]=v;else delete m[b.ci]}else{if(v)b.vd=v;else delete b.vd}save();renderPage()}
 function openBlockMenu(anchor,b,p){
   const i=p.blocks.indexOf(b),it=(a,l,ic,cls)=>`<button class="ditem${cls?' '+cls:''}" data-a="${a}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ic}</svg><span>${l}</span></button>`;
   openPop(anchor,pop=>{
@@ -3959,9 +3972,11 @@ function openBlockMenu(anchor,b,p){
       +it('spr','Add empty space on the right','<rect x="3" y="5" width="7" height="14" rx="1.5"/><rect x="14" y="5" width="7" height="14" rx="1.5" stroke-dasharray="3 2"/>')
       +(i>0?it('up','Move up','<path d="M12 19V5M6 11l6-6 6 6"/>'):'')
       +(i<p.blocks.length-1?it('down','Move down','<path d="M12 5v14M6 13l6 6 6-6"/>'):'')
-      +(b.grp?it('vdiv',p.colDiv&&p.colDiv[b.grp]?'Remove vertical dividers':'Add vertical dividers','<path d="M12 3v18"/><rect x="3" y="6" width="5" height="12" rx="1"/><rect x="16" y="6" width="5" height="12" rx="1"/>'):'')
+      +'<div class="dsep"></div><div class="dlabel">Vertical divider</div><div class="vdseg">'+[['l','Left'],['r','Right'],['lr','Both']].map(([k,l])=>`<button class="${vdGet(b,p)===k?'on':''}" data-vd="${k}"><svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="6" y="3" width="10" height="10" rx="1.5" stroke-opacity=".45"/>${k.includes('l')?'<path d="M2 1v14"/>':''}${k.includes('r')?'<path d="M20 1v14"/>':''}</svg><span>${l}</span></button>`).join('')+`<button data-vd="" class="${vdGet(b,p)?'':'on'}"><svg width="22" height="16" viewBox="0 0 22 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="6" y="3" width="10" height="10" rx="1.5" stroke-opacity=".45"/></svg><span>None</span></button></div>`
+      +(b.grp?it('vdiv',p.colDiv&&p.colDiv[b.grp]?'Remove lines between all columns':'Lines between all columns','<path d="M12 3v18"/><rect x="3" y="6" width="5" height="12" rx="1"/><rect x="16" y="6" width="5" height="12" rx="1"/>'):'')
       +(b.grp?it('uncol','Take out of columns','<rect x="3" y="4" width="7" height="16" rx="1"/><path d="M14 12h7M18 9l3 3-3 3"/>'):'')
       +'<div class="dsep"></div>'+it('del',b.type==='pagelink'?'Remove link':'Delete',IC.trash,'danger');
+    pop.querySelectorAll('[data-vd]').forEach(x=>x.onclick=()=>{POPCLOSE=null;closePop();vdSet(b,p,x.dataset.vd)});
     pop.querySelectorAll('[data-a]').forEach(x=>x.onclick=()=>{const a=x.dataset.a;POPCLOSE=null;closePop();
       if(a==='del')deleteBlock(b,p);
       else if(a==='dup')dupBlock(b,p);
