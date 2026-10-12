@@ -48,6 +48,23 @@ jobs:
       - name: Create Android project
         run: |
           npx cap add android
+          # no Android overscroll stretch: bars and edges stay still
+          cat > android/app/src/main/java/com/jayjay/jjecosystem/MainActivity.java <<'JAVA'
+          package com.jayjay.jjecosystem;
+
+          import android.view.View;
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {
+            @Override
+            public void onStart() {
+              super.onStart();
+              if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().setOverScrollMode(View.OVER_SCROLL_NEVER);
+              }
+            }
+          }
+          JAVA
           npx capacitor-assets generate --android \
             --iconBackgroundColor '#1F6F5C' --iconBackgroundColorDark '#1F6F5C' \
             --splashBackgroundColor '#F4F6F3' --splashBackgroundColorDark '#111412'

@@ -38,15 +38,21 @@
     saveFile:saveFile};
 
   /* ---- Android back button: close the top-most panel, otherwise leave the app ---- */
-  function vis(sel){var el=document.querySelector(sel);return el&&!el.hidden&&el.offsetParent!==null}
+  function vis(sel){var el=document.querySelector(sel);return !!(el&&!el.hidden&&el.getClientRects().length)}
   function call(fn){try{if(typeof window[fn]==='function'){window[fn]();return true}}catch(e){}return false}
   function onBack(){
     if(vis('#lock')){APP&&APP.minimizeApp();return}
+    /* Bible: close its sheet first, then go back to the ecosystem home */
+    try{if(typeof bibBack==='function'&&bibBack())return}catch(e){}
+    /* ecosystem home: close a module preview, otherwise leave the app */
+    if(vis('#hub')){try{if(typeof hubBack==='function'&&hubBack())return}catch(e){}APP&&APP.minimizeApp();return}
     var scrim=document.querySelector('.gadj-scrim');if(scrim){scrim.click();return}
     if(vis('#cdlg')){var c=document.querySelector('#cdlg [data-r="0"]');if(c){c.click();return}}
     var steps=[['#pop','closePop'],['#slash','closeSlash'],['#dmenu','closeMenu'],['#modal','closeExport'],['#tpanel','closeTheme'],['#cpanel','closeCover'],['#spanel','closeSettings'],['#trash','closeTrash'],['#npanel','closeNotes'],['#peek','closePeek']];
     for(var i=0;i<steps.length;i++){if(vis(steps[i][0])&&call(steps[i][1]))return}
     var side=document.querySelector('#side.open');if(side&&call('closeDrawer'))return;
+    /* Notes with nothing open: back goes to the ecosystem home */
+    if(call('showHub'))return;
     APP&&APP.minimizeApp();
   }
 
