@@ -1135,6 +1135,17 @@ body.lockshow .main .fab{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .bvt sup{font-family:"IBM Plex Mono",monospace;font-size:.58em;color:var(--gold);margin:0 .35em 0 .1em;font-weight:600;vertical-align:.45em}
 .bvt[dir="rtl"] sup{margin:0 .1em 0 .35em}
 .bvt.par{color:#BFCBE0}
+.btl{display:block;font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:calc(var(--bsz) * .78);line-height:1.5;color:#7FD7E8;margin-top:2px;text-align:left;direction:ltr}
+.bvt[lang="he"] .btl{font-size:calc(var(--bsz) * .62)}
+.bibtext.words .bvt{line-height:1.3}
+.bw{display:inline-flex;flex-direction:column;align-items:center;vertical-align:top;margin:0 .12em .5em;text-align:center}
+.bwt{font-family:"Source Serif 4",Georgia,serif;font-style:italic;font-size:calc(var(--bsz) * .62);color:#7FD7E8;line-height:1.3;margin-top:1px;white-space:nowrap}
+.bvt[lang="he"] .bwt{font-size:calc(var(--bsz) * .56)}
+.bibtlnote{margin:0 0 14px;padding:8px 12px;border-radius:10px;background:rgba(127,215,232,.08);color:#9FB3CF;font-size:13px}
+.bsh4{margin:16px 4px 8px;font-size:13px;letter-spacing:.04em;color:var(--bfg)}.bsh4 small{opacity:.6;font-weight:400;margin-left:6px}
+.segrow{display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap}.segrow button{flex:1;min-width:0;padding:9px 6px;border-radius:10px;border:1px solid var(--bline);color:var(--bfg);font:inherit;font-size:13px}
+.segrow button.on{border-color:var(--gold);background:rgba(245,196,81,.12);color:var(--gold)}
+
 .bmiss{color:#55627c}
 .bv.bm .bvt:first-child sup::after{content:" 🔖";font-size:.9em}
 .bv.hl-yellow{background:rgba(245,196,81,.16)}.bv.hl-green{background:rgba(46,230,160,.13)}.bv.hl-blue{background:rgba(91,140,255,.16)}.bv.hl-pink{background:rgba(255,79,216,.14)}.bv.hl-purple{background:rgba(169,139,230,.17)}
@@ -4212,6 +4223,84 @@ function openBible(){
   $('#bible').style.setProperty('--bsz',st.size+'px');bibGo(st.t,st.b,st.c);
 }
 function closeBible(){BIB.open=false;$('#bible').hidden=true;closeBibSheet();showHub()}
+/* ---------- pronunciation guides (transliteration) ---------- */
+/* Greek: academic (Erasmian) style; the stressed vowel keeps an accent mark, e.g. \u03BB\u03CC\u03B3\u03BF\u03C2 \u2192 l\u00F3gos */
+const GR={'\u03B1':'a','\u03B2':'b','\u03B3':'g','\u03B4':'d','\u03B5':'e','\u03B6':'z','\u03B7':'\u0113','\u03B8':'th','\u03B9':'i','\u03BA':'k','\u03BB':'l','\u03BC':'m','\u03BD':'n','\u03BE':'x','\u03BF':'o','\u03C0':'p','\u03C1':'r','\u03C3':'s','\u03C2':'s','\u03C4':'t','\u03C5':'y','\u03C6':'ph','\u03C7':'ch','\u03C8':'ps','\u03C9':'\u014D','\u03F2':'s'};
+const ACC1={'a':'\u00E1','e':'\u00E9','\u0113':'\u1E17','i':'\u00ED','o':'\u00F3','\u014D':'\u1E53','y':'\u00FD','u':'\u00FA'};
+function translitGreek(s){
+  const out=[];
+  for(const word of String(s).replace(/[\u2E00-\u2E0F]/g,'').normalize('NFD').split(/(\s+)/)){
+    if(/^\s+$/.test(word)){out.push(word);continue}
+    const L=[];/* letters with marks */
+    for(const ch of word){if(/[\u0300-\u036F]/.test(ch)){if(L.length)L[L.length-1].m+=ch}else L.push({c:ch,m:''})}
+    let w='',rough=false,stressAt=-1;const parts=[];
+    for(let i=0;i<L.length;i++){
+      const {c,m}=L[i],lo=c.toLowerCase(),up=c!==lo;
+      if(!GR[lo]){parts.push({t:c===';'?'?':c==='\u00B7'?';':c,v:false});continue}
+      let t=GR[lo];const nx=L[i+1]&&L[i+1].c.toLowerCase();
+      if(lo==='\u03B3'&&['\u03B3','\u03BA','\u03BE','\u03C7'].includes(nx))t='n';
+      /* diphthongs: the second vowel carries breathing/accent */
+      if(['\u03B1','\u03B5','\u03BF','\u03B7'].includes(lo)&&nx==='\u03C5'&&!/\u0308/.test(L[i+1].m)){t=(lo==='\u03BF'?'ou':GR[lo]+'u');const mm=m+L[i+1].m;i++;parts.push({t,v:true,m:mm,up});continue}
+      if(['\u03B1','\u03B5','\u03BF','\u03C5'].includes(lo)&&nx==='\u03B9'&&!/\u0308/.test(L[i+1].m)){t=(lo==='\u03C5'?'ui':GR[lo]+'i');const mm=m+L[i+1].m;i++;parts.push({t,v:true,m:mm,up});continue}
+      if(lo==='\u03C1'&&/\u0314/.test(m)){t='rh'}
+      parts.push({t,v:'\u03B1\u03B5\u03B7\u03B9\u03BF\u03C5\u03C9'.includes(lo),m,up});
+    }
+    parts.forEach((p,k)=>{
+      let t=p.t;
+      if(p.v&&p.m&&/[\u0300\u0301\u0342]/.test(p.m)){const a=[...t];let j=-1;a.forEach((x,q)=>{if(ACC1[x])j=q});if(j>=0){a[j]=ACC1[a[j]];t=a.join('')}}
+      if(p.v&&p.m&&/\u0314/.test(p.m))rough=true;
+      if(p.up)t=t[0].toUpperCase()+t.slice(1);
+      w+=t;
+    });
+    const lets=L.filter(x=>GR[x.c.toLowerCase()]);if(lets.length>1&&lets.every(x=>x.c!==x.c.toLowerCase()))w=w.toLowerCase();
+    if(rough)w=(/^[A-Z\u0112\u014C\u00C1\u00C9\u1E16\u00CD\u00D3\u1E52\u00DD\u00DA]/.test(w)?'H'+w[0].toLowerCase():'h'+w[0])+w.slice(1);
+    if(lets.length>1&&lets.every(x=>x.c!==x.c.toLowerCase()))w=w[0].toUpperCase()+w.slice(1);
+    out.push(w);
+  }
+  return out.join('').normalize('NFC');
+}
+/* Hebrew: simple reading guide from the vowel points (Sephardic/modern sounds) */
+function translitHebrew(s){
+  s=String(s).replace(/[\u0591-\u05AF\u05BD\u05C0\u05C3\u05C6]/g,'').replace(/\u05BE/g,'-').replace(/\u05C3/g,'.').replace(/[|\u034F]/g,'').replace(/(^|\s)([\u05D0-\u05EA][\u05B0-\u05C7]*)\s+(?=[\u05D0-\u05EA])/g,'$1$2');
+  const C={'\u05D0':'','\u05D1':'v','\u05D2':'g','\u05D3':'d','\u05D4':'h','\u05D5':'v','\u05D6':'z','\u05D7':'ch','\u05D8':'t','\u05D9':'y','\u05DB':'kh','\u05DA':'kh','\u05DC':'l','\u05DE':'m','\u05DD':'m','\u05E0':'n','\u05DF':'n','\u05E1':'s','\u05E2':'','\u05E4':'f','\u05E3':'f','\u05E6':'ts','\u05E5':'ts','\u05E7':'k','\u05E8':'r','\u05E9':'sh','\u05EA':'t'};
+  const V={'\u05B0':'e','\u05B1':'e','\u05B2':'a','\u05B3':'o','\u05B4':'i','\u05B5':'e','\u05B6':'e','\u05B7':'a','\u05B8':'a','\u05B9':'o','\u05BA':'o','\u05BB':'u','\u05C7':'o'};
+  return s.split(/(\s+|-)/).map(word=>{
+    if(!/[\u05D0-\u05EA]/.test(word))return word;
+    const bare=word.replace(/[^\u05D0-\u05EA]/g,'');
+    if(/^[\u05D5\u05D1\u05DC\u05DB\u05DE\u05E9\u05D4]?\u05D9\u05D4\u05D5\u05D4$/.test(bare)){const pre=bare.length>4?translitHebrew(word.replace(/\u05D9\u05B0?\u05D4\u05B9?\u05D5\u05B8?\u05B4?\u05D4.*$/,'').trim()):'';return pre+'Yahweh'}
+    if(bare==='\u05DB\u05DC'&&!/\u05B9/.test(word))return 'kol';
+    const G=[];for(const ch of word){if(/[\u05D0-\u05EA]/.test(ch))G.push({c:ch,m:''});else if(G.length&&/[\u05B0-\u05C7]/.test(ch))G[G.length-1].m+=ch;else G.push({c:ch,m:'',x:true})}
+    let o='';
+    G.forEach((g,i)=>{
+      if(g.x){o+=g.c;return}
+      const dag=g.m.includes('\u05BC'),shin=g.m.includes('\u05C1'),sin=g.m.includes('\u05C2'),last=i===G.length-1||G.slice(i+1).every(q=>q.x);
+      let c=C[g.c];
+      if(dag&&g.c==='\u05D1')c='b';if(dag&&(g.c==='\u05DB'||g.c==='\u05DA'))c='k';if(dag&&(g.c==='\u05E4'||g.c==='\u05E3'))c='p';
+      if(g.c==='\u05E9')c=sin?'s':'sh';
+      if(g.c==='\u05D5'){if(g.m.includes('\u05B9')&&!/[\u05B0-\u05BB]/.test(g.m.replace('\u05B9',''))){o+='o';return}
+        if(dag&&!/[\u05B0-\u05BB]/.test(g.m)){o+='u';return}}
+      if(g.c==='\u05D9'&&!/[\u05B0-\u05BB\u05BC]/.test(g.m)&&i>0&&/[\u05B4\u05B5\u05B6]/.test(G[i-1].m)){return}
+      if(g.c==='\u05D4'&&last&&!dag&&!/[\u05B0-\u05BB]/.test(g.m)){return}
+      let v='';for(const ch of g.m)if(V[ch]){v=V[ch];break}
+      if(g.m.includes('\u05B0')){const first=i===0||(i===1&&G[0].x);const prevShva=i>0&&G[i-1].m.includes('\u05B0');v=(first||prevShva||dag)&&!last?'e':''}
+      if((g.c==='\u05D0'||g.c==='\u05E2')&&i>0&&v&&!G[i-1].x)c="'";
+      if(g.c==='\u05D7'&&last&&g.m.includes('\u05B7'))o+='a'+c;else o+=c+v;
+    });
+    return o.replace(/^-/,'');
+  }).join('').replace(/\s{2,}/g,' ').trim();
+}
+function translitFor(lang,txt){return lang==='grc'?translitGreek(txt):lang==='he'&&/[\u05B0-\u05BB]/.test(txt)?translitHebrew(txt):''}
+
+const tlPlain=x=>x.normalize('NFD').replace(/[\u0300-\u036F]/g,'').normalize('NFC');
+/* verse html with pronunciation: mode 'line' adds a guide line, 'word' puts the sound under each word */
+function tlVerse(lang,raw,shown,mode,plain){
+  const can=lang==='grc'||(lang==='he'&&/[\u05B0-\u05BB]/.test(raw));
+  if(!mode||!can||!raw)return esc(shown);
+  const fix=x=>plain?tlPlain(x):x;
+  if(mode==='line')return `${esc(shown)}<span class="btl" dir="ltr" lang="en">${esc(fix(translitFor(lang,raw)))}</span>`;
+  return shown.split(/\s+/).filter(Boolean).map(w=>{const t=fix(translitFor(lang,w));return `<span class="bw"><span class="bwo">${esc(w)}</span><span class="bwt" dir="ltr">${esc(t)||'&nbsp;'}</span></span>`}).join(' ');
+}
+
 async function bibGo(t,b,c,hlv){
   const st=bibS(),body=$('#bibBody');
   if(!bibHas(t))t='kjv';
@@ -4229,9 +4318,9 @@ async function bibGo(t,b,c,hlv){
   const n=Math.max(vs.length,pv?pv.length:0);let h='';
   for(let i=0;i<n;i++){const k=`${b}.${c}.${i+1}`,hl=st.hl[k],a=vs[i]||'',z=pv?(pv[i]||''):null;if(!a&&!z)continue;
     h+=`<div class="bv${hl?' hl-'+hl:''}${st.bm.includes(k)?' bm':''}" data-v="${i+1}">`
-      +`<p class="bvt" dir="${T.dir||'ltr'}" lang="${T.lang||''}"><sup>${i+1}</sup>${esc(strip(a))||'<i class="bmiss">—</i>'}</p>`
-      +(pv?`<p class="bvt par" dir="${P.dir||'ltr'}" lang="${P.lang||''}"><sup>${i+1}</sup>${esc(strip(z))||'<i class="bmiss">—</i>'}</p>`:'')+'</div>'}
-  body.innerHTML=`<h2 class="bibh"><small>${esc(T.name)}${P?` · ${esc(P.name)}`:''}</small>${esc(bName(T,b))} ${c}</h2><div class="bibtext${P?' two':''}">${h||'<p class="bibmsg">This chapter is not in this translation.</p>'}</div>
+      +`<p class="bvt" dir="${T.dir||'ltr'}" lang="${T.lang||''}"><sup>${i+1}</sup>${a?tlVerse(T.lang,a,strip(a),st.tl,st.tlPlain):'<i class="bmiss">—</i>'}</p>`
+      +(pv?`<p class="bvt par" dir="${P.dir||'ltr'}" lang="${P.lang||''}"><sup>${i+1}</sup>${z?tlVerse(P.lang,z,strip(z),st.tl,st.tlPlain):'<i class="bmiss">—</i>'}</p>`:'')+'</div>'}
+  body.innerHTML=`<h2 class="bibh"><small>${esc(T.name)}${P?` · ${esc(P.name)}`:''}</small>${esc(bName(T,b))} ${c}</h2>${st.tl&&[T,P].some(x=>x&&x.lang==='he'&&x.id==='hebmod')?'<p class="bibtlnote">Pronunciation needs vowel points. Use WLC or MAM for the Hebrew guide.</p>':''}<div class="bibtext${P?' two':''}${st.tl==='word'?' words':''}">${h||'<p class="bibmsg">This chapter is not in this translation.</p>'}</div>
     <nav class="bibnav"><button data-d="-1">‹ Previous</button><button data-d="1">Next ›</button></nav>`;
   body.querySelectorAll('.bibnav button').forEach(x=>x.onclick=()=>bibStep(+x.dataset.d));
   body.querySelectorAll('.bv').forEach(x=>x.onclick=e=>bibVerseMenu(x,+x.dataset.v));
@@ -4341,10 +4430,16 @@ function bibMarks(){const st=bibS(),T=BIB.cur;
 }
 function bibText(){const st=bibS();
   const s=bibSheet(`<header><b>Reading</b><button class="bsx" aria-label="Close">×</button></header><div class="bsbody"><div class="szrow"><button data-s="-1" aria-label="Smaller text">A−</button><span>${st.size}px</span><button data-s="1" aria-label="Bigger text">A+</button></div>
-    <button class="trrow${st.accents?' on':''}" data-a="acc"><span class="trab">א</span><span class="trtx"><b>Hebrew cantillation marks</b><small>${st.accents?'Shown':'Hidden'} · vowel points always stay</small></span></button></div>`);
+    <button class="trrow${st.accents?' on':''}" data-a="acc"><span class="trab">א</span><span class="trtx"><b>Hebrew cantillation marks</b><small>${st.accents?'Shown':'Hidden'} · vowel points always stay</small></span></button>
+    <h4 class="bsh4">Pronunciation guide <small>Greek &amp; Hebrew</small></h4>
+    <div class="segrow" data-g="tl">${[['','Off'],['line','Under verse'],['word','Under each word']].map(([v,n])=>`<button data-v="${v}" class="${(st.tl||'')===v?'on':''}">${n}</button>`).join('')}</div>
+    <div class="segrow" data-g="pl">${[[0,'With marks (ē, ó)'],[1,'Plain letters']].map(([v,n])=>`<button data-v="${v}" class="${(+!!st.tlPlain)===v?'on':''}">${n}</button>`).join('')}</div>
+    <p class="bsnote">Greek: classroom (Erasmian) reading, the accent shows the stressed syllable. Hebrew: modern / Sephardic sounds from the vowel points. A reading guide only, not audio.</p></div>`);
   s.querySelector('.bsx').onclick=closeBibSheet;
   s.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{st.size=Math.max(14,Math.min(30,st.size+(+b.dataset.s)*2));save();$('#bible').style.setProperty('--bsz',st.size+'px');s.querySelector('.szrow span').textContent=st.size+'px'});
   s.querySelector('[data-a="acc"]').onclick=()=>{st.accents=!st.accents;save();closeBibSheet();bibGo(st.t,st.b,st.c)};
+  s.querySelectorAll('.segrow button').forEach(b=>b.onclick=()=>{const g=b.parentNode.dataset.g;if(g==='tl')st.tl=b.dataset.v;else st.tlPlain=b.dataset.v==='1';save();
+    b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));const y=$('#bibScroll').scrollTop;bibGo(st.t,st.b,st.c).then(()=>{$('#bibScroll').scrollTop=y})});
 }
 $('#bibHome').onclick=closeBible;$('#bibRefBtn').onclick=bibBooks;$('#bibTrBtn').onclick=()=>bibTrans();$('#bibPar').onclick=()=>bibTrans('par');
 $('#bibFind').onclick=bibSearch;$('#bibMarks').onclick=bibMarks;$('#bibAa').onclick=bibText;$('#bibScrim').onclick=closeBibSheet;
