@@ -1,6 +1,6 @@
 // Builds www/ (what goes inside the APK) from src/app.html.
 // src/app.html is the same file as the design artifact: replace it to ship new features.
-import {readFileSync,writeFileSync,mkdirSync,rmSync,cpSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdirSync,rmSync,cpSync,readdirSync,renameSync} from 'node:fs';
 const pkg=JSON.parse(readFileSync('package.json','utf8'));
 const build=process.env.BUILD_NUMBER||'0';
 const version=`${pkg.version.split('.').slice(0,2).join('.')}.${build}`;
@@ -36,6 +36,8 @@ ${src}
 `;
 rmSync('www',{recursive:true,force:true});mkdirSync('www',{recursive:true});
 cpSync('web','www',{recursive:true});
+// Android's build strips a ".gz" ending from asset names (and unpacks the file), so the Bibles ship as .jgz
+for(const f of readdirSync('www/bibles'))if(f.endsWith('.json.gz'))renameSync(`www/bibles/${f}`,`www/bibles/${f.replace(/\.json\.gz$/,'.jgz')}`);
 writeFileSync('www/index.html',html);
 writeFileSync('www/shell.js',readFileSync('web/shell.js','utf8').replace('__VERSION__',version));
 writeFileSync('www/version.json',JSON.stringify({version,build:+build,built:new Date().toISOString()}));

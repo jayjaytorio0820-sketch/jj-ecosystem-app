@@ -4253,7 +4253,7 @@ function bibLoad(id){
   if(BIB.cache[id])return Promise.resolve(BIB.cache[id]);
   const cat=BIB_CAT.find(x=>x.id===id);
   /* the app ships gzip files; the online preview gets the same bytes as base64 text */
-  const url=window.JJ_APP?`bibles/${id}.json.gz`:`bibles/${id}.gz.txt`;
+  const url=window.JJ_APP?`bibles/${id}.jgz`:`bibles/${id}.gz.txt`;
   const p=cat&&cat.on?fetch(url).then(r=>{if(!r.ok)throw new Error('missing');return window.JJ_APP?r.arrayBuffer():r.text().then(t=>{const bin=atob(t.trim()),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a.buffer})}).then(async buf=>{
       const u=new Uint8Array(buf);let txt;
       if(u[0]===0x1f&&u[1]===0x8b){txt=await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}else txt=new TextDecoder().decode(u);
