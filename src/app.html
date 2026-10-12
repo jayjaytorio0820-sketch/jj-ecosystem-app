@@ -4144,14 +4144,37 @@ const BK_TL={GEN:'Genesis',EXO:'Exodo',LEV:'Levitico',NUM:'Mga Bilang',DEU:'Deut
 const NT_IDS=['MAT','MRK','LUK','JHN','ACT','ROM','1CO','2CO','GAL','EPH','PHP','COL','1TH','2TH','1TI','2TI','TIT','PHM','HEB','JAS','1PE','2PE','1JN','2JN','3JN','JUD','REV'];
 const DC_IDS=['TOB','JDT','ESG','WIS','SIR','BAR','LJE','SUS','BEL','DAG','1MA','2MA','3MA','4MA','1ES','MAN'];
 /* translations: bundled ones are public domain; the rest are under copyright, so you add your own copy */
+const PD='Public domain',BYSA='Free license (CC BY-SA)';
 const BIB_CAT=[
-  {id:'kjv',abbr:'KJV',name:'King James Version (1769)',lang:'English',on:1,note:'Public domain'},
-  {id:'adb1905',abbr:'ADB1905',name:'Ang Dating Biblia (1905)',lang:'Tagalog',on:1,note:'Public domain'},
-  {id:'wlc',abbr:'WLC',name:'Westminster Leningrad Codex',lang:'Hebrew · Old Testament',on:1,note:'Hebrew Masoretic text, from the Leningrad Codex (c. 1008 AD). Public domain.'},
-  {id:'tr',abbr:'TR',name:'Textus Receptus',lang:'Greek · New Testament',on:1,note:'Stephanus 1550 / Scrivener 1894, the Greek text behind the KJV. Public domain.'},
-  {id:'byz',abbr:'BYZ',name:'Byzantine Textform (Robinson–Pierpont)',lang:'Greek · New Testament',on:1,note:'Majority-text Greek New Testament. Public domain.'},
-  {id:'lxx',abbr:'LXX',name:'Septuagint (Greek, Brenton edition 1844)',lang:'Greek · Old Testament',on:1,note:'The Greek Old Testament with the deuterocanonical books. Public domain.'},
-  {id:'lxxen',abbr:'LXX-EN',name:'Brenton English Septuagint',lang:'English',on:1,note:'English translation of the LXX by Sir Lancelot Brenton (1844), updated spelling. Public domain.'},
+  {id:'kjv',abbr:'KJV',name:'King James Version (1769)',lang:'English',g:'en',on:1,note:PD},
+  {id:'asv',abbr:'ASV',name:'American Standard Version (1901)',lang:'English',g:'en',on:1,note:PD},
+  {id:'ylt',abbr:'YLT',name:"Young's Literal Translation (1898)",lang:'English',g:'en',on:1,note:PD+' · very word-for-word'},
+  {id:'darby',abbr:'DARBY',name:'Darby Bible (1889)',lang:'English',g:'en',on:1,note:PD},
+  {id:'drc',abbr:'DRC',name:'Douay-Rheims Bible (Challoner revision)',lang:'English',g:'en',on:1,note:PD+' · Catholic, with deuterocanon'},
+  {id:'webster',abbr:'WEBSTER',name:'Webster Bible (1833)',lang:'English',g:'en',on:1,note:PD},
+  {id:'geneva',abbr:'GENEVA',name:'Geneva Bible (1599)',lang:'English',g:'en',on:1,note:PD},
+  {id:'bbe',abbr:'BBE',name:'Bible in Basic English (1949/1964)',lang:'English',g:'en',on:1,note:PD+' · simple English'},
+  {id:'bsb',abbr:'BSB',name:'Berean Standard Bible',lang:'English',g:'en',on:1,note:'Public domain (CC0) · modern English'},
+  {id:'rotherham',abbr:'ROTH',name:'Rotherham Emphasized Bible (1902)',lang:'English',g:'en',on:1,note:PD},
+  {id:'nheb',abbr:'NHEB',name:'New Heart English Bible',lang:'English',g:'en',on:1,note:PD+' · modern English'},
+  {id:'lxxen',abbr:'LXX-EN',name:'Brenton English Septuagint',lang:'English · Old Testament from the Greek',g:'en',on:1,note:PD+' · Sir Lancelot Brenton, 1844'},
+  {id:'adb1905',abbr:'ADB1905',name:'Ang Dating Biblia (1905)',lang:'Tagalog',g:'tl',on:1,note:PD},
+  {id:'tglulb',abbr:'TGL-ULB',name:'Banal na Bibliya (Tagalog Unlocked Literal Bible)',lang:'Tagalog',g:'tl',on:1,note:BYSA+' · Door43 World Missions Community'},
+  {id:'cebpin',abbr:'CEB',name:'Ang Biblia, Cebuano (Pinadayag)',lang:'Cebuano',g:'tl',on:1,note:PD},
+  {id:'iloulb',abbr:'ILO-ULB',name:'Ilocano Unlocked Literal Bible',lang:'Ilocano',g:'tl',on:1,note:BYSA+' · Door43 World Missions Community'},
+  {id:'wlc',abbr:'WLC',name:'Westminster Leningrad Codex',lang:'Hebrew · Old Testament',g:'he',on:1,note:PD+' · Masoretic text of the Leningrad Codex (c. 1008 AD)'},
+  {id:'mam',abbr:'MAM',name:'Miqra according to the Masorah',lang:'Hebrew · Old Testament',g:'he',on:1,note:BYSA+' · based on the Aleppo Codex (c. 930 AD)'},
+  {id:'hebmod',abbr:'HEB',name:'Hebrew Bible with New Testament',lang:'Hebrew · Old and New Testament, no vowel points',g:'he',on:1,note:PD},
+  {id:'tr',abbr:'TR',name:'Textus Receptus (Stephanus 1550 / Scrivener 1894)',lang:'Greek · New Testament',g:'grc',on:1,note:PD+' · the Greek text behind the KJV'},
+  {id:'byz',abbr:'BYZ',name:'Byzantine Textform (Robinson–Pierpont)',lang:'Greek · New Testament',g:'grc',on:1,note:PD},
+  {id:'grcmt',abbr:'MT',name:'Majority Text (no accents)',lang:'Greek · New Testament',g:'grc',on:1,note:PD},
+  {id:'nestle1904',abbr:'NA1904',name:'Nestle 1904',lang:'Greek · New Testament',g:'grc',on:1,note:PD+' · Eberhard Nestle'},
+  {id:'tisch',abbr:'TISCH',name:'Tischendorf 8th edition (1869–72)',lang:'Greek · New Testament',g:'grc',on:1,note:PD+' · relies heavily on Codex Sinaiticus'},
+  {id:'sblgnt',abbr:'SBLGNT',name:'SBL Greek New Testament (2010)',lang:'Greek · New Testament',g:'grc',on:1,note:'Free license · Society of Biblical Literature and Logos Bible Software'},
+  {id:'grcsr',abbr:'SR',name:'Statistical Restoration',lang:'Greek · New Testament',g:'grc',on:1,note:PD+' · Center for New Testament Restoration'},
+  {id:'tcgnt',abbr:'TCGNT',name:'Text-Critical Greek New Testament',lang:'Greek · New Testament',g:'grc',on:1,note:PD},
+  {id:'lxx',abbr:'LXX',name:'Septuagint (Brenton edition, 1844)',lang:'Greek · Old Testament',g:'lxx',on:1,note:PD+' · lines up verse by verse with Brenton English'},
+  {id:'swete',abbr:'SWETE',name:'Septuagint (Swete edition, 1909–1930)',lang:'Greek · Old Testament',g:'lxx',on:1,note:'Swete text public domain · digital edition CC BY-SA'},
   {id:'fsv',abbr:'FSV',name:'Ang Bagong Tipan: Filipino Standard Version',lang:'Tagalog'},
   {id:'abtag1978',abbr:'ABTAG1978',name:'Ang Biblia (1978)',lang:'Tagalog'},
   {id:'abtag2001',abbr:'ABTAG2001',name:'Ang Biblia, 2001',lang:'Tagalog'},
@@ -4163,6 +4186,9 @@ const BIB_CAT=[
   {id:'isv',abbr:'ISV',name:'International Standard Version',lang:'English'},
   {id:'nkjv',abbr:'NKJV',name:'New King James Version',lang:'English'},
   {id:'lamsa',abbr:'LAMSA',name:'Lamsa Bible (from the Aramaic Peshitta)',lang:'English'}];
+const BIB_GROUPS=[['en','English'],['tl','Tagalog and other Philippine languages'],['he','Hebrew'],['grc','Greek New Testament'],['lxx','Greek Old Testament (Septuagint)']];
+/* the English or Tagalog text that best fits an original-language text */
+const bibPartner=(id,lang)=>id==='lxx'||id==='swete'?(lang==='tl'?'adb1905':'lxxen'):(lang==='tl'?'adb1905':'kjv');
 const BIB={cache:{},cur:null,par:null,open:false};
 const bibS=()=>S.bible||(S.bible={t:'kjv',b:'JHN',c:1,par:null,size:18,hl:{},bm:[],accents:true});
 const bName=(t,id)=>(t&&t.lang==='tl'?BK_TL[id]:0)||BK_EN[id]||id;
@@ -4172,7 +4198,12 @@ const bidb=(mode,fn)=>BIDB().then(d=>new Promise((ok,no)=>{const tx=d.transactio
 function bibLoad(id){
   if(BIB.cache[id])return Promise.resolve(BIB.cache[id]);
   const cat=BIB_CAT.find(x=>x.id===id);
-  const p=cat&&cat.on?fetch(`bibles/${id}.json`).then(r=>{if(!r.ok)throw new Error('missing');return r.json()}):bidb('readonly',s=>s.get(id)).then(d=>{if(!d)throw new Error('missing');return d});
+  /* the app ships gzip files; the online preview gets the same bytes as base64 text */
+  const url=window.JJ_APP?`bibles/${id}.json.gz`:`bibles/${id}.gz.txt`;
+  const p=cat&&cat.on?fetch(url).then(r=>{if(!r.ok)throw new Error('missing');return window.JJ_APP?r.arrayBuffer():r.text().then(t=>{const bin=atob(t.trim()),a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return a.buffer})}).then(async buf=>{
+      const u=new Uint8Array(buf);let txt;
+      if(u[0]===0x1f&&u[1]===0x8b){txt=await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).text()}else txt=new TextDecoder().decode(u);
+      return JSON.parse(txt)}):bidb('readonly',s=>s.get(id)).then(d=>{if(!d)throw new Error('missing');return d});
   return p.then(d=>{d.map={};d.books.forEach((b,i)=>d.map[b.id]=i);BIB.cache[id]=d;return d});
 }
 function bibHas(id){const c=BIB_CAT.find(x=>x.id===id);return c&&c.on||(S.bible&&S.bible.imported||[]).includes(id)}
@@ -4226,16 +4257,20 @@ function bibChapters(b){const T=BIB.cur,n=T.books[T.map[b]].c.length;
 }
 function bibTrans(mode){const st=bibS(),imp=st.imported||[];
   const row=c=>{const have=c.on||imp.includes(c.id),cur=mode==='par'?st.par===c.id:st.t===c.id;
-    return `<button class="trrow${cur?' on':''}${have?'':' locked'}" data-t="${c.id}"><span class="trab">${c.abbr}</span><span class="trtx"><b>${esc(c.name)}</b><small>${esc(c.lang)}${have?(c.on?'':' · imported'):' · add your own copy'}</small></span>${cur?'<span class="trok">✓</span>':have?'':'<span class="trlock">＋</span>'}</button>`};
+    return `<button class="trrow${cur?' on':''}${have?'':' locked'}" data-t="${c.id}"><span class="trab">${c.abbr}</span><span class="trtx"><b>${esc(c.name)}</b><small>${esc(c.lang)}${have?(c.on?(c.note?' · '+esc(c.note):''):' · imported'):' · add your own copy'}</small></span>${cur?'<span class="trok">✓</span>':have?'':'<span class="trlock">＋</span>'}</button>`};
   const mine=BIB_CAT.filter(c=>c.on||imp.includes(c.id)),other=BIB_CAT.filter(c=>!c.on&&!imp.includes(c.id));
+  const grouped=BIB_GROUPS.map(([g,l])=>{const xs=mine.filter(c=>c.g===g);return xs.length?`<h4>${l}</h4>${xs.map(row).join('')}`:''}).join('')+(mine.some(c=>!c.g)?`<h4>Imported</h4>${mine.filter(c=>!c.g).map(row).join('')}`:'');
   const s=bibSheet(`<header><b>${mode==='par'?'Show side by side':'Translation'}</b><button class="bsx" aria-label="Close">×</button></header><div class="bsbody">
     ${mode==='par'?`<button class="trrow${!st.par?' on':''}" data-t=""><span class="trab">—</span><span class="trtx"><b>One column only</b><small>Turn off side by side</small></span></button><button class="trrow" data-t="__lxx"><span class="trab">LXX</span><span class="trtx"><b>Septuagint Greek + English</b><small>Opens the LXX with Brenton's English beside it</small></span></button>`:''}
-    <h4>On this device</h4>${mine.map(row).join('')}
+    ${mode==='par'?`<h4>Suggested</h4>${['kjv','adb1905','lxxen','bsb'].filter(x=>x!==st.t).map(x=>row(BIB_CAT.find(c=>c.id===x))).join('')}`:''}
+    ${grouped}
     ${mode==='par'?'':`<h4>Add your own copy</h4><p class="bsnote">These translations are copyrighted, so they can't come inside the app. If you have a copy as a file (JSON or CSV), add it here and it stays on this device only.</p>${other.map(row).join('')}<button class="bsimport" data-imp="">Import another Bible file…</button>`}</div>`,'tall');
   s.querySelector('.bsx').onclick=closeBibSheet;
   s.querySelectorAll('[data-t]').forEach(x=>x.onclick=()=>{const id=x.dataset.t;
     if(mode==='par'){if(id==='__lxx'){st.t='lxx';st.par='lxxen'}else st.par=id||null;save();closeBibSheet();bibGo(st.t,st.b,st.c);return}
-    if(!bibHas(id)){bibImport(id);return}closeBibSheet();bibGo(id,st.b,st.c)});
+    if(!bibHas(id)){bibImport(id);return}
+    const c=BIB_CAT.find(x=>x.id===id);if(c&&['he','grc','lxx'].includes(c.g)&&!st.par){st.par=bibPartner(id,'en');save();toast('Showing English beside it. Tap Parallel to switch to Tagalog or another Bible.')}
+    closeBibSheet();bibGo(id,st.b,st.c)});
   const im=s.querySelector('[data-imp]');if(im)im.onclick=()=>bibImport('');
 }
 /* import a Bible file the user owns: our JSON, scrollmapper-style JSON, or CSV/TSV (book,chapter,verse,text) */
