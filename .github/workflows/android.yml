@@ -1,0 +1,99 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Check signing secret
+        env:
+          JJ_KEYSTORE_PASS: ${{ secrets.JJ_KEYSTORE_PASS }}
+        run: |
+          if [ -z "$JJ_KEYSTORE_PASS" ]; then
+            echo "::error::Add the JJ_KEYSTORE_PASS secret in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+
+      - name: Install
+        run: npm ci
+
+      - name: Build app files
+        run: npm run build:web
+
+      - name: Create Android project
+        run: |
+          npx cap add android
+          npx capacitor-assets generate --android \
+            --iconBackgroundColor '#1F6F5C' --iconBackgroundColorDark '#1F6F5C' \
+            --splashBackgroundColor '#F4F6F3' --splashBackgroundColorDark '#111412'
+          npx cap sync android
+
+      - name: Set version
+        run: |
+          VER="1.0.${BUILD_NUMBER}"
+          sed -i -E "s/versionCode [0-9]+/versionCode ${BUILD_NUMBER}/" android/app/build.gradle
+          sed -i -E "s/versionName \"[^\"]*\"/versionName \"${VER}\"/" android/app/build.gradle
+          grep -E "versionCode|versionName" android/app/build.gradle
+          echo "VER=${VER}" >> "$GITHUB_ENV"
+
+      - name: Unlock signing key
+        env:
+          JJ_KEYSTORE_PASS: ${{ secrets.JJ_KEYSTORE_PASS }}
+        run: openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in keys/release.jks.enc -out android/app/release.jks -pass env:JJ_KEYSTORE_PASS
+
+      - name: Build signed APK
+        env:
+          JJ_KEYSTORE_PASS: ${{ secrets.JJ_KEYSTORE_PASS }}
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file="$PWD/app/release.jks" \
+            -Pandroid.injected.signing.store.password="$JJ_KEYSTORE_PASS" \
+            -Pandroid.injected.signing.key.alias=jjeco \
+            -Pandroid.injected.signing.key.password="$JJ_KEYSTORE_PASS"
+          mkdir -p ../dist
+          cp app/build/outputs/apk/release/app-release.apk "../dist/JJ-Ecosystem-${VER}.apk"
+          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/apksigner verify --print-certs "../dist/JJ-Ecosystem-${VER}.apk" | head -3
+          rm -f app/release.jks
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JJ-Ecosystem-${{ env.VER }}
+          path: dist/*.apk
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VER }}
+          name: JJ Ecosystem ${{ env.VER }}
+          body: |
+            Install on your phone or tablet. If the app is already installed, this updates it and keeps all your notes.
+            Do not uninstall the old version first.
+          files: dist/*.apk
+          make_latest: true
