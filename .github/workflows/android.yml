@@ -53,6 +53,8 @@ jobs:
           package com.jayjay.jjecosystem;
 
           import android.view.View;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
           import com.getcapacitor.BridgeActivity;
 
           public class MainActivity extends BridgeActivity {
@@ -60,7 +62,14 @@ jobs:
             public void onStart() {
               super.onStart();
               if (getBridge() != null && getBridge().getWebView() != null) {
-                getBridge().getWebView().setOverScrollMode(View.OVER_SCROLL_NEVER);
+                WebView wv = getBridge().getWebView();
+                wv.setOverScrollMode(View.OVER_SCROLL_NEVER);
+                // no pinch / double-tap zoom, and ignore the phone's font-size setting so the layout stays put
+                WebSettings ws = wv.getSettings();
+                ws.setSupportZoom(false);
+                ws.setBuiltInZoomControls(false);
+                ws.setDisplayZoomControls(false);
+                ws.setTextZoom(100);
               }
             }
           }
