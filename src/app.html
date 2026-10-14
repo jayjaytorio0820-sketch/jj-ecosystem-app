@@ -341,7 +341,11 @@ body.lockshow .main .fab{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
 .dind.v::before{top:-5px;left:50%;transform:translateX(-50%)}.dind.v::after{bottom:-5px;left:50%;transform:translateX(-50%)}
 .blk.dragsrc{opacity:.35}
 body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
-@media (hover:none){.hdl{opacity:0}.blk:focus-within>.gutw .hdl{opacity:.6}}
+@media (hover:none){.hdl{opacity:0}.blk:focus-within>.gutw .hdl{opacity:.6}
+  /* fingers have no hover: the block you tapped shows its + and drag handle, even blocks you can't type in (empty space, divider, widgets, photos) */
+  .blk.act>.gutw .gut,.blk.act>.gutw .hdl{opacity:.75}
+  .blk.t-spacer.act .spacer{border-color:color-mix(in srgb,var(--fg) 18%,transparent);background:color-mix(in srgb,var(--fg) 3%,transparent)}.blk.t-spacer.act .spacer span{opacity:1}
+  .blk.t-spacer .spacer{border-color:color-mix(in srgb,var(--fg) 8%,transparent)}}
 
 /* block picker: floating on desktop, bottom sheet on phone */
 .pscrim{position:fixed;inset:0;z-index:39;background:rgba(0,0,0,.35)}
@@ -3520,8 +3524,11 @@ function renderBlocks(p,w){
     w.appendChild(row);n=0;
   }
 }
+/* touch: remember which block was tapped so its handles show */
+document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const blk=e.target.closest&&e.target.closest('.blk');
+  document.querySelectorAll('.blk.act').forEach(x=>{if(x!==blk)x.classList.remove('act')});if(blk)blk.classList.add('act')},true);
 function startBlockDrag(e,b,p,hd){
-  if(e.button>0)return;
+  if(e.button>0)return;if(e.pointerType!=='mouse'){try{hd.setPointerCapture(e.pointerId)}catch(_){}}
   const sx=e.clientX,sy=e.clientY;let dragging=false,ghost,ind,target=null,zone=null;
   const move=ev=>{
     if(!dragging){if(Math.hypot(ev.clientX-sx,ev.clientY-sy)<7)return;dragging=true;hd.dataset.dragged='1';closePop();closeSlash();
