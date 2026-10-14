@@ -790,6 +790,8 @@ body.splitting .peek{top:62px;bottom:10px}
 @media (max-width:820px){.tpanel#spanel{top:50%;left:50%;right:auto;bottom:auto;max-height:calc(100dvh - 32px);border-radius:18px}}
 
 .sectbtn.first{margin-top:0}
+.blk.act>.gutw .gut,.blk.act>.gutw .hdl{opacity:1}
+.blk.t-spacer.act .spacer{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}.blk.t-spacer.act .spacer span{opacity:1}
 .spacer{min-height:44px;border-radius:10px;display:grid;place-items:center;border:1.5px dashed transparent;transition:border-color .15s,background .15s}
 .spacer span{font-size:12px;color:var(--muted);opacity:0;transition:opacity .15s}
 .blk.t-spacer:hover .spacer,.blk.t-spacer:focus-within .spacer,body.dragging .spacer{border-color:color-mix(in srgb,var(--fg) 18%,transparent);background:color-mix(in srgb,var(--fg) 3%,transparent)}
@@ -3525,7 +3527,7 @@ function renderBlocks(p,w){
   }
 }
 /* touch: remember which block was tapped so its handles show */
-document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const blk=e.target.closest&&e.target.closest('.blk');
+document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#pop,#dmenu,#slash,.gadj-scrim,#cdlg'))return;const blk=e.target.closest&&e.target.closest('.blk');
   document.querySelectorAll('.blk.act').forEach(x=>{if(x!==blk)x.classList.remove('act')});if(blk)blk.classList.add('act')},true);
 function startBlockDrag(e,b,p,hd){
   if(e.button>0)return;if(e.pointerType!=='mouse'){try{hd.setPointerCapture(e.pointerId)}catch(_){}}
