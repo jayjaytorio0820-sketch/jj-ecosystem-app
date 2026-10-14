@@ -1011,7 +1011,8 @@ body.splitting .peek{top:62px;bottom:10px}
 @media (hover:none){.wadd{opacity:.8}}
 .wgal .whead .wgear{margin-left:2px}
 .wtimer{margin-left:8px;font-size:11.5px;color:var(--muted);background:var(--chip);border-radius:999px;padding:2px 8px}
-.gcar{position:relative;border-radius:12px;overflow:hidden;background:#0b0b0c;aspect-ratio:16/10}
+.gcar{position:relative;border-radius:12px;overflow:hidden;background:#0b0b0c;aspect-ratio:16/10;min-height:0}
+.gtrack,.gsl{min-height:0}.gsl img,.gimg img{min-height:0;min-width:0}.gone .gimg,.ggrid .gimg{min-height:0}
 .wname{cursor:text;border-radius:5px;padding:1px 4px;margin-left:-4px;outline:none}
 @media (hover:hover){.wname:hover{background:var(--hover)}}
 .wname.named{text-transform:none;letter-spacing:0;font-size:13.5px;font-weight:600;color:var(--fg)}
@@ -3622,7 +3623,7 @@ function readImages(files,done){const out=[];let left=files.length;if(!left)retu
 function pickImages(cb){const i=document.createElement('input');i.type='file';i.accept='image/*';i.multiple=true;i.onchange=()=>readImages(i.files,cb);i.click()}
 /* per-photo framing: fit = whole photo, fill = cover the window (drag to move, zoom) */
 const gFit=(b,k)=>{b.fit=b.fit||[];return b.fit[k]||{m:'fit',x:50,y:50,z:1}};
-const gImgStyle=f=>`object-fit:${f.m==='fill'?'cover':'contain'};object-position:${f.x}% ${f.y}%;${f.m==='fill'&&f.z>1?`transform:scale(${f.z});transform-origin:${f.x}% ${f.y}%;`:''}`;
+const gImgStyle=f=>f.m!=='fill'?'object-fit:contain;object-position:50% 50%;':`object-fit:cover;object-position:${f.x}% ${f.y}%;${f.m==='fill'&&f.z>1?`transform:scale(${f.z});transform-origin:${f.x}% ${f.y}%;`:''}`;
 const gAspect=b=>b.layout==='grid'?'1 / 1':'16 / 10';
 const G_DEF=()=>({m:'fill',x:50,y:50,z:1});
 function openPhotoAdjust(o,onOk){
@@ -3650,7 +3651,7 @@ function openPhotoAdjust(o,onOk){
     thumbs()};
   const move=to=>{to=Math.max(0,Math.min(n-1,to));if(to===k)return;for(const A of [srcs,fits,ord]){const [x]=A.splice(k,1);A.splice(to,0,x)}k=to;draw()};
   ov.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{const d=b.dataset.o;move(d==='first'?0:d==='last'?n-1:k+(+d))});
-  ov.querySelectorAll('.gadj-mode button').forEach(b=>b.onclick=()=>{fits[k].m=b.dataset.m;draw()});
+  ov.querySelectorAll('.gadj-mode button').forEach(b=>b.onclick=()=>{const f=fits[k];f.m=b.dataset.m;if(f.m==='fit'){f.x=50;f.y=50;f.z=1}draw()});
   zm.oninput=()=>{fits[k].z=+zm.value;im.style.cssText=gImgStyle(fits[k])};
   ov.querySelector('.gadj-reset').onclick=()=>{fits[k]=G_DEF();draw()};
   const ra=ov.querySelector('.gadj-rall');if(ra)ra.onclick=()=>{fits.forEach((_,i)=>fits[i]=G_DEF());draw();toast('All photos reset.')};
