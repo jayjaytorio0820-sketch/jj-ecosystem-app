@@ -997,7 +997,13 @@ body.splitting .peek{top:62px;bottom:10px}
 .gadj-thumbs{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:2px}
 .gadj-thumbs button{flex:none;width:56px;height:40px;border-radius:7px;overflow:hidden;border:2px solid transparent;padding:0;opacity:.7}
 .gadj-thumbs button.on{border-color:var(--accent);opacity:1}.gadj-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
-.gadj-all{margin-top:8px}
+.gadj-all{margin-top:0}
+.gadj-reset{margin-left:auto}
+.gadj-order{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:12px}.gadj-pos{flex:1;text-align:center;font-size:13px;color:var(--muted);min-width:90px}
+.gadj-order button:disabled{opacity:.35}
+.gadj-thumbs button{position:relative}.gadj-thumbs i{position:absolute;left:3px;bottom:2px;font-style:normal;font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000}
+.gadj-row2{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
 .gadj-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
 
 .wadd{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--muted);margin-left:auto;opacity:0;transition:opacity .15s}
@@ -3618,44 +3624,60 @@ function pickImages(cb){const i=document.createElement('input');i.type='file';i.
 const gFit=(b,k)=>{b.fit=b.fit||[];return b.fit[k]||{m:'fit',x:50,y:50,z:1}};
 const gImgStyle=f=>`object-fit:${f.m==='fill'?'cover':'contain'};object-position:${f.x}% ${f.y}%;${f.m==='fill'&&f.z>1?`transform:scale(${f.z});transform-origin:${f.x}% ${f.y}%;`:''}`;
 const gAspect=b=>b.layout==='grid'?'1 / 1':'16 / 10';
+const G_DEF=()=>({m:'fill',x:50,y:50,z:1});
 function openPhotoAdjust(o,onOk){
-  const fits=o.fits.map(f=>({...f}));let k=o.start||0;
+  /* work on copies; with o.reorder the photos can also be put in a new order */
+  const srcs=o.srcs.slice(),fits=o.fits.map(f=>({...f})),ord=o.srcs.map((_,i)=>i);let k=o.start||0;const n=srcs.length;
   const ov=document.createElement('div');ov.className='gadj-scrim';
-  ov.innerHTML=`<div class="gadj" role="dialog" aria-label="${esc(o.title)}"><h3>${esc(o.title)}</h3><p class="gadj-sub">This is how the photo will look in the gallery window.</p>
+  ov.innerHTML=`<div class="gadj" role="dialog" aria-label="${esc(o.title)}"><h3>${esc(o.title)}</h3><p class="gadj-sub">This is exactly how the photo will sit in the gallery window. Once you approve, it stays this way.</p>
     <div class="gadj-frame" style="aspect-ratio:${o.aspect}"><img alt="" draggable="false"></div>
-    <div class="gadj-ctl"><div class="seg gadj-mode"><button data-m="fit">Fit whole photo</button><button data-m="fill">Fill the window</button></div>
-      <label class="gadj-zoom"><span>Zoom</span><input type="range" min="1" max="3" step="0.05"></label></div>
+    <div class="gadj-ctl"><div class="seg gadj-mode"><button data-m="fill">Fill the window</button><button data-m="fit">Show whole photo</button></div>
+      <label class="gadj-zoom"><span>Zoom</span><input type="range" min="1" max="4" step="0.05"></label><button class="btn sec sm gadj-reset" title="Put this photo back to the centre, no zoom">Reset</button></div>
     <p class="gadj-hint"></p>
-    ${o.srcs.length>1?`<div class="gadj-thumbs">${o.srcs.map((x,i)=>`<button data-i="${i}"><img alt="" src="${x}"></button>`).join('')}</div><button class="btn sec sm gadj-all">Use this for all ${o.srcs.length} photos</button>`:''}
+    ${n>1?`<div class="gadj-order"><button class="btn sec sm" data-o="first">\u23EE First</button><button class="btn sec sm" data-o="-1">\u25C0 Earlier</button><span class="gadj-pos"></span><button class="btn sec sm" data-o="1">Later \u25B6</button><button class="btn sec sm" data-o="last">Last \u23ED</button></div><div class="gadj-thumbs"></div>
+      <div class="gadj-row2"><button class="btn sec sm gadj-all">Use this setup for all ${n} photos</button><button class="btn sec sm gadj-rall">Reset all photos</button></div>`:''}
     <div class="gadj-foot"><button class="btn sec" data-a="cancel">Cancel</button><button class="btn pri" data-a="ok">${esc(o.okLabel)}</button></div></div>`;
   document.body.appendChild(ov);
-  const fr=ov.querySelector('.gadj-frame'),im=fr.querySelector('img'),zm=ov.querySelector('.gadj-zoom input'),hint=ov.querySelector('.gadj-hint');
-  const draw=()=>{const f=fits[k];im.src=o.srcs[k];im.style.cssText=gImgStyle(f);
+  const fr=ov.querySelector('.gadj-frame'),im=fr.querySelector('img'),zm=ov.querySelector('.gadj-zoom input'),hint=ov.querySelector('.gadj-hint'),th=ov.querySelector('.gadj-thumbs');
+  const thumbs=()=>{if(!th)return;th.innerHTML=srcs.map((x,i)=>`<button data-i="${i}" class="${i===k?'on':''}" aria-label="Photo ${i+1}"><img alt="" src="${x}"><i>${i+1}</i></button>`).join('');
+    th.querySelectorAll('button').forEach(b=>b.onclick=()=>{k=+b.dataset.i;draw()});const on=th.querySelector('.on');if(on)on.scrollIntoView({block:'nearest',inline:'nearest'})};
+  const draw=()=>{const f=fits[k];im.src=srcs[k];im.style.cssText=gImgStyle(f);
     ov.querySelectorAll('.gadj-mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===f.m));
     ov.querySelector('.gadj-zoom').hidden=f.m!=='fill';zm.value=f.z||1;fr.classList.toggle('movable',f.m==='fill');
-    hint.textContent=f.m==='fill'?'Drag the photo to choose which part shows. Use Zoom to go closer.':'The whole photo shows. Empty space is filled with a dark background.';
-    ov.querySelectorAll('.gadj-thumbs button').forEach(b=>b.classList.toggle('on',+b.dataset.i===k))};
+    hint.textContent=f.m==='fill'?'Drag the photo to move it. Zoom (or pinch / mouse wheel) to go closer.':'The whole photo shows, with dark space around it.';
+    const pos=ov.querySelector('.gadj-pos');if(pos)pos.textContent=`Photo ${k+1} of ${n}`;
+    ov.querySelectorAll('[data-o]').forEach(b=>{const d=b.dataset.o;b.disabled=(d==='-1'||d==='first')?k===0:k===n-1});
+    thumbs()};
+  const move=to=>{to=Math.max(0,Math.min(n-1,to));if(to===k)return;for(const A of [srcs,fits,ord]){const [x]=A.splice(k,1);A.splice(to,0,x)}k=to;draw()};
+  ov.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{const d=b.dataset.o;move(d==='first'?0:d==='last'?n-1:k+(+d))});
   ov.querySelectorAll('.gadj-mode button').forEach(b=>b.onclick=()=>{fits[k].m=b.dataset.m;draw()});
   zm.oninput=()=>{fits[k].z=+zm.value;im.style.cssText=gImgStyle(fits[k])};
-  ov.querySelectorAll('.gadj-thumbs button').forEach(b=>b.onclick=()=>{k=+b.dataset.i;draw()});
-  const all=ov.querySelector('.gadj-all');if(all)all.onclick=()=>{const f=fits[k];fits.forEach((x,i)=>{if(i!==k){x.m=f.m;x.z=f.z;if(f.m==='fit'){x.x=50;x.y=50}}});toast('Applied to all photos.')};
-  fr.addEventListener('pointerdown',e=>{const f=fits[k];if(f.m!=='fill')return;e.preventDefault();fr.setPointerCapture(e.pointerId);
-    const sx=e.clientX,sy=e.clientY,x0=f.x,y0=f.y,R=fr.getBoundingClientRect(),nw=im.naturalWidth||1,nh=im.naturalHeight||1;
-    const sc=Math.max(R.width/nw,R.height/nh)*(f.z||1),ox=Math.max(1,nw*sc-R.width),oy=Math.max(1,nh*sc-R.height);
-    const mv=ev=>{f.x=Math.max(0,Math.min(100,x0-(ev.clientX-sx)/ox*100));f.y=Math.max(0,Math.min(100,y0-(ev.clientY-sy)/oy*100));im.style.cssText=gImgStyle(f)};
-    const up=()=>{fr.removeEventListener('pointermove',mv);fr.removeEventListener('pointerup',up);fr.removeEventListener('pointercancel',up)};
-    fr.addEventListener('pointermove',mv);fr.addEventListener('pointerup',up);fr.addEventListener('pointercancel',up)});
+  ov.querySelector('.gadj-reset').onclick=()=>{fits[k]=G_DEF();draw()};
+  const ra=ov.querySelector('.gadj-rall');if(ra)ra.onclick=()=>{fits.forEach((_,i)=>fits[i]=G_DEF());draw();toast('All photos reset.')};
+  const all=ov.querySelector('.gadj-all');if(all)all.onclick=()=>{const f=fits[k];fits.forEach((x,i)=>{if(i!==k){x.m=f.m;x.z=f.z;x.x=f.x;x.y=f.y}});toast('Applied to all photos.')};
+  /* drag to move; two fingers to zoom */
+  const pts=new Map();let st=null;
+  const startState=()=>{const f=fits[k],R=fr.getBoundingClientRect(),nw=im.naturalWidth||1,nh=im.naturalHeight||1;return {f,R,nw,nh,x0:f.x,y0:f.y,z0:f.z||1}};
+  fr.addEventListener('pointerdown',e=>{const f=fits[k];if(f.m!=='fill')return;e.preventDefault();fr.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    st={...startState(),sx:e.clientX,sy:e.clientY,d0:pts.size===2?Math.hypot(...(([a,b])=>[a.x-b.x,a.y-b.y])([...pts.values()])):0}});
+  fr.addEventListener('pointermove',e=>{if(!st||!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});const f=st.f;
+    if(pts.size===2){const [a,b]=[...pts.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(!st.d0){st.d0=d;st.z0=f.z||1}f.z=Math.max(1,Math.min(4,st.z0*d/st.d0));zm.value=f.z;im.style.cssText=gImgStyle(f);return}
+    const sc=Math.max(st.R.width/st.nw,st.R.height/st.nh)*(f.z||1),ox=Math.max(1,st.nw*sc-st.R.width),oy=Math.max(1,st.nh*sc-st.R.height);
+    f.x=Math.max(0,Math.min(100,st.x0-(e.clientX-st.sx)/ox*100*(f.z||1)/(f.z||1)));f.y=Math.max(0,Math.min(100,st.y0-(e.clientY-st.sy)/oy*100));im.style.cssText=gImgStyle(f)});
+  const up=e=>{pts.delete(e.pointerId);if(pts.size===1){const [p]=[...pts.values()];st={...startState(),sx:p.x,sy:p.y,d0:0}}else if(!pts.size)st=null};
+  fr.addEventListener('pointerup',up);fr.addEventListener('pointercancel',up);
+  fr.addEventListener('wheel',e=>{const f=fits[k];if(f.m!=='fill')return;e.preventDefault();f.z=Math.max(1,Math.min(4,(f.z||1)*(e.deltaY<0?1.08:1/1.08)));zm.value=f.z;im.style.cssText=gImgStyle(f)},{passive:false});
   const close=()=>{ov.remove();removeEventListener('keydown',key,true)};
   const key=e=>{if(e.key==='Escape'){e.stopPropagation();close()}};addEventListener('keydown',key,true);
   ov.onclick=e=>{if(e.target===ov)close()};
   ov.querySelector('[data-a="cancel"]').onclick=close;
-  ov.querySelector('[data-a="ok"]').onclick=()=>{close();onOk(fits)};
+  ov.querySelector('[data-a="ok"]').onclick=()=>{close();onOk(fits,ord,k)};
   draw();
 }
 function wGallery(b,c){
   /* galleries default to the swipe carousel; the grid is only used when picked on purpose */
   if(b.layout==='grid'&&!b.gridSet)b.layout='slide';
-  const w=wShell('wgal','Gallery'),body=w.querySelector('.wbody'),shp=b.shape!=='fixed';b.ar=b.ar||[];
+  const w=wShell('wgal','Gallery'),body=w.querySelector('.wbody'),shp=b.shape==='photo';b.ar=b.ar||[];
   /* the name: tap it to rename */
   const lab=w.querySelector('.wlabel');lab.textContent=b.title||'Gallery';lab.classList.add('wname');lab.classList.toggle('named',!!b.title);lab.title='Tap to rename';lab.tabIndex=0;
   if(b.imgs.length){const cn=document.createElement('span');cn.className='wcount';cn.textContent=b.imgs.length;lab.after(cn)}
@@ -3670,9 +3692,9 @@ function wGallery(b,c){
     if(shp){let left=imgs.length;const rs=[];imgs.forEach((src,j)=>ratioOf(src,r=>{rs[j]=r;if(--left)return;
       const at=b.imgs.length;b.fit=b.fit||[];while(b.fit.length<at)b.fit.push({m:'fit',x:50,y:50,z:1});while(b.ar.length<at)b.ar.push(0);
       b.imgs.push(...imgs);b.fit.push(...imgs.map(()=>({m:'fit',x:50,y:50,z:1})));b.ar.push(...rs);b.idx=at;save();renderPage();toast(`${imgs.length} photo${imgs.length>1?'s':''} added.`)}));return}
-    openPhotoAdjust({srcs:imgs,fits:imgs.map(()=>({m:'fit',x:50,y:50,z:1})),aspect:gAspect(b),title:imgs.length>1?`Add ${imgs.length} photos`:'Add photo',okLabel:imgs.length>1?`Add ${imgs.length} photos`:'Add photo'},fits=>{
+    openPhotoAdjust({srcs:imgs,fits:imgs.map(()=>G_DEF()),aspect:gAspect(b),title:imgs.length>1?`Position ${imgs.length} photos`:'Position photo',okLabel:imgs.length>1?`Approve ${imgs.length} photos`:'Approve photo'},(fits,ord)=>{imgs=ord.map(i=>imgs[i]);
       const at=b.imgs.length;b.fit=b.fit||[];while(b.fit.length<at)b.fit.push({m:'fit',x:50,y:50,z:1});while(b.ar.length<at)b.ar.push(0);b.imgs.push(...imgs);b.fit.push(...fits);b.ar.push(...imgs.map(()=>0));b.idx=at;save();renderPage();toast(`${imgs.length} photo${imgs.length>1?'s':''} added.`)})});
-  const adjust=start=>openPhotoAdjust({srcs:b.imgs,fits:b.imgs.map((_,k)=>gFit(b,k)),aspect:gAspect(b),title:'Adjust photos',okLabel:'Save',start},fits=>{b.fit=fits;save();renderPage();toast('Photos updated.',{label:'Undo',fn:undo})});
+  const adjust=start=>openPhotoAdjust({srcs:b.imgs,fits:b.imgs.map((_,k)=>gFit(b,k)),aspect:gAspect(b),title:'Position and order',okLabel:'Save',start,reorder:true},(fits,ord,k)=>{const ar=b.ar||[];b.imgs=ord.map(i=>b.imgs[i]);b.ar=ord.map(i=>ar[i]||0);b.fit=fits;b.idx=k;save();renderPage();toast('Photos updated.',{label:'Undo',fn:undo})});
   /* + sits in the header, so adding photos never grows the widget downward */
   const ab=document.createElement('button');ab.className='wadd';ab.title='Add photos';ab.setAttribute('aria-label','Add photos');
   ab.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';ab.onclick=add;
@@ -3715,13 +3737,13 @@ function wGallery(b,c){
   w.querySelector('.wgear').onclick=e=>openPop(e.currentTarget,pop=>{
     pop.innerHTML='<div class="lb3">Layout</div>'+optRow('Swipe gallery',b.layout==='slide','data-l="slide"')+optRow('Grid',b.layout==='grid','data-l="grid"')+optRow('Single photo',b.layout==='single','data-l="single"')
       +(b.layout==='slide'?'<div class="lb3">Auto-play</div>'+[0,5,10,15,20].map(v=>optRow(v?`Every ${v} seconds`:'Off',(b.auto||0)===v,`data-t="${v}"`)).join(''):'')
-      +(b.layout!=='grid'?'<div class="lb3">Window shape</div>'+optRow('Match each photo',shp,'data-s="photo"')+optRow('Fixed (wide 16:10)',!shp,'data-s="fixed"'):'')
-      +'<div class="dsep"></div><button class="ditem" data-a="rename"><span>Rename gallery</span></button><button class="ditem" data-a="add"><span>Add photos</span></button>'+(b.imgs.length&&(!shp||b.layout==='grid')?'<button class="ditem" data-a="adjust"><span>Adjust how photos fit</span></button>':'')+(b.imgs.length?'<button class="ditem danger" data-a="clear"><span>Remove all photos</span></button>':'');
+      +(b.layout!=='grid'?'<div class="lb3">Window shape</div>'+optRow('Fixed window (16:10)',!shp,'data-s="fixed"')+optRow('Change with each photo',shp,'data-s="photo"'):'')
+      +'<div class="dsep"></div><button class="ditem" data-a="rename"><span>Rename gallery</span></button><button class="ditem" data-a="add"><span>Add photos</span></button>'+(b.imgs.length&&(!shp||b.layout==='grid')?'<button class="ditem" data-a="adjust"><span>Reposition and reorder photos</span></button>':'')+(b.imgs.length?'<button class="ditem danger" data-a="clear"><span>Remove all photos</span></button>':'');
     pop.querySelectorAll('[data-l]').forEach(x=>x.onclick=()=>{b.layout=x.dataset.l;b.gridSet=b.layout==='grid';save();closePop()});
     pop.querySelectorAll('[data-t]').forEach(x=>x.onclick=()=>{b.auto=+x.dataset.t;save();closePop();toast(b.auto?`Photos change every ${b.auto} seconds.`:'Auto-play is off.')});
     pop.querySelector('[data-a="add"]').onclick=()=>{POPCLOSE=null;closePop();add()};
     pop.querySelector('[data-a="rename"]').onclick=()=>{POPCLOSE=null;closePop();const el=document.querySelector(`[data-bid="${b.id}"] .wgal .wname`);if(el)el.click()};
-    pop.querySelectorAll('[data-s]').forEach(x=>x.onclick=()=>{if(x.dataset.s==='fixed')b.shape='fixed';else delete b.shape;save();closePop()});
+    pop.querySelectorAll('[data-s]').forEach(x=>x.onclick=()=>{if(x.dataset.s==='photo')b.shape='photo';else delete b.shape;save();closePop()});
     const ad=pop.querySelector('[data-a="adjust"]');if(ad)ad.onclick=()=>{POPCLOSE=null;closePop();adjust(b.idx||0)};
     const cl=pop.querySelector('[data-a="clear"]');if(cl)cl.onclick=()=>{b.imgs=[];b.fit=[];b.ar=[];save();closePop();toast('Photos removed.',{label:'Undo',fn:undo})};
   },renderPage);
