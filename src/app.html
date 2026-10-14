@@ -1719,7 +1719,17 @@ let saveT;
 function persist(){if(window.JJ_APP){JJ_APP.persist(S);return}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function stampText(t){const d=new Date(t),n=new Date(),tm=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});if(d.toDateString()===n.toDateString())return `Updated today, ${tm}`;const y=new Date(n);y.setDate(n.getDate()-1);if(d.toDateString()===y.toDateString())return `Updated yesterday, ${tm}`;return 'Updated '+d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+', '+tm}
 function updStamp(){const el=document.getElementById('stamp');if(el){el.textContent=stampText(S.updatedAt||Date.now());el.title=new Date(S.updatedAt||Date.now()).toLocaleString('en-US')}}
-function save(){S.updatedAt=Date.now();updStamp();clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;record();persist()},300)}
+function save(){S.updatedAt=Date.now();updStamp();clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;record();persist()},300);liveDB()}
+/* live database: widgets and linked views redraw by themselves when the data they show changes */
+let liveT=null,liveBusy=false;
+const dbSig=db=>{if(!db)return '';try{return JSON.stringify([db.props,db.titleAt||0,db.name,db.rows.map(id=>{const r=pg(id);return r?[r.id,r.title,r.icon,r.deleted?1:0,r.props,r.cover?1:0]:0})])}catch(e){return String(Math.random())}};
+function liveDB(){if(liveBusy)return;clearTimeout(liveT);liveT=setTimeout(()=>{liveBusy=true;try{
+  const ae=document.activeElement,cache={};
+  document.querySelectorAll('.gdb,.wdbv').forEach(el=>{const L=el._live;if(!L||!el.isConnected)return;
+    if(ae&&ae!==document.body&&el.contains(ae))return;            /* never redraw the one you are typing in */
+    const sig=cache[L.dbid]??(cache[L.dbid]=dbSig(S.dbs[L.dbid]));if(el._sig===sig)return;el._sig=sig;
+    const y=el.querySelector('.tl-sc')?.scrollLeft;try{L.rer()}catch(e){}const t=el.querySelector('.tl-sc');if(t&&y!=null)t.scrollLeft=y})
+}finally{liveBusy=false}},350)}
 const pg=id=>S.pages.find(p=>p.id===id);
 const kids=id=>S.pages.filter(p=>p.parent===id&&!p.deleted&&!p.rowOf);
 function cur(){const c=pg(S.current);return c&&!c.deleted?c:(S.pages.find(x=>!x.deleted)||S.pages[0])}
@@ -3676,7 +3686,7 @@ const RO_BLOCK='.gli,.ggc,.gcard,.cit,.tl-n,.tl-b,.gfp header,.gfp-open,.gm-set,
 let roTip=0;
 function wDB(b,c){
   const w=wShell('wdbv','Database'),body=w.querySelector('.wbody'),lab=w.querySelector('.wlabel');
-  const draw=()=>{const db=b.dbid&&S.dbs[b.dbid];body.innerHTML='';lab.innerHTML='';
+  const draw=()=>{const db=b.dbid&&S.dbs[b.dbid];body.innerHTML='';lab.innerHTML='';w._live=db?{dbid:db.id,rer:draw}:null;w._sig=dbSig(db);
     if(!db){lab.textContent='Database view';body.innerHTML=`<button class="gempty2">${lyIcon('chart',26)}<b>Choose a saved database</b><small>Shows it as a table, chart, board, map\u2026 View only, so nothing gets changed by accident.</small></button>`;
       body.firstChild.onclick=e=>pickDatabase(e.currentTarget,id=>{b.dbid=id;b.lv={view:'table'};save();draw();setTimeout(()=>{const ch=w.querySelector('.wdb-ly');if(ch)ch.click()},60)});return}
     w.querySelectorAll('.whead .wdb-ly,.whead .wdb-ro').forEach(x=>x.remove());const V=b.lv=b.lv||{view:'table'};vTabs(V);V.ro=true;const t=V.tabs.find(x=>x.id===V.tab);
@@ -3709,7 +3719,7 @@ function wDB(b,c){
 }
 
 function renderGDB(db,box,hostId,inline,blk){
-  const rer=()=>renderGDB(db,box,hostId,inline,blk);
+  const rer=()=>renderGDB(db,box,hostId,inline,blk);box._live={dbid:db.id,rer};box._sig=dbSig(db);
   const V=blk&&blk.linked?(blk.lv=blk.lv||{view:'table'}):db,linked=!!(blk&&blk.linked);
   box.innerHTML='';box.className='gdb'+(inline?' inline':'')+(linked?' linked':'');
   if(inline){
