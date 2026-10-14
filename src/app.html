@@ -480,7 +480,20 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .wdb-nm{text-transform:none;letter-spacing:0;font-size:13.5px;font-weight:600;color:var(--fg)}
 .wdb-ly{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:var(--chip);font-size:12px;color:var(--fg)}
 .wdb-ro{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
-.wdbv .wbody{max-height:600px;overflow:auto;overscroll-behavior:contain}
+.wdbv .wbody{overflow:visible}
+.wdbv .chscroll,.wdbv .gcal,.wdbv .tl-sc,.wdbv .rotbl{overflow:visible}
+.wdbv .gboard{flex-wrap:wrap;overflow:visible}.wdbv .gcol{flex:1 1 200px}
+.wdbv .calgrid{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr))}.wdbv .cit{white-space:normal;word-break:normal;overflow-wrap:break-word;hyphens:auto}
+@media (max-width:640px){.wdbv .cit{font-size:10.5px;line-height:1.25;padding:2px 3px}.wdbv .tl-mo span{padding:6px 3px;font-size:11px}}
+.wdbv .rotbl table{table-layout:auto}.wdbv .rotbl th,.wdbv .rotbl td{white-space:normal;word-break:normal;overflow-wrap:break-word}.wdbv .rotbl td.nm{white-space:normal}
+/* narrow widget: each row becomes a small card so nothing gets squeezed */
+@media (max-width:640px){.wdbv .rotbl thead{display:none}.wdbv .rotbl table,.wdbv .rotbl tbody{display:block}
+  .wdbv .rotbl tr{display:block;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:var(--surface)}
+  .wdbv .rotbl td{display:flex;gap:10px;border:0;padding:3px 0;text-align:left!important}.wdbv .rotbl td.empty{display:none}
+  .wdbv .rotbl td::before{content:attr(data-l);color:var(--muted);font-size:12px;flex:none;width:86px;padding-top:2px}
+  .wdbv .rotbl td.nm{font-weight:600;font-size:14.5px;padding-bottom:4px}.wdbv .rotbl td.nm::before{content:none}}
+.wdbv .tl-days{display:none}.wdbv .tl-h{height:28px}.wdbv .tl-nh{height:28px;padding-top:6px}.wdbv .tl-b{padding:0 4px}.wdbv .tl-b span{font-size:11.5px}
+.wdbv .gm-side{max-height:none;overflow:visible}.wdbv .gli b{white-space:normal;max-width:none}
 .wdbv .gli,.wdbv .ggc,.wdbv .gcard,.wdbv .cit,.wdbv .tl-n,.wdbv .tl-b,.wdbv .gfp header{cursor:default}.wdbv .gfp-open{display:none}
 .rotbl{overflow:auto}.rotbl table{border-collapse:collapse;width:100%;font-size:13.5px}
 .rotbl th{text-align:left;font-weight:500;color:var(--muted);font-size:12.5px;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -3656,9 +3669,9 @@ function gMap(db,box,hostId,rer,V){
 
 /* ---------- Database widget: shows a saved database in any layout, view-only ---------- */
 function gTableRO(db,box,hostId,rer,V){const cols=dbCols(db),rows=viewRows(db,V),t=document.createElement('div');t.className='rotbl';
-  t.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c.pr?c.pr.name:'Name')}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>{if(!c.pr)return `<td class="nm">${r.icon||'\u1F4C4'} ${esc(r.title||'Untitled')}</td>`;
+  t.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c.pr?c.pr.name:'Name')}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>{if(!c.pr)return `<td class="nm" data-l="Name">${r.icon||'\u1F4C4'} ${esc(r.title||'Untitled')}</td>`;
     const v=r.props[c.pr.id];let h='';if(c.pr.type==='select'&&v)h=chipH(c.pr,v);else if(c.pr.type==='multi'&&v)h=v.map(x=>chipH(c.pr,x)).join(' ');else if(c.pr.type==='check')h=v?'\u2611':'\u2610';else if(c.pr.type==='date'&&v)h=esc(fmtDateShort(v));else h=esc(fmtVal(db,c.pr,v,r));
-    return `<td class="${c.pr.type==='number'||c.pr.type==='formula'?'n':''}">${h}</td>`}).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}" class="tsub">No rows.</td></tr>`}</tbody></table>`;box.appendChild(t)}
+    return `<td class="${c.pr.type==='number'||c.pr.type==='formula'?'n':''}${h?'':' empty'}" data-l="${esc(c.pr.name)}">${h}</td>`}).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}" class="tsub">No rows.</td></tr>`}</tbody></table>`;box.appendChild(t)}
 const RO_BLOCK='.gli,.ggc,.gcard,.cit,.tl-n,.tl-b,.gfp header,.gfp-open,.gm-set,.newrow,.ggc-new,.cadd,.gempty button';
 let roTip=0;
 function wDB(b,c){
@@ -3676,6 +3689,12 @@ function wDB(b,c){
     body.querySelectorAll('.newrow,.ggc-new,.cadd,.gm-set,.tl-g,.gempty button').forEach(x=>x.remove());
     body.querySelectorAll('[draggable="true"]').forEach(x=>x.draggable=false);
     body.querySelectorAll('.tsub').forEach(x=>{if(/Drag a card|Switch to Table/.test(x.textContent))x.remove()});
+    /* everything fits the widget: no scrolling inside it. The timeline is squeezed to the widget's width */
+    const tin=body.querySelector('.tl-in');if(tin){const W=parseFloat(tin.style.width)||1;tin.style.width='100%';
+      tin.querySelectorAll('[style*="left"]').forEach(el=>{const l=parseFloat(el.style.left),wd=parseFloat(el.style.width);if(!isNaN(l))el.style.left=(l/W*100)+'%';if(!isNaN(wd))el.style.width=(wd/W*100)+'%'})}
+    body.querySelectorAll('.chsvg').forEach(x=>x.style.minWidth='0');
+    /* month names shrink to fit narrow timelines */
+    requestAnimationFrame(()=>body.querySelectorAll('.tl-mo span').forEach(sp=>{if(!sp.dataset.full)sp.dataset.full=sp.textContent;const d=new Date(sp.dataset.full);if(isNaN(d))return;const w=sp.offsetWidth;sp.textContent=w<34?d.toLocaleString('en-US',{month:'narrow'}):w<90?d.toLocaleString('en-US',{month:'short'}):sp.dataset.full}));
   };
   const block=e=>{if(e.target.closest&&e.target.closest(RO_BLOCK)){e.stopPropagation();e.preventDefault();if(e.type==='click'&&Date.now()-roTip>4000){roTip=Date.now();toast('This widget is view only. Open the database page to edit.',{label:'Open',fn:()=>{const h=b.dbid&&hostOfDB(b.dbid);if(h)go(h.id)}})}}};
   body.addEventListener('click',block,true);body.addEventListener('pointerdown',block,true);body.addEventListener('dragstart',e=>e.preventDefault(),true);
