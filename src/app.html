@@ -3528,7 +3528,11 @@ function renderBlocks(p,w){
 }
 /* touch: remember which block was tapped so its handles show */
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#pop,#dmenu,#slash,.gadj-scrim,#cdlg'))return;const blk=e.target.closest&&e.target.closest('.blk');
-  document.querySelectorAll('.blk.act').forEach(x=>{if(x!==blk)x.classList.remove('act')});if(blk)blk.classList.add('act')},true);
+  document.querySelectorAll('.blk.act').forEach(x=>{if(x!==blk)x.classList.remove('act')});if(blk){blk.dataset.wasAct=blk.classList.contains('act')?'1':'';blk.classList.add('act');
+    /* only one block shows its handles: leave the text you were typing in when you pick another block */
+    const ae=document.activeElement;if(ae&&ae.isContentEditable&&!blk.contains(ae)&&!(e.target.isContentEditable||e.target.closest('[contenteditable="true"],[contenteditable="plaintext-only"],input,textarea')))ae.blur()}},true);
+/* a photo opens full view only once its gallery is selected: the first click selects, like other blocks */
+const galReady=el=>{const blk=el.closest('.blk');return !blk||blk.dataset.wasAct==='1'};
 function startBlockDrag(e,b,p,hd){
   if(e.button>0)return;if(e.pointerType!=='mouse'){try{hd.setPointerCapture(e.pointerId)}catch(_){}}
   const sx=e.clientX,sy=e.clientY;let dragging=false,ghost,ind,target=null,zone=null;
@@ -3790,7 +3794,7 @@ function wGallery(b,c){
       const up=ev=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);tr.classList.remove('grab');
         if(moved){tr._noclick=true;setTimeout(()=>tr._noclick=false,0);const dx=ev.clientX-sx;to(Math.abs(dx)>tr.clientWidth*.15?i+(dx<0?1:-1):i)}};
       addEventListener('pointermove',mv);addEventListener('pointerup',up)});
-    body.querySelectorAll('.gsl img').forEach(x=>x.onclick=()=>{if(!tr._noclick)openLightbox(b.imgs,+x.dataset.i)});
+    body.querySelectorAll('.gsl img').forEach(x=>x.onclick=()=>{if(!tr._noclick&&galReady(x))openLightbox(b.imgs,+x.dataset.i)});
     if(n>1){body.querySelector('.l').onclick=()=>to(i-1);body.querySelector('.r').onclick=()=>to(i+1);body.querySelectorAll('.gdots button').forEach(x=>x.onclick=()=>to(+x.dataset.k))}
     const gb=body.querySelector('.gadjb');if(gb)gb.onclick=e=>{e.stopPropagation();adjust(i)};
     body.querySelector('.gdel').onclick=e=>{e.stopPropagation();b.imgs.splice(i,1);if(b.fit)b.fit.splice(i,1);if(b.ar)b.ar.splice(i,1);if(b.orig)b.orig.splice(i,1);b.idx=Math.max(0,Math.min(i,b.imgs.length-1));save();renderPage();toast('Photo removed.',{label:'Undo',fn:undo})};
@@ -3799,7 +3803,7 @@ function wGallery(b,c){
   }else{
     const one=b.layout==='single';
     body.innerHTML=`<div class="${one?'gone':'ggrid'}${one&&shp?' shp':''}" style="${one&&shp?`--ar:${arCss(0)}`:''}">${(one?b.imgs.slice(0,1):b.imgs).map((src,k)=>`<div class="gimg"><img alt="" src="${src}" data-i="${k}" style="${one&&shp?'object-fit:contain':gImgStyle(gFit(b,k))}"><button class="gdel" data-d="${k}" aria-label="Remove photo">×</button></div>`).join('')}</div>`;
-    body.querySelectorAll('img').forEach(x=>x.onclick=()=>openLightbox(b.imgs,+x.dataset.i));
+    body.querySelectorAll('img').forEach(x=>x.onclick=()=>{if(galReady(x))openLightbox(b.imgs,+x.dataset.i)});
     body.querySelectorAll('.gdel').forEach(x=>x.onclick=e=>{e.stopPropagation();b.imgs.splice(+x.dataset.d,1);if(b.fit)b.fit.splice(+x.dataset.d,1);if(b.ar)b.ar.splice(+x.dataset.d,1);if(b.orig)b.orig.splice(+x.dataset.d,1);save();renderPage();toast('Photo removed.',{label:'Undo',fn:undo})});
   }
   w.querySelector('.wgear').onclick=e=>openPop(e.currentTarget,pop=>{
