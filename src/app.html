@@ -1062,7 +1062,7 @@ body.splitting .peek{top:62px;bottom:10px}
 .gdots button.on{background:#fff;width:18px;border-radius:4px}
 
 /* while typing, only the block with the cursor shows its + and handle */
-body.typing .blk:hover:not(:focus-within) .gut,body.typing .blk:hover:not(:focus-within) .hdl{opacity:0}
+body.typing .blk:hover:not(:focus-within):not(.act) .gut,body.typing .blk:hover:not(:focus-within):not(.act) .hdl{opacity:0}
 
 /* paired lock look: side panel + split rail */
 .lockfx{position:relative;width:34px;height:34px;padding:0!important;border-radius:50%!important;display:grid;place-items:center;color:var(--accent);
@@ -3098,6 +3098,8 @@ function bumpLockHint(e){if(e&&e.target&&e.target.closest&&e.target.closest('#lo
 })();
 document.addEventListener('keydown',e=>{if(e.target.closest&&e.target.closest('[contenteditable]'))document.body.classList.add('typing')},true);
 document.addEventListener('mousemove',e=>{if((e.movementX||e.movementY)&&document.body.classList.contains('typing'))document.body.classList.remove('typing')},{passive:true});
+/* fingers never send mousemove: a tap also ends typing mode */
+document.addEventListener('pointerdown',e=>{if(!(e.target.closest&&e.target.closest('[contenteditable]')))document.body.classList.remove('typing')},true);
 ['pointerdown','keydown','wheel','touchstart'].forEach(ev=>document.addEventListener(ev,bumpLockHint,{passive:true,capture:true}));
 addEventListener('scroll',()=>bumpLockHint(),{passive:true});
 let idleT;
