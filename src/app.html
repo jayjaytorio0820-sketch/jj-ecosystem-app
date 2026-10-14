@@ -3510,7 +3510,7 @@ const chNum=(db,pr,r)=>{const v=pr.type==='formula'?fval(db,pr,r):r.props[pr.id]
 function chartData(db,V){const c=V.chart||{},rows=viewRows(db,V);const [ag,ap]=(c.agg||'count').split(':');const npr=ap&&propById(db,ap);
   const val=r=>npr?chNum(db,npr,r):1;
   const xk=c.x||(db.props.find(p=>p.type==='select')||{}).id||'title',xp=xk==='title'?null:propById(db,xk);
-  const keysOf=r=>{if(!xp)return [r.title||'Untitled'];const v=r.props[xp.id];if(xp.type==='multi')return v&&v.length?v:['(none)'];if(xp.type==='check')return [v?'Yes':'No'];if(xp.type==='date')return [v?v.slice(0,7):'(no date)'];return [v===''||v==null?'(none)':String(v)]};
+  const keysOf=r=>{if(!xp)return [r.title||'Untitled'];const v=r.props[xp.id];if(xp.type==='multi')return v&&v.length?v:['(none)'];if(xp.type==='check')return [v?'Yes':'No'];if(xp.type==='date')return [v?v.slice(0,7):'(no date)'];if(xp.type==='formula'){const f=FX.show(fval(db,xp,r));return [f===''?'(none)':f]}if(xp.type==='number')return [v===''||v==null?'(none)':nfmt(+v)];return [v===''||v==null?'(none)':String(v)]};
   const G=new Map();if(xp&&xp.type==='select')(xp.options||[]).forEach(o=>G.set(o.v,{k:o.v,n:0,s:0,c:COLOR_HEX[o.c],rows:[]}));
   rows.forEach(r=>{const v=val(r);keysOf(r).forEach(k=>{if(!G.has(k))G.set(k,{k,n:0,s:0,c:null,rows:[]});const g=G.get(k);g.rows.push(r);if(v!=null){g.n++;g.s+=v}})});
   let out=[...G.values()].filter(g=>g.rows.length||(xp&&xp.type==='select'));out.forEach(g=>g.v=ag==='count'||!npr?g.rows.length:ag==='avg'?(g.n?g.s/g.n:0):g.s);
@@ -3581,7 +3581,7 @@ function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=do
   box.appendChild(w)}
 /* chart part of the view settings */
 function chartSettingsHTML(db,V){const c=V.chart=V.chart||{},type=c.type||'bar',rows=c.mode==='rows'&&(type==='line'||type==='bar');
-  const xs=db.props.filter(p=>['select','multi','check','date','text','place'].includes(p.type)),ns=db.props.filter(p=>p.type==='number'||p.type==='formula'),rxs=db.props.filter(p=>['date','number','formula'].includes(p.type));
+  const xs=db.props,ns=db.props.filter(p=>p.type==='number'||p.type==='formula'),rxs=db.props;
   const sel=(k,opts,cur)=>`<select data-c="${k}" class="psel">${opts.map(([v,l])=>`<option value="${v}"${(cur??'')===v?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
   let o=`<div class="vslbl">Chart type</div><div class="chtypes">${CHARTS.map(([k,l,ic])=>`<button data-ct="${k}" class="${type===k?'on':''}" title="${l}" aria-label="${l}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></button>`).join('')}</div>`;
   if(type==='line'||type==='bar')o+=`<div class="vsgrp"><div class="vsrow"><span>Data</span><div class="vseg"><button data-cm="" class="${rows?'':'on'}">Group &amp; total</button><button data-cm="rows" class="${rows?'on':''}">Each row</button></div></div></div>`;
