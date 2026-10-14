@@ -467,6 +467,25 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .dbbar2{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:4px 0 8px}
 .dbbar2 .sp{flex:1}
 /* database views: tabs, settings, new layouts */
+.vscol{flex-direction:column;align-items:stretch}.vscol>span{align-self:flex-start}.chys{align-items:flex-start}.vscol>span small{font-weight:400}
+.chys{display:flex;flex-direction:column;gap:6px;margin-top:4px}.chys label{display:flex;align-items:center;gap:8px;font-size:13.5px;cursor:pointer}.chys i{width:12px;height:12px;border-radius:3px;flex:none}
+.chrng{display:flex;align-items:center;gap:6px}.chrng b{font-weight:400;color:var(--muted);font-size:12px}
+.chrng input{width:104px;box-sizing:border-box;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:13px}
+.chrng input[type="number"]{width:84px}
+.chlegh{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:8px 4px 0;font-size:13px}.chlegh span{display:flex;align-items:center;gap:6px}.chlegh i{width:12px;height:4px;border-radius:2px}.chlegh small{color:var(--muted)}
+.chpt{cursor:pointer}
+/* database widget */
+.wdbv .whead{justify-content:flex-start;gap:6px}.wdbv .wgear{margin-left:auto}
+.wdbv .wlabel{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wdb-ly,.wdb-ro{flex:none;white-space:nowrap}@media (max-width:640px){.wdb-ro{display:none}}
+.wdb-nm{text-transform:none;letter-spacing:0;font-size:13.5px;font-weight:600;color:var(--fg)}
+.wdb-ly{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;background:var(--chip);font-size:12px;color:var(--fg)}
+.wdb-ro{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.wdbv .wbody{max-height:600px;overflow:auto;overscroll-behavior:contain}
+.wdbv .gli,.wdbv .ggc,.wdbv .gcard,.wdbv .cit,.wdbv .tl-n,.wdbv .tl-b,.wdbv .gfp header{cursor:default}.wdbv .gfp-open{display:none}
+.rotbl{overflow:auto}.rotbl table{border-collapse:collapse;width:100%;font-size:13.5px}
+.rotbl th{text-align:left;font-weight:500;color:var(--muted);font-size:12.5px;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.rotbl td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}.rotbl td.n{text-align:right;font-variant-numeric:tabular-nums}.rotbl td.nm{font-weight:500;white-space:nowrap}
+
 .vtabs{display:flex;align-items:center;gap:2px;flex-wrap:wrap;min-width:0}
 .vtab{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:7px;font-size:13px;color:var(--muted);white-space:nowrap;max-width:200px}
 .vtab span{overflow:hidden;text-overflow:ellipsis}.vtab.on{color:var(--fg);background:var(--chip);font-weight:500}.vtab-c{font-style:normal;font-size:10px;opacity:.6}
@@ -1820,6 +1839,7 @@ function blockEl(b,p,n){
   else if(T==='table')renderTableBlock(b,p,c);
   else if(T==='w_clock')wClock(b,c);
   else if(T==='w_gallery')wGallery(b,c);
+  else if(T==='w_db')wDB(b,c);
   else if(T==='w_cal')wCal(b,c);
   else if(T==='database'){const db=S.dbs[b.dbid];if(db){const box=document.createElement('div');c.appendChild(box);renderGDB(db,box,p.id,true,b)}else c.innerHTML='<p class="tsub">This database was deleted.</p>'}
   else if(T==='pagelink'){const lp=pg(b.pid);if(!lp||lp.deleted){c.innerHTML='';return w}const a=document.createElement('div');a.className='plink';a.tabIndex=0;a.innerHTML=`<span>${lp.icon}</span><span>${esc(lp.title||'Untitled')}</span>`;a.onclick=()=>openPeek(lp.id);a.onkeydown=e=>{if(e.key==='Enter')openPeek(lp.id)};a.title='Opens in a side panel';c.appendChild(a)}
@@ -1867,7 +1887,7 @@ const TYPES=[
   {t:'p',l:'Text',h:'Plain paragraph',g:'Aa'},{t:'h1',l:'Heading 1',h:'Large section title',g:'H1'},{t:'h2',l:'Heading 2',h:'Medium title',g:'H2'},{t:'h3',l:'Heading 3',h:'Small title',g:'H3'},
   {t:'todo',l:'To-do list',h:'Checklist with checkboxes',g:'☐'},{t:'bullet',l:'Bulleted list',h:'Simple list',g:'•'},{t:'number',l:'Numbered list',h:'Numbered steps',g:'1.'},
   {t:'toggle',l:'Toggle',h:'Show or hide content',g:'▸'},{t:'callout',l:'Callout',h:'Highlighted note',g:'!'},{t:'quote',l:'Quote',h:'Quotation',g:'"'},
-  {t:'code',l:'Code',h:'Code snippet',g:'</>'},{t:'table',l:'Table',h:'Rows and columns',g:'▦'},{t:'divider',l:'Divider',h:'Visual separator',g:'—'},{t:'spacer',l:'Empty space',h:'Blank block to push others aside',g:'⬚'},{t:'page',l:'Page',h:'New page inside this one',g:'↳'},{t:'dbinline',l:'Database – Inline',h:'Table, board and calendar on this page',g:'▤'},{t:'dbpage',l:'Database – Full page',h:'A database as its own page',g:'▦'},{t:'dblink',l:'Linked database',h:'Show a database you already made',g:'⇢'},{t:'w_clock',l:'Clock widget',h:'Live time and date, any time zone',g:'◷'},{t:'w_gallery',l:'Gallery widget',h:'Photos in a grid or slideshow',g:'▣'},{t:'w_cal',l:'Calendar widget',h:'Month view with dates from your databases',g:'▦'}];
+  {t:'code',l:'Code',h:'Code snippet',g:'</>'},{t:'table',l:'Table',h:'Rows and columns',g:'▦'},{t:'divider',l:'Divider',h:'Visual separator',g:'—'},{t:'spacer',l:'Empty space',h:'Blank block to push others aside',g:'⬚'},{t:'page',l:'Page',h:'New page inside this one',g:'↳'},{t:'dbinline',l:'Database – Inline',h:'Table, board and calendar on this page',g:'▤'},{t:'dbpage',l:'Database – Full page',h:'A database as its own page',g:'▦'},{t:'dblink',l:'Linked database',h:'Show a database you already made',g:'⇢'},{t:'w_clock',l:'Clock widget',h:'Live time and date, any time zone',g:'◷'},{t:'w_gallery',l:'Gallery widget',h:'Photos in a grid or slideshow',g:'▣'},{t:'w_cal',l:'Calendar widget',h:'Month view with dates from your databases',g:'▦'},{t:'w_db',l:'Database widget',h:'View a saved database as a chart, table, board… (view only)',g:'◔'}];
 const SL={open:false,bid:null,filter:'',sel:0,items:[],plus:false};
 const narrow=()=>innerWidth<=820||matchMedia('(hover:none)').matches;
 function openSlash(bid,plus,turn){SL.open=true;SL.bid=bid;SL.filter='';SL.sel=0;SL.plus=plus;SL.turn=!!turn;SL.built=false;SL.cur=null;
@@ -3395,18 +3415,15 @@ function openViewSettings(anchor,db,V,rer,mode){
       const bk=pop.querySelector('.vsback');if(bk)bk.onclick=main;
       pop.querySelectorAll('[data-ly]').forEach(b=>b.onclick=()=>{const k=b.dataset.ly;if(isNew){vAdd(V,k);closePop();return}
         const t=V.tabs.find(x=>x.id===V.tab);if(t&&t.name===lyName(V.view))t.name=lyName(k);V.view=k;save();main()})};
-    const main=()=>{const t=V.tabs.find(x=>x.id===V.tab),c=V.chart=V.chart||{};let o='';
+    let lt;const live=()=>{clearTimeout(lt);lt=setTimeout(rer,200)};
+    const main=()=>{const t=V.tabs.find(x=>x.id===V.tab);let o='';
       o+=`<div class="vshead"><b>Settings</b></div><div class="vscard"><span class="vsic">${lyIcon(V.view,18)}</span><input class="vsname" value="${esc(t.name)}" aria-label="View name">${V.tabs.length>1?'<button class="vsdel" title="Delete this view" aria-label="Delete this view">\u00D7</button>':''}</div>
         <button class="vscard vslay"><span class="vsic">${lyIcon(V.view,18)}</span><span class="vsl">Layout</span><span class="vsv">${lyName(V.view)} \u203A</span></button>`;
       if(V.view==='board')o+=`<div class="vsgrp">`+pick('Group by','groupBy',props('select'))+'</div>';
       if(V.view==='calendar')o+=`<div class="vsgrp">`+pick('Show by date','dateProp',props('date'))+'</div>';
       if(V.view==='timeline')o+=`<div class="vsgrp">`+pick('Start date','dateProp',props('date'))+pick('End date','endProp',props('date'),'Same as start')+`<div class="vsrow"><span>Scale</span><div class="vseg">${[['day','Days'],['week','Weeks'],['month','Months']].map(([k,l])=>`<button data-sc="${k}" class="${(V.tlScale||'week')===k?'on':''}">${l}</button>`).join('')}</div></div></div>`;
       if(V.view==='gallery')o+=`<div class="vsgrp"><div class="vsrow"><span>Card size</span><div class="vseg">${[['s','Small'],['m','Medium'],['l','Large']].map(([k,l])=>`<button data-gs="${k}" class="${(V.galSize||'m')===k?'on':''}">${l}</button>`).join('')}</div></div><div class="vsrow"><span>Card preview</span><div class="vseg">${[['cover','Cover / photo'],['none','None']].map(([k,l])=>`<button data-gc="${k}" class="${(V.galCover||'cover')===k?'on':''}">${l}</button>`).join('')}</div></div></div>`;
-      if(V.view==='chart'){const xs=db.props.filter(p=>['select','multi','check','date','text','place'].includes(p.type)),ns=db.props.filter(p=>p.type==='number'||p.type==='formula');
-        o+=`<div class="vslbl">Chart type</div><div class="chtypes">${CHARTS.map(([k,l,ic])=>`<button data-ct="${k}" class="${(c.type||'bar')===k?'on':''}" title="${l}" aria-label="${l}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></button>`).join('')}</div>
-          <div class="vsgrp">${(c.type||'bar')!=='number'?`<div class="vsrow"><span>${(c.type||'bar')==='donut'?'Slices by':'X axis'}</span><select data-c="x" class="psel"><option value="title"${c.x==='title'?' selected':''}>Name</option>${xs.map(p=>`<option value="${p.id}"${c.x===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select></div>`:''}
-          <div class="vsrow"><span>Value</span><select data-c="agg" class="psel"><option value="count">Count of rows</option>${ns.map(p=>`<option value="sum:${p.id}"${c.agg==='sum:'+p.id?' selected':''}>Sum of ${esc(p.name)}</option><option value="avg:${p.id}"${c.agg==='avg:'+p.id?' selected':''}>Average of ${esc(p.name)}</option>`).join('')}</select></div>
-          ${(c.type||'bar')!=='number'&&(c.type||'bar')!=='line'?`<div class="vsrow"><span>Order</span><div class="vseg">${[['','Default'],['desc','Biggest first'],['asc','Smallest first']].map(([k,l])=>`<button data-co="${k}" class="${(c.ord||'')===k?'on':''}">${l}</button>`).join('')}</div></div>`:''}</div>`}
+      if(V.view==='chart')o+=chartSettingsHTML(db,V);
       if(V.view==='map'){const pl=props('place');o+=`<div class="vsgrp">${pl.length?pick('Location','mapProp',pl):''}</div>${pl.length?'':'<button class="btn sec sm vsaddloc">Add a Location property</button>'}<p class="tsub" style="padding:4px 2px">Locations are \u201Clatitude, longitude\u201D or a Philippine place name (e.g. Caloocan, Cebu City). Works offline.</p>`}
       if(['list','feed','table'].includes(V.view))o+='<p class="tsub" style="padding:6px 2px">Use Filter and Sort in the toolbar to choose which rows show here.</p>';
       pop.innerHTML=o;
@@ -3417,9 +3434,7 @@ function openViewSettings(anchor,db,V,rer,mode){
       pop.querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{V.tlScale=b.dataset.sc;save();main()});
       pop.querySelectorAll('[data-gs]').forEach(b=>b.onclick=()=>{V.galSize=b.dataset.gs;save();main()});
       pop.querySelectorAll('[data-gc]').forEach(b=>b.onclick=()=>{V.galCover=b.dataset.gc;save();main()});
-      pop.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>{c.type=b.dataset.ct;save();main()});
-      pop.querySelectorAll('select[data-c]').forEach(s=>s.onchange=()=>{c[s.dataset.c]=s.value;save()});
-      pop.querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{c.ord=b.dataset.co;save();main()});
+      if(V.view==='chart')wireChartSettings(pop,db,V,main,live);
       const al=pop.querySelector('.vsaddloc');if(al)al.onclick=()=>{const pr={id:uid(),name:'Location',type:'place'};db.props.push(pr);V.mapProp=pr.id;save();main()};
     };
     if(mode==='new')grid(true);else main();
@@ -3485,49 +3500,112 @@ function gTimeline(db,box,hostId,rer,V){
   if(und.length){const u=document.createElement('span');u.className='tsub';u.innerHTML=` ${und.length} row${und.length>1?'s have':' has'} no ${esc(dp.name)}: `+und.slice(0,6).map(r=>`<button class="lnk" data-id="${r.id}">${esc(r.title||'Untitled')}</button>`).join(', ');u.querySelectorAll('[data-id]').forEach(x=>x.onclick=()=>openPeek(x.dataset.id));ft.appendChild(u)}
   box.appendChild(ft);
 }
-/* CHART: bar, horizontal bar, line, donut or a single number */
+/* CHART: bar, horizontal bar, line, donut or a single number.
+   Data: "Group & total" adds rows up per group; "Each row" plots each row's own number properties (one line / bar colour per property).
+   Y range and X range can be fixed by hand. */
+const PAL=['#2f7fd6','#2e9a5b','#d9772b','#8a5cd6','#d1508f','#c99a17','#d1493f','#1aa0a8','#9a6b4a','#8a8f8c'];
+const nfmt=v=>Math.abs(v)>=1000?Math.round(v).toLocaleString('en-US'):(+(+v).toFixed(2)).toLocaleString('en-US');
+const numOr=(v,d)=>v===''||v==null||isNaN(+v)?d:+v;
+const chNum=(db,pr,r)=>{const v=pr.type==='formula'?fval(db,pr,r):r.props[pr.id];return typeof v==='number'?v:(v===''||v==null||isNaN(+v)?null:+v)};
 function chartData(db,V){const c=V.chart||{},rows=viewRows(db,V);const [ag,ap]=(c.agg||'count').split(':');const npr=ap&&propById(db,ap);
-  const val=r=>{if(!npr)return 1;const v=npr.type==='formula'?fval(db,npr,r):r.props[npr.id];return typeof v==='number'?v:(v===''||v==null||isNaN(+v)?null:+v)};
+  const val=r=>npr?chNum(db,npr,r):1;
   const xk=c.x||(db.props.find(p=>p.type==='select')||{}).id||'title',xp=xk==='title'?null:propById(db,xk);
   const keysOf=r=>{if(!xp)return [r.title||'Untitled'];const v=r.props[xp.id];if(xp.type==='multi')return v&&v.length?v:['(none)'];if(xp.type==='check')return [v?'Yes':'No'];if(xp.type==='date')return [v?v.slice(0,7):'(no date)'];return [v===''||v==null?'(none)':String(v)]};
   const G=new Map();if(xp&&xp.type==='select')(xp.options||[]).forEach(o=>G.set(o.v,{k:o.v,n:0,s:0,c:COLOR_HEX[o.c],rows:[]}));
   rows.forEach(r=>{const v=val(r);keysOf(r).forEach(k=>{if(!G.has(k))G.set(k,{k,n:0,s:0,c:null,rows:[]});const g=G.get(k);g.rows.push(r);if(v!=null){g.n++;g.s+=v}})});
   let out=[...G.values()].filter(g=>g.rows.length||(xp&&xp.type==='select'));out.forEach(g=>g.v=ag==='count'||!npr?g.rows.length:ag==='avg'?(g.n?g.s/g.n:0):g.s);
-  if(xp&&xp.type==='date')out.sort((a,b)=>a.k<b.k?-1:1);if(c.ord==='desc')out.sort((a,b)=>b.v-a.v);if(c.ord==='asc')out.sort((a,b)=>a.v-b.v);
+  if(xp&&xp.type==='date'){out.sort((a,b)=>a.k<b.k?-1:1);if(c.xmin)out=out.filter(g=>g.k>=String(c.xmin).slice(0,7));if(c.xmax)out=out.filter(g=>g.k<=String(c.xmax).slice(0,7))}
+  if(c.ord==='desc')out.sort((a,b)=>b.v-a.v);if(c.ord==='asc')out.sort((a,b)=>a.v-b.v);
   const label=k=>xp&&xp.type==='date'&&/^\d{4}-\d{2}$/.test(k)?new Date(k+'-01T00:00').toLocaleString('en-US',{month:'short',year:'2-digit'}):k;
   const total=ag==='count'||!npr?rows.length:ag==='avg'?(()=>{const vs=rows.map(val).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:0})():rows.map(val).filter(v=>v!=null).reduce((a,b)=>a+b,0);
   const what=!npr?'rows':`${ag==='avg'?'average':'total'} ${npr.name}`;
   return {out,label,total,what,xName:xp?xp.name:'Name',type:c.type||'bar'}}
-const PAL=['#2f7fd6','#2e9a5b','#d9772b','#8a5cd6','#d1508f','#c99a17','#d1493f','#1aa0a8','#9a6b4a','#8a8f8c'];
-const nfmt=v=>Math.abs(v)>=1000?Math.round(v).toLocaleString('en-US'):(+v.toFixed(2)).toLocaleString('en-US');
-function gChart(db,box,hostId,rer,V){const {out,label,total,what,xName,type}=chartData(db,V);const w=document.createElement('div');w.className='gchart t-'+type;
-  out.forEach((g,i)=>g.col=g.c||PAL[i%PAL.length]);
-  const max=Math.max(1,...out.map(g=>g.v));
+/* "Each row": X is the row name, a date or a number; every chosen number property is a series */
+function chartRows(db,V){const c=V.chart||{},rows=viewRows(db,V);const xk=c.rx||'title',xp=xk==='title'?null:propById(db,xk);
+  let ys=(c.ys||[]).map(id=>propById(db,id)).filter(Boolean);if(!ys.length){const f=db.props.find(p=>p.type==='number'||p.type==='formula');if(f)ys=[f]}
+  const kind=!xp?'cat':xp.type==='date'?'date':xp.type==='number'||xp.type==='formula'?'num':'cat';
+  let pts=rows.map(r=>{let x;if(kind==='date'){const v=r.props[xp.id];x=v?new Date(v+'T00:00').getTime():null}else if(kind==='num')x=chNum(db,xp,r);else x=xp?fmtVal(db,xp,r.props[xp.id],r)||'(none)':(r.title||'Untitled');return {r,x,ys:ys.map(p=>chNum(db,p,r))}});
+  if(kind!=='cat'){pts=pts.filter(p=>p.x!=null).sort((a,b)=>a.x-b.x);
+    const lo=kind==='date'?(c.xmin?new Date(c.xmin+'T00:00').getTime():null):numOr(c.xmin,null),hi=kind==='date'?(c.xmax?new Date(c.xmax+'T00:00').getTime():null):numOr(c.xmax,null);
+    if(lo!=null)pts=pts.filter(p=>p.x>=lo);if(hi!=null)pts=pts.filter(p=>p.x<=hi);
+    const xl=kind==='date'?x=>new Date(x).toLocaleDateString('en-US',{month:'short',day:'numeric'}):x=>nfmt(x);return {pts,ys,kind,xl,lo,hi,xName:xp.name}}
+  return {pts,ys,kind,xl:x=>String(x),xName:xp?xp.name:'Name'}}
+const niceMax=v=>{if(v<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(v))),f=v/e;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e};
+function yDomain(c,vals){const lo=numOr(c.ymin,Math.min(0,...vals)),hi0=numOr(c.ymax,niceMax(Math.max(...vals,0)));return [lo,hi0>lo?hi0:lo+1]}
+function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=document.createElement('div');w.className='gchart t-'+type;
+  const rowsMode=c.mode==='rows'&&(type==='line'||type==='bar');
+  const narrow=innerWidth<=640,BW=narrow?360:560,H=narrow?200:240,T=24;
+  const axis=(W,lo,hi,fmt)=>{let s='';for(let t=0;t<=4;t++){const y=T+H*t/4;s+=`<line x1="44" x2="${W}" y1="${y}" y2="${y}" class="chgrid"/><text x="38" y="${y+4}" class="chax" text-anchor="end">${fmt(hi-(hi-lo)*t/4)}</text>`}return s};
+  const clampY=(v,lo,hi)=>T+H-(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*H;
+  if(rowsMode){const {pts,ys,kind,xl,lo:xlo,hi:xhi,xName}=chartRows(db,V);
+    if(!ys.length){w.innerHTML='<p class="tsub" style="padding:16px">Add a Number property, then choose it in the view settings to draw it.</p>';box.appendChild(w);return}
+    if(!pts.length){w.innerHTML='<p class="tsub" style="padding:16px">No rows in this range.</p>';box.appendChild(w);return}
+    const vals=pts.flatMap(p=>p.ys).filter(v=>v!=null),[lo,hi]=yDomain(c,vals.length?vals:[0]);const n=pts.length;
+    const W=Math.max(BW,type==='bar'?n*(ys.length*16+18)+70:n*(kind==='cat'?64:12)+70);
+    let xOf;if(kind==='cat'||type==='bar')xOf=i=>60+(n<2?(W-80)/2:i*(W-90)/(n-1));else{const a=xlo??pts[0].x,b=xhi??pts[n-1].x,span=b-a||1;xOf=i=>60+(pts[i].x-a)/span*(W-90)}
+    let s=`<svg viewBox="0 0 ${W} ${H+T+44}" class="chsvg" style="min-width:${W>BW*1.4?Math.min(W*.7,1400):0}px">`+axis(W,lo,hi,nfmt);
+    if(type==='line'){ys.forEach((p,si)=>{const col=PAL[si%PAL.length],seg=pts.map((q,i)=>q.ys[si]==null?null:[xOf(i),clampY(q.ys[si],lo,hi)]);
+        const d=seg.reduce((a,q,i)=>q?a+(a&&seg[i-1]?' L':' M')+q.join(','):a,'');s+=`<path d="${d}" class="chline" style="stroke:${col}"/>`;
+        seg.forEach((q,i)=>{if(q)s+=`<g class="chpt" data-i="${i}"><circle cx="${q[0]}" cy="${q[1]}" r="4.5" class="chdot" style="stroke:${col}"/>${n<=16?`<text x="${q[0]}" y="${q[1]-9}" text-anchor="middle" class="chval">${nfmt(pts[i].ys[si])}</text>`:''}</g>`})})}
+    else{const bw=Math.max(6,Math.min(26,((W-90)/Math.max(1,n))/(ys.length+.6)));ys.forEach((p,si)=>{const col=PAL[si%PAL.length];pts.forEach((q,i)=>{const v=q.ys[si];if(v==null)return;const x=xOf(i)-bw*ys.length/2+si*bw,y0=clampY(Math.max(lo,0),lo,hi),y=clampY(v,lo,hi);
+      s+=`<g class="chpt" data-i="${i}"><rect x="${x}" y="${Math.min(y,y0)}" width="${bw-2}" height="${Math.max(1,Math.abs(y0-y))}" rx="3" fill="${col}"/></g>`})})}
+    let lastX=-1e9;pts.forEach((q,i)=>{const gx=xOf(i);if(gx-lastX>=(narrow?70:62)){lastX=gx;s+=`<text x="${xOf(i)}" y="${H+T+20}" text-anchor="middle" class="chlab">${esc(String(xl(q.x)).slice(0,12))}</text>`}});
+    w.innerHTML=`<div class="chscroll">${s}</svg></div><div class="chlegh">${ys.map((p,si)=>`<span><i style="background:${PAL[si%PAL.length]}"></i>${esc(p.name)}</span>`).join('')}<small>\u00B7 by ${esc(xName)}${c.ymin!==''&&c.ymin!=null||c.ymax!==''&&c.ymax!=null?` \u00B7 Y ${nfmt(lo)} to ${nfmt(hi)}`:''}</small></div><div class="chrows"></div>`;
+    w.querySelectorAll('.chpt').forEach(g=>g.addEventListener('click',()=>{const q=pts[+g.dataset.i];const bx=w.querySelector('.chrows');bx.innerHTML=`<div class="chrh"><b>${esc(q.r.title||'Untitled')}</b> \u00B7 ${ys.map((p,si)=>`${esc(p.name)} ${q.ys[si]==null?'\u2014':nfmt(q.ys[si])}`).join(' \u00B7 ')}<button class="lnk">Clear</button></div>`+(V.ro?'':`<button class="gli" data-id="${q.r.id}"><span class="gli-ic">${q.r.icon||'\u1F4C4'}</span><b>Open ${esc(q.r.title||'Untitled')}</b></button>`);
+      bx.querySelector('.lnk').onclick=()=>bx.innerHTML='';const o=bx.querySelector('[data-id]');if(o)o.onclick=()=>openPeek(o.dataset.id)}));
+    box.appendChild(w);return}
+  const {out,label,total,what,xName}=chartData(db,V);out.forEach((g,i)=>g.col=g.c||PAL[i%PAL.length]);
+  const [lo,hi]=yDomain(c,out.map(g=>g.v));
   if(type==='number'){w.innerHTML=`<div class="chnum"><b>${nfmt(total)}</b><span>${esc(what)}</span></div>`}
   else if(!out.length){w.innerHTML='<p class="tsub" style="padding:16px">Nothing to chart yet. Add rows, or pick another X axis in the view settings.</p>'}
-  else if(type==='bar'){const n=out.length,gap=14,BW=innerWidth<=640?360:560,bw=Math.max(18,Math.min(90,(BW-60)/n-gap)),W=Math.max(BW,n*(bw+gap)+70),H=innerWidth<=640?200:250,x0=52+Math.max(0,(W-62-n*(bw+gap))/2);
-    let s=`<svg viewBox="0 0 ${W} ${H+60}" class="chsvg" style="min-width:${n>6?Math.min(n*52,1200):0}px">`;
-    for(let t=0;t<=4;t++){const y=24+H*t/4;s+=`<line x1="40" x2="${W}" y1="${y}" y2="${y}" class="chgrid"/><text x="34" y="${y+4}" class="chax" text-anchor="end">${nfmt(max*(4-t)/4)}</text>`}
-    out.forEach((g,i)=>{const x=x0+i*(bw+gap),h=g.v/max*H,y=24+H-h;s+=`<g class="chbar" data-i="${i}"><rect x="${x}" y="${y}" width="${bw}" height="${Math.max(1,h)}" rx="4" fill="${g.col}"/><text x="${x+bw/2}" y="${y-5}" text-anchor="middle" class="chval">${nfmt(g.v)}</text><text x="${x+bw/2}" y="${H+44}" text-anchor="middle" class="chlab">${esc(String(label(g.k)).slice(0,14))}</text></g>`});
+  else if(type==='bar'){const n=out.length,gap=14,bw=Math.max(18,Math.min(90,(BW-64)/n-gap)),W=Math.max(BW,n*(bw+gap)+70),x0=56+Math.max(0,(W-66-n*(bw+gap))/2);
+    let s=`<svg viewBox="0 0 ${W} ${H+T+40}" class="chsvg" style="min-width:${n>6?Math.min(n*52,1200):0}px">`+axis(W,lo,hi,nfmt);
+    out.forEach((g,i)=>{const x=x0+i*(bw+gap),y0=clampY(Math.max(lo,0),lo,hi),y=clampY(g.v,lo,hi);s+=`<g class="chbar" data-i="${i}"><rect x="${x}" y="${Math.min(y,y0)}" width="${bw}" height="${Math.max(1,Math.abs(y0-y))}" rx="4" fill="${g.col}"/><text x="${x+bw/2}" y="${Math.min(y,y0)-5}" text-anchor="middle" class="chval">${nfmt(g.v)}</text><text x="${x+bw/2}" y="${H+T+20}" text-anchor="middle" class="chlab">${esc(String(label(g.k)).slice(0,14))}</text></g>`});
     w.innerHTML=`<div class="chscroll">${s}</svg></div>`}
-  else if(type==='hbar'){w.innerHTML=`<div class="chh">${out.map((g,i)=>`<button class="chhr chbar" data-i="${i}"><span class="chhl">${esc(label(g.k))}</span><span class="chht"><i style="width:${g.v/max*100}%;background:${g.col}"></i></span><b>${nfmt(g.v)}</b></button>`).join('')}</div>`}
-  else if(type==='line'){const n=out.length,W=Math.max(innerWidth<=640?360:560,n*70),H=innerWidth<=640?190:230,x=i=>(n<2?W/2:60+i*(W-100)/(n-1)),y=v=>24+H-v/max*H;
-    const pts=out.map((g,i)=>[x(i),y(g.v)]);let s=`<svg viewBox="0 0 ${W} ${H+50}" class="chsvg" style="min-width:${n>6?Math.min(n*52,1200):0}px">`;
-    for(let t=0;t<=4;t++){const yy=24+H*t/4;s+=`<line x1="40" x2="${W}" y1="${yy}" y2="${yy}" class="chgrid"/><text x="34" y="${yy+4}" class="chax" text-anchor="end">${nfmt(max*(4-t)/4)}</text>`}
-    s+=`<path d="M${pts[0][0]},${24+H} L${pts.map(p=>p.join(',')).join(' L')} L${pts[pts.length-1][0]},${24+H}Z" class="charea"/><path d="M${pts.map(p=>p.join(',')).join(' L')}" class="chline"/>`;
-    out.forEach((g,i)=>{s+=`<g class="chbar" data-i="${i}"><circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="5" class="chdot"/><text x="${pts[i][0]}" y="${pts[i][1]-10}" text-anchor="middle" class="chval">${nfmt(g.v)}</text><text x="${pts[i][0]}" y="${H+46}" text-anchor="middle" class="chlab">${esc(String(label(g.k)).slice(0,12))}</text></g>`});
+  else if(type==='hbar'){const span=hi-lo;w.innerHTML=`<div class="chh">${out.map((g,i)=>`<button class="chhr chbar" data-i="${i}"><span class="chhl">${esc(label(g.k))}</span><span class="chht"><i style="width:${Math.max(0,Math.min(100,(g.v-lo)/span*100))}%;background:${g.col}"></i></span><b>${nfmt(g.v)}</b></button>`).join('')}</div>`}
+  else if(type==='line'){const n=out.length,W=Math.max(BW,n*70),x=i=>(n<2?W/2:64+i*(W-104)/(n-1));const pts=out.map((g,i)=>[x(i),clampY(g.v,lo,hi)]);
+    let s=`<svg viewBox="0 0 ${W} ${H+T+40}" class="chsvg" style="min-width:${n>8?Math.min(n*52,1200):0}px">`+axis(W,lo,hi,nfmt);
+    s+=`<path d="M${pts[0][0]},${T+H} L${pts.map(p=>p.join(',')).join(' L')} L${pts[pts.length-1][0]},${T+H}Z" class="charea"/><path d="M${pts.map(p=>p.join(',')).join(' L')}" class="chline"/>`;
+    out.forEach((g,i)=>{s+=`<g class="chbar" data-i="${i}"><circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="5" class="chdot"/><text x="${pts[i][0]}" y="${pts[i][1]-10}" text-anchor="middle" class="chval">${nfmt(g.v)}</text><text x="${pts[i][0]}" y="${H+T+20}" text-anchor="middle" class="chlab">${esc(String(label(g.k)).slice(0,12))}</text></g>`});
     w.innerHTML=`<div class="chscroll">${s}</svg></div>`}
   else if(type==='donut'){const sum=out.reduce((a,g)=>a+g.v,0)||1;let a0=-Math.PI/2,s='<svg viewBox="0 0 220 220" class="chdon">';
     out.forEach((g,i)=>{const a1=a0+g.v/sum*Math.PI*2,R=100,r=62,big=a1-a0>Math.PI?1:0,P=(rad,ang)=>[110+rad*Math.cos(ang),110+rad*Math.sin(ang)];
-      if(g.v<=0){return}const full=g.v/sum>.9999;const p1=P(R,a0),p2=P(R,a1-(full?.0001:0)),p3=P(r,a1-(full?.0001:0)),p4=P(r,a0);
+      if(g.v<=0)return;const full=g.v/sum>.9999;const p1=P(R,a0),p2=P(R,a1-(full?.0001:0)),p3=P(r,a1-(full?.0001:0)),p4=P(r,a0);
       s+=`<path class="chbar" data-i="${i}" fill="${g.col}" d="M${p1} A${R},${R} 0 ${big} 1 ${p2} L${p3} A${r},${r} 0 ${big} 0 ${p4}Z"/>`;a0=a1});
     s+=`<text x="110" y="108" text-anchor="middle" class="chdt">${nfmt(total)}</text><text x="110" y="128" text-anchor="middle" class="chax">${esc(what)}</text></svg>`;
     w.innerHTML=`<div class="chdonw">${s}<div class="chleg">${out.map((g,i)=>`<button class="chbar" data-i="${i}"><i style="background:${g.col}"></i><span>${esc(label(g.k))}</span><b>${nfmt(g.v)}</b><small>${Math.round(g.v/sum*100)}%</small></button>`).join('')}</div></div>`}
   if(type!=='number'&&out.length)w.insertAdjacentHTML('beforeend',`<p class="chcap">${esc(what[0].toUpperCase()+what.slice(1))} by ${esc(xName)} \u00B7 tap a bar to see its rows</p><div class="chrows"></div>`);
   w.querySelectorAll('.chbar').forEach(el=>el.addEventListener('click',()=>{const g=out[+el.dataset.i];const box2=w.querySelector('.chrows');w.querySelectorAll('.chbar').forEach(x=>x.classList.toggle('dim',x.dataset.i!==el.dataset.i));
     box2.innerHTML=`<div class="chrh"><b>${esc(label(g.k))}</b> \u00B7 ${g.rows.length} row${g.rows.length===1?'':'s'}<button class="lnk">Clear</button></div>`+g.rows.map(r=>`<button class="gli" data-id="${r.id}"><span class="gli-ic">${r.icon||'\u1F4C4'}</span><b>${esc(r.title||'Untitled')}</b><span class="gli-m">${rowMeta(db,r,null,3)}</span></button>`).join('');
-    box2.querySelector('.lnk').onclick=()=>{box2.innerHTML='';w.querySelectorAll('.dim').forEach(x=>x.classList.remove('dim'))};box2.querySelectorAll('[data-id]').forEach(x=>x.onclick=()=>openPeek(x.dataset.id))}));
+    box2.querySelector('.lnk').onclick=()=>{box2.innerHTML='';w.querySelectorAll('.dim').forEach(x=>x.classList.remove('dim'))};if(!V.ro)box2.querySelectorAll('[data-id]').forEach(x=>x.onclick=()=>openPeek(x.dataset.id))}));
   box.appendChild(w)}
+/* chart part of the view settings */
+function chartSettingsHTML(db,V){const c=V.chart=V.chart||{},type=c.type||'bar',rows=c.mode==='rows'&&(type==='line'||type==='bar');
+  const xs=db.props.filter(p=>['select','multi','check','date','text','place'].includes(p.type)),ns=db.props.filter(p=>p.type==='number'||p.type==='formula'),rxs=db.props.filter(p=>['date','number','formula'].includes(p.type));
+  const sel=(k,opts,cur)=>`<select data-c="${k}" class="psel">${opts.map(([v,l])=>`<option value="${v}"${(cur??'')===v?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
+  let o=`<div class="vslbl">Chart type</div><div class="chtypes">${CHARTS.map(([k,l,ic])=>`<button data-ct="${k}" class="${type===k?'on':''}" title="${l}" aria-label="${l}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></button>`).join('')}</div>`;
+  if(type==='line'||type==='bar')o+=`<div class="vsgrp"><div class="vsrow"><span>Data</span><div class="vseg"><button data-cm="" class="${rows?'':'on'}">Group &amp; total</button><button data-cm="rows" class="${rows?'on':''}">Each row</button></div></div></div>`;
+  o+='<div class="vsgrp">';
+  if(rows){const xk=c.rx||'title',xp=xk==='title'?null:propById(db,xk);
+    o+=`<div class="vsrow"><span>X axis</span>${sel('rx',[['title','Name'],...rxs.map(p=>[p.id,p.name])],xk)}</div>`;
+    o+=`<div class="vsrow vscol"><span>${type==='line'?'Lines':'Bars'} <small class="tsub">(properties to draw)</small></span><div class="chys">${ns.length?ns.map((p,i)=>{const on=(c.ys&&c.ys.length?c.ys:[ns[0].id]).includes(p.id);return `<label><input type="checkbox" data-y="${p.id}"${on?' checked':''}><i style="background:${PAL[(c.ys||[ns[0].id]).indexOf(p.id)%PAL.length]||'var(--line)'}"></i>${esc(p.name)}</label>`}).join(''):'<span class="tsub">Add a Number property first.</span>'}</div></div>`;
+    if(xp&&(xp.type==='date'||xp.type==='number'||xp.type==='formula')){const t=xp.type==='date'?'date':'number';o+=`<div class="vsrow"><span>X range</span><span class="chrng"><input type="${t}" data-c="xmin" value="${esc(c.xmin||'')}" placeholder="From" aria-label="X from"><b>to</b><input type="${t}" data-c="xmax" value="${esc(c.xmax||'')}" placeholder="To" aria-label="X to"></span></div>`}}
+  else if(type!=='number'){const xk=c.x||(db.props.find(p=>p.type==='select')||{}).id||'title',xp=xk==='title'?null:propById(db,xk);
+    o+=`<div class="vsrow"><span>${type==='donut'?'Slices by':'X axis'}</span>${sel('x',[['title','Name'],...xs.map(p=>[p.id,p.name])],xk)}</div>`;
+    if(xp&&xp.type==='date'&&type!=='donut')o+=`<div class="vsrow"><span>X range</span><span class="chrng"><input type="month" data-c="xmin" value="${esc((c.xmin||'').slice(0,7))}" aria-label="From month"><b>to</b><input type="month" data-c="xmax" value="${esc((c.xmax||'').slice(0,7))}" aria-label="To month"></span></div>`}
+  if(!rows)o+=`<div class="vsrow"><span>Value</span>${sel('agg',[['count','Count of rows'],...ns.flatMap(p=>[['sum:'+p.id,'Sum of '+p.name],['avg:'+p.id,'Average of '+p.name]])],c.agg||'count')}</div>`;
+  if(!rows&&type!=='number'&&type!=='line')o+=`<div class="vsrow"><span>Order</span><div class="vseg">${[['','Default'],['desc','Biggest first'],['asc','Smallest first']].map(([k,l])=>`<button data-co="${k}" class="${(c.ord||'')===k?'on':''}">${l}</button>`).join('')}</div></div>`;
+  if(type!=='number'&&type!=='donut')o+=`<div class="vsrow"><span>Y range</span><span class="chrng"><input type="number" step="any" data-c="ymin" value="${esc(c.ymin??'')}" placeholder="Auto" aria-label="Y minimum"><b>to</b><input type="number" step="any" data-c="ymax" value="${esc(c.ymax??'')}" placeholder="Auto" aria-label="Y maximum"></span></div>`;
+  return o+'</div>'}
+function wireChartSettings(pop,db,V,redraw,live){const c=V.chart;
+  pop.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>{c.type=b.dataset.ct;save();redraw();live()});
+  pop.querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{c.mode=b.dataset.cm||undefined;delete c.xmin;delete c.xmax;save();redraw();live()});
+  pop.querySelectorAll('select[data-c]').forEach(s=>s.onchange=()=>{c[s.dataset.c]=s.value;if(s.dataset.c==='x'||s.dataset.c==='rx'){delete c.xmin;delete c.xmax}save();redraw();live()});
+  pop.querySelectorAll('input[data-c]').forEach(i=>{i.oninput=()=>{c[i.dataset.c]=i.value;save();live()};i.onkeydown=e=>{if(e.key==='Enter')i.blur()}});
+  pop.querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{c.ord=b.dataset.co;save();redraw();live()});
+  pop.querySelectorAll('[data-y]').forEach(x=>x.onchange=()=>{const ns=db.props.filter(p=>p.type==='number'||p.type==='formula');let ys=c.ys&&c.ys.length?c.ys.slice():(ns[0]?[ns[0].id]:[]);
+    if(x.checked){if(!ys.includes(x.dataset.y))ys.push(x.dataset.y)}else ys=ys.filter(y=>y!==x.dataset.y);c.ys=ys;save();redraw();live()})}
+
 /* MAP: offline world + detailed Philippines; places are "lat, lng" or a known place name */
 const PH_PLACES={'manila':[14.5995,120.9842],'quezon city':[14.676,121.0437],'caloocan':[14.6507,120.9668],'makati':[14.5547,121.0244],'pasig':[14.5764,121.0851],'taguig':[14.5176,121.0509],'pasay':[14.5378,121.0014],'paranaque':[14.4793,121.0198],'las pinas':[14.4445,120.9939],'muntinlupa':[14.4081,121.0415],'valenzuela':[14.7011,120.983],'malabon':[14.6681,120.9658],'navotas':[14.6667,120.9417],'marikina':[14.6507,121.1029],'san juan':[14.6019,121.0355],'mandaluyong':[14.5794,121.0359],
   'antipolo':[14.5862,121.1761],'cavite':[14.4791,120.8970],'bacoor':[14.4624,120.9645],'imus':[14.4297,120.9367],'dasmarinas':[14.3294,120.9367],'tagaytay':[14.1153,120.9621],'batangas':[13.7565,121.0583],'lipa':[13.9411,121.1631],'calamba':[14.2117,121.1653],'santa rosa':[14.3122,121.1114],'lucena':[13.9373,121.6170],'malolos':[14.8527,120.8160],'meycauayan':[14.7347,120.9578],'san jose del monte':[14.8139,121.0453],'angeles':[15.1450,120.5887],'san fernando':[15.0286,120.6898],'olongapo':[14.8292,120.2828],'tarlac':[15.4755,120.5963],'cabanatuan':[15.4865,120.9667],'baguio':[16.4023,120.596],'dagupan':[16.0433,120.3333],'vigan':[17.5747,120.3869],'laoag':[18.1978,120.5936],'tuguegarao':[17.6131,121.7269],'naga':[13.6218,123.1948],'legazpi':[13.1391,123.7438],'puerto princesa':[9.7392,118.7353],'el nido':[11.1956,119.4075],'coron':[12.0012,120.2043],
@@ -3569,11 +3647,46 @@ function gMap(db,box,hostId,rer,V){
     if(cur.length>=2&&st.pts.length>=2){const d0=Math.hypot(st.pts[0].x-st.pts[1].x,st.pts[0].y-st.pts[1].y),d1=Math.hypot(cur[0].x-cur[1].x,cur[0].y-cur[1].y);if(d0>0){const f=d1/d0,cx=st.vb[0]+st.vb[2]/2,cy=st.vb[1]+st.vb[3]/2,nw=Math.max(.6*K,Math.min(360*K,st.vb[2]/f));vb=[cx-nw/2,cy-nw*st.vb[3]/st.vb[2]/2,nw,nw*st.vb[3]/st.vb[2]];setVB();moved=true}return}
     const dx=e.clientX-st.pts[0].x,dy=e.clientY-st.pts[0].y;if(Math.hypot(dx,dy)>4)moved=true;if(moved){vb=[st.vb[0]-dx*sc,st.vb[1]-dy*sc,st.vb[2],st.vb[3]];setVB()}});
   const end=e=>{P.delete(e.pointerId);if(P.size)return;const was=moved;st=null;
-    if(!was&&!placing&&pinHit){openPeek(pinHit.dataset.id);pinHit=null;return}pinHit=null;
+    if(!was&&!placing&&pinHit){if(!V.ro)openPeek(pinHit.dataset.id);pinHit=null;return}pinHit=null;
     if(!was&&placing){const p=toSvg(e),ln=p.x/K-180,la=90-p.y/K;const r=pg(placing);r.props[mp.id]=`${la.toFixed(4)}, ${ln.toFixed(4)}`;placing=null;save();toast(`Placed \u201C${r.title||'Untitled'}\u201D.`,{label:'Undo',fn:undo});rer()}};
   svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',e=>{P.delete(e.pointerId);st=null});
-  w.querySelectorAll('.gm-go').forEach(b=>b.onclick=()=>{const p=pts.find(x=>x.r.id===b.dataset.id);if(p&&p.ll){const [x,y]=xy(p.ll);vb=[x-vb[2]/2,y-vb[3]/2,vb[2],vb[3]];setVB()}else openPeek(b.dataset.id)});
+  w.querySelectorAll('.gm-go').forEach(b=>b.onclick=()=>{const p=pts.find(x=>x.r.id===b.dataset.id);if(p&&p.ll){const [x,y]=xy(p.ll);vb=[x-vb[2]/2,y-vb[3]/2,vb[2],vb[3]];setVB()}else if(!V.ro)openPeek(b.dataset.id)});
   w.querySelectorAll('.gm-set').forEach(b=>b.onclick=()=>{placing=b.dataset.id;const r=pg(placing);hint.hidden=false;hint.innerHTML=`Tap the map where \u201C${esc(r.title||'Untitled')}\u201D is. <button class="lnk">Cancel</button>`;hint.querySelector('button').onclick=()=>{placing=null;hint.hidden=true};w.classList.add('placing')});
+}
+
+/* ---------- Database widget: shows a saved database in any layout, view-only ---------- */
+function gTableRO(db,box,hostId,rer,V){const cols=dbCols(db),rows=viewRows(db,V),t=document.createElement('div');t.className='rotbl';
+  t.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c.pr?c.pr.name:'Name')}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>{if(!c.pr)return `<td class="nm">${r.icon||'\u1F4C4'} ${esc(r.title||'Untitled')}</td>`;
+    const v=r.props[c.pr.id];let h='';if(c.pr.type==='select'&&v)h=chipH(c.pr,v);else if(c.pr.type==='multi'&&v)h=v.map(x=>chipH(c.pr,x)).join(' ');else if(c.pr.type==='check')h=v?'\u2611':'\u2610';else if(c.pr.type==='date'&&v)h=esc(fmtDateShort(v));else h=esc(fmtVal(db,c.pr,v,r));
+    return `<td class="${c.pr.type==='number'||c.pr.type==='formula'?'n':''}">${h}</td>`}).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}" class="tsub">No rows.</td></tr>`}</tbody></table>`;box.appendChild(t)}
+const RO_BLOCK='.gli,.ggc,.gcard,.cit,.tl-n,.tl-b,.gfp header,.gfp-open,.gm-set,.newrow,.ggc-new,.cadd,.gempty button';
+let roTip=0;
+function wDB(b,c){
+  const w=wShell('wdbv','Database'),body=w.querySelector('.wbody'),lab=w.querySelector('.wlabel');
+  const draw=()=>{const db=b.dbid&&S.dbs[b.dbid];body.innerHTML='';lab.innerHTML='';
+    if(!db){lab.textContent='Database view';body.innerHTML=`<button class="gempty2">${lyIcon('chart',26)}<b>Choose a saved database</b><small>Shows it as a table, chart, board, map\u2026 View only, so nothing gets changed by accident.</small></button>`;
+      body.firstChild.onclick=e=>pickDatabase(e.currentTarget,id=>{b.dbid=id;b.lv={view:'table'};save();draw();setTimeout(()=>{const ch=w.querySelector('.wdb-ly');if(ch)ch.click()},60)});return}
+    w.querySelectorAll('.whead .wdb-ly,.whead .wdb-ro').forEach(x=>x.remove());const V=b.lv=b.lv||{view:'table'};vTabs(V);V.ro=true;const t=V.tabs.find(x=>x.id===V.tab);
+    lab.innerHTML=`<span class="wdb-nm">${esc(dbTitle(db))}</span>`;
+    const ly=document.createElement('button');ly.className='wdb-ly';ly.title='Change the layout of this widget';ly.innerHTML=`${lyIcon(V.view,13)}<span>${esc(t.name)}</span>`;ly.onclick=()=>openViewSettings(ly,db,V,draw);lab.after(ly);
+    const ro=document.createElement('span');ro.className='wdb-ro';ro.textContent='View only';ly.after(ro);
+    const R={board:gBoard,calendar:gCal,timeline:gTimeline,list:gList,gallery:gGallery,chart:gChart,feed:gFeed,map:gMap}[V.view]||gTableRO;
+    const h=hostOfDB(db.id);R(db,body,h?h.id:null,draw,V);
+    /* view only: no adding, moving or opening rows from here */
+    body.querySelectorAll('.newrow,.ggc-new,.cadd,.gm-set,.tl-g,.gempty button').forEach(x=>x.remove());
+    body.querySelectorAll('[draggable="true"]').forEach(x=>x.draggable=false);
+    body.querySelectorAll('.tsub').forEach(x=>{if(/Drag a card|Switch to Table/.test(x.textContent))x.remove()});
+  };
+  const block=e=>{if(e.target.closest&&e.target.closest(RO_BLOCK)){e.stopPropagation();e.preventDefault();if(e.type==='click'&&Date.now()-roTip>4000){roTip=Date.now();toast('This widget is view only. Open the database page to edit.',{label:'Open',fn:()=>{const h=b.dbid&&hostOfDB(b.dbid);if(h)go(h.id)}})}}};
+  body.addEventListener('click',block,true);body.addEventListener('pointerdown',block,true);body.addEventListener('dragstart',e=>e.preventDefault(),true);
+  w.querySelector('.wgear').onclick=e=>openPop(e.currentTarget,pop=>{const db=b.dbid&&S.dbs[b.dbid],h=db&&hostOfDB(db.id);
+    pop.innerHTML='<div class="lb3">Database widget</div>'+(db?'<button class="ditem" data-a="ly"><span>Layout and view settings</span></button>':'')+'<button class="ditem" data-a="pick"><span>'+(db?'Change database':'Choose a database')+'</span></button>'+(h?`<button class="ditem" data-a="open"><span>Open \u201C${esc(h.title||'Untitled')}\u201D to edit</span></button>`:'');
+    const a=k=>pop.querySelector(`[data-a="${k}"]`);
+    if(a('ly'))a('ly').onclick=()=>{POPCLOSE=null;closePop();const ch=w.querySelector('.wdb-ly');if(ch)ch.click()};
+    a('pick').onclick=()=>{POPCLOSE=null;closePop();pickDatabase(w.querySelector('.wgear'),id=>{if(id!==b.dbid){b.dbid=id;b.lv={view:(b.lv&&b.lv.view)||'table'}}save();draw()})};
+    if(a('open'))a('open').onclick=()=>{POPCLOSE=null;closePop();go(h.id)};
+  });
+  draw();c.appendChild(w);
 }
 
 function renderGDB(db,box,hostId,inline,blk){
@@ -3890,10 +4003,10 @@ function unColumn(b,p){
 }
 
 /* ---------- widgets: clock, gallery, calendar ---------- */
-const WIDGETS=['w_clock','w_gallery','w_cal'];
+const WIDGETS=['w_clock','w_gallery','w_cal','w_db'];
 const TZS=[['local','This device'],['Asia/Manila','Manila'],['America/New_York','New York'],['Europe/London','London'],['Asia/Tokyo','Tokyo'],['Australia/Sydney','Sydney']];
 const GEAR='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>';
-function widgetDefaults(t){return t==='w_clock'?{style:'digital',h24:false,sec:true,tz:'local'}:t==='w_gallery'?{imgs:[],layout:'slide',auto:0}:{wkStart:0,events:true,month:null}}
+function widgetDefaults(t){return t==='w_db'?{dbid:null,lv:{view:'table'}}:t==='w_clock'?{style:'digital',h24:false,sec:true,tz:'local'}:t==='w_gallery'?{imgs:[],layout:'slide',auto:0}:{wkStart:0,events:true,month:null}}
 function wShell(cls,label){const d=document.createElement('div');d.className='widget '+cls;d.innerHTML=`<div class="whead"><span class="wlabel">${label}</span><button class="wgear" aria-label="Widget settings" title="Widget settings">${GEAR}</button></div><div class="wbody"></div>`;return d}
 function optRow(label,on,attrs){return `<button class="ditem${on?' on':''}" ${attrs}><span>${label}</span>${on?'<span class="okm">✓</span>':''}</button>`}
 
