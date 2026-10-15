@@ -82,8 +82,11 @@ button:focus-visible,select:focus-visible,input:focus-visible,[contenteditable]:
 .ghost:hover{background:var(--hover);color:var(--fg)}
 /* main */
 .main{display:flex;flex-direction:column;min-width:0;min-height:100vh;min-height:100dvh;background:var(--surface)}
-.top{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line);min-height:52px;box-sizing:border-box;position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--surface)}
-.menu{display:grid;width:34px;height:34px;border-radius:8px;place-items:center}
+.top{display:flex;align-items:center;gap:6px;padding:2px 10px;border-bottom:1px solid var(--line);min-height:38px;box-sizing:border-box;position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--surface)}
+.menu{display:grid;width:32px;height:32px;border-radius:8px;place-items:center}
+.top .tbtn{width:32px;height:32px}.top .backsplit{padding-block:3px}
+.apal{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.apal button{display:flex;flex-direction:column;gap:5px;align-items:center;padding:6px;border-radius:10px;border:1.5px solid var(--line);font-size:12.5px;color:var(--fg)}.apal button.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.apsw{position:relative;width:100%;height:38px;border-radius:7px;overflow:hidden;display:flex;border:1px solid var(--line)}.apsw i{flex:1}.apsw i:first-child{flex:.6}.apsw b{position:absolute;right:6px;bottom:6px;width:14px;height:14px;border-radius:50%}
 .menu:hover{background:var(--hover)}
 .crumb{flex:1;min-width:0;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden}
 .crumb span{overflow:hidden;text-overflow:ellipsis}
@@ -104,7 +107,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,[contenteditable]:
 .pico:focus{outline:none}.pico:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
 .ptitle{white-space:pre-wrap;font-family:var(--display);font-weight:700;font-size:38px;line-height:1.15;letter-spacing:-.02em;margin:10px 0 18px 28px;outline:none;text-wrap:balance;word-break:break-word}
 .ptitle:empty::before{content:"Untitled";color:var(--muted)}
-.meta{margin:-8px 0 20px 28px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+.meta{margin:10px 0 20px 28px;font-size:12px;color:var(--muted);font-family:var(--mono);opacity:.8}
 /* blocks */
 .blk{display:grid;grid-template-columns:28px minmax(0,1fr);align-items:start;position:relative}
 .gut{opacity:0;width:24px;height:26px;border-radius:5px;color:var(--muted);display:grid;place-items:center;margin-top:2px}
@@ -385,7 +388,7 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .tdot{width:7px;height:7px;border-radius:50%;flex:none}
 #tReset:disabled{opacity:.45;cursor:default}
 @media (max-width:820px){.pstyle{margin-left:24px}}
-.cover{height:210px;margin-inline:calc(-1 * clamp(16px,3vw,40px));position:relative;background-size:cover;background-position:center;background-color:var(--chip)}
+.cover{height:120px;margin-inline:calc(-1 * clamp(16px,3vw,40px));position:relative;background-size:cover;background-position:center;background-color:var(--chip)}
 .cover.moving{cursor:ns-resize;touch-action:none}
 .cvbar{position:absolute;right:16px;top:12px;flex-wrap:wrap;justify-content:flex-end;display:flex;gap:6px;opacity:0;transition:opacity .15s}
 .cover:hover .cvbar,.cover:focus-within .cvbar,.cover.moving .cvbar{opacity:1}
@@ -413,7 +416,7 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .cprev.movable{cursor:ns-resize;touch-action:none}
 .cpicon{position:absolute;left:14px;bottom:8px;font-size:34px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 .cpbtns{display:flex;justify-content:flex-end;gap:8px;margin:12px 0 18px}
-@media (max-width:820px){.cover{height:150px}.pbar{margin-left:24px}
+@media (max-width:820px){.cover{height:86px}.pbar{margin-left:24px}
   .cpanel{top:auto;bottom:0;left:0;right:0;transform:none;width:auto;max-height:80vh;border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}}
 .dmenu{position:fixed;z-index:45;width:260px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px}
 .dmenu.sheet{left:0!important;right:0;bottom:0;top:auto!important;width:auto;border-radius:18px 18px 0 0;padding:10px 10px calc(12px + env(safe-area-inset-bottom,0px))}
@@ -766,7 +769,7 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .pkpath{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pkbody{flex:1;overflow:auto;padding:0 18px 30px 6px;overscroll-behavior:contain}
 .peek{overscroll-behavior:contain}
-.pkcover{height:120px;margin:0 -18px 0 -6px;background-size:cover;background-position:center}
+.pkcover{height:84px;margin:0 -18px 0 -6px;background-size:cover;background-position:center}
 .pkicon{font-size:46px;line-height:1;margin:22px 0 0 var(--gut);display:block;background:none;padding:0;transition:transform .15s}
 .pkicon:hover{transform:scale(1.05)}
 .pkcover{position:relative}
@@ -806,7 +809,7 @@ body.resizing .main{transition:none}
 .pane{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05);--gut:40px;font-family:var(--body);transition:border-color .15s,box-shadow .15s}
 .pane.focus{border-color:color-mix(in srgb,#3b82f6 55%,var(--line));box-shadow:0 0 0 3px rgba(59,130,246,.12)}
 .pane .pkbody{padding:0 14px 24px 4px}
-.pane .pkcover{margin:0 -14px 0 -4px;height:100px}
+.pane .pkcover{margin:0 -14px 0 -4px;height:70px}
 .pane .ptitle{font-size:24px}
 .pane .pkicon{font-size:40px}
 body.splitting .canvas,body.splitting .main .fab{visibility:hidden}
@@ -963,6 +966,36 @@ body.splitting .peek{top:62px;bottom:10px}
 .nghead b{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nghead i{font-style:normal;font-size:11.5px;color:var(--muted);background:var(--chip);border-radius:999px;padding:1px 8px}
 .nghead:hover{background:var(--hover)}.nghead svg{color:var(--muted)}
 .nscrim{position:fixed;inset:0;z-index:61;background:rgba(0,0,0,.3)}
+.npanel header{gap:6px}.nhsp{flex:1}.npanel .nadd{white-space:nowrap}
+.nsearch{display:flex;align-items:center;gap:8px;margin:0 16px 8px;padding:0 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--muted)}
+.nsearch input{flex:1;min-width:0;border:0;background:none;outline:none;padding:9px 0;font:inherit;font-size:14px;color:var(--fg)}
+.nrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 10px;border-radius:10px;border:1px solid var(--line);margin-bottom:6px;background:var(--surface);color:var(--fg);font:inherit}
+@media (hover:hover){.nrow:hover{background:var(--hover)}}.nrow.pinned{border-color:color-mix(in srgb,var(--nc) 60%,var(--line))}
+.ndot{width:10px;height:10px;border-radius:50%;background:var(--nc);flex:none}
+.nrt{flex:1;min-width:0;display:flex;flex-direction:column}.nrt b{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nrt small{font-size:11.5px;color:var(--muted)}
+.nrow>svg{color:var(--muted);flex:none}.nst{font-size:11px;flex:none}
+.nghead.gone{cursor:default}.nghead em,.sdbrow em{font-style:normal;font-size:11px;color:var(--muted);background:var(--chip);border-radius:999px;padding:1px 7px;white-space:nowrap}
+.sdbrow.gone .nm{opacity:.75}
+.nedh{display:flex;align-items:center;gap:4px;padding:10px 10px 6px 8px!important}
+.nback{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:var(--fg);flex:none}.nback:hover{background:var(--hover)}
+.nfrom{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nedw{flex:1;overflow:auto;padding:4px 16px 24px;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain}
+.ntitle{border:0;background:none;outline:none;font:inherit;font-family:var(--display);font-size:21px;font-weight:700;color:var(--fg);padding:4px 0;border-bottom:2px solid color-mix(in srgb,var(--nc) 60%,transparent)}
+.nmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.nmeta .ncols{margin-left:auto;margin-right:0}
+.nstat{display:flex;gap:4px;flex-wrap:wrap}.nstat button{padding:3px 6px;border-radius:999px;font-size:12px;color:var(--muted);border:1.5px solid transparent}.nstat button.on{border-color:var(--fg);color:var(--fg)}.nstat .opt{font-size:11.5px}
+.ntool{display:flex;align-items:center;gap:2px;flex-wrap:wrap;padding:4px;border-radius:10px;background:var(--chip);position:sticky;top:0;z-index:1}
+.ntool button{min-width:32px;height:32px;border-radius:8px;font-size:14px;color:var(--fg);display:grid;place-items:center;padding:0 6px}.ntool button:hover{background:var(--hover)}
+.ntool small{font-size:10px}.nhl{background:#ffe58a;color:#222;padding:0 3px;border-radius:3px}.ntsep{width:1px;height:20px;background:var(--line);margin:0 3px}
+.nedit{min-height:180px;outline:none;font-size:14.5px;line-height:1.6;padding:6px 2px;border-radius:8px;word-break:break-word}
+.nedit:empty::before{content:attr(data-ph);color:var(--muted)}
+.nedit ul{margin:4px 0;padding-left:22px}.nedit font[size="2"]{font-size:12px}.nedit font[size="5"]{font-size:18px}.nedit font[size="6"]{font-size:22px;font-weight:700}
+.nck{display:flex;align-items:flex-start;gap:4px}.ckb{flex:none;width:17px;height:17px;margin-top:4px;border:1.8px solid var(--muted);border-radius:4px;cursor:pointer;display:inline-grid;place-items:center;user-select:none}
+.ckb[data-on="1"]{background:var(--accent);border-color:var(--accent)}.ckb[data-on="1"]::after{content:"✓";color:#fff;font-size:12px;font-weight:700;line-height:1}
+.nck.done{color:var(--muted);text-decoration:line-through}
+.ntg{margin:4px 0;padding:2px 0 2px 4px;border-left:2px solid var(--line)}.ntg summary{cursor:pointer;font-weight:600}.ntg>div{padding-left:14px}
+.nph{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:999px;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-size:12.5px;font-weight:600;cursor:pointer;user-select:none}
+.nedw .ntime{order:0;margin:0}
+
 .sectbtn{display:flex;align-items:center;gap:6px;width:100%;text-align:left;margin-top:10px}
 .sectbtn:hover{color:var(--fg)}.sectbtn i{font-style:normal;margin-left:auto;font-size:10.5px;letter-spacing:0;background:var(--chip);border-radius:999px;padding:0 7px;line-height:17px}
 .sdbrow{width:100%;text-align:left}.sdbrow .sdbn{margin-left:auto;font-size:11px;color:var(--muted);padding-right:6px}
@@ -1553,6 +1586,7 @@ body.lockshow .main .fab{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 <aside class="tpanel" id="spanel" hidden aria-label="Settings">
   <header><h2>Settings</h2><button class="x" id="sClose" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
   <div class="tbody2">
+    <section class="tsec"><h3>Appearance</h3><div id="sApp"></div></section>
     <section class="tsec"><h3>Security</h3>
       <span class="lb2">Auto-lock after inactivity</span>
       <div class="seg" id="sLock"><button data-v="never">Never</button><button data-v="1">1 min</button><button data-v="5">5 min</button><button data-v="15">15 min</button></div>
@@ -1761,17 +1795,17 @@ function renderTree(){
     sv.forEach(db=>{const h=hostOfDB(db.id),r=document.createElement('button');r.className='row sdbrow'+(h&&h.id===S.current?' on':'');r.title=`In ${h.title||'Untitled'}`;
       r.innerHTML=`<span class="ic">🗂️</span><span class="nm">${esc(dbTitle(db))}</span><span class="sdbn">${dbRowsAlive(db).length}</span>`;r.onclick=()=>openSavedDB(db);t.appendChild(r)})}
   /* saved notes, grouped by page */
-  const all=notesArr().filter(n=>pg(n.pid)&&!pg(n.pid).deleted),byP={};all.forEach(n=>(byP[n.pid]=byP[n.pid]||[]).push(n));
+  const all=notesArr(),byP={};all.forEach(n=>(byP[n.pid]=byP[n.pid]||[]).push(n));
   const nopen=S.ui.notesOpen!==false;
   const nh=document.createElement('button');nh.className='sect sectbtn';nh.innerHTML=`<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="transform:rotate(${nopen?90:0}deg)"><path d="M9 6l6 6-6 6z"/></svg>Saved notes${all.length?`<i>${all.length}</i>`:''}`;
   nh.onclick=()=>{S.ui.notesOpen=!nopen;persist();renderTree()};t.appendChild(nh);
   if(nopen){
     if(!all.length)t.insertAdjacentHTML('beforeend','<p class="sdbempty">Tap the notes icon at the top right of any page to write a note.</p>');
     else{const ar=document.createElement('button');ar.className='row sdbrow'+(NT.open&&NT.tab==='all'?' on':'');ar.innerHTML=`<span class="ic">📝</span><span class="nm">All notes</span><span class="sdbn">${all.length}</span>`;ar.onclick=()=>{closeDrawer();openNotes(S.current,'all')};t.appendChild(ar);
-      Object.entries(byP).sort((a,b)=>Math.max(...b[1].map(n=>n.updated))-Math.max(...a[1].map(n=>n.updated))).forEach(([pid,ns])=>{const pp=pg(pid),r=document.createElement('button');
-        r.className='row sdbrow'+(NT.open&&NT.tab==='page'&&NT.pid===pid?' on':'');r.title=`Notes on ${pp.title||'Untitled'}`;
-        r.innerHTML=`<span class="ic">${pp.icon}</span><span class="nm">${esc(pp.title||'Untitled')}</span><span class="sdbn">${ns.length}</span>`;
-        r.onclick=()=>{closeDrawer();if(!SPL&&S.current!==pid)go(pid);openNotes(pid,'page')};t.appendChild(r)})}}
+      Object.entries(byP).sort((a,b)=>Math.max(...b[1].map(n=>n.updated))-Math.max(...a[1].map(n=>n.updated))).forEach(([pid,ns])=>{const alive=pageAlive(pid),pp=pg(pid),r=document.createElement('button');
+        const nm=alive?(pp.title||'Untitled'):(ns[0].ptitle||'Untitled');r.className='row sdbrow'+(alive?'':' gone')+(NT.open&&NT.tab==='page'&&NT.pid===pid?' on':'');r.title=alive?`Notes on ${nm}`:`${nm} was deleted. Its notes are kept.`;
+        r.innerHTML=`<span class="ic">${alive?pp.icon:(ns[0].picon||'📄')}</span><span class="nm">${esc(nm)}${alive?'':' <em>(deleted)</em>'}</span><span class="sdbn">${ns.length}</span>`;
+        r.onclick=()=>{closeDrawer();if(!alive){openNotes(S.current,'all');return}if(!SPL&&S.current!==pid)go(pid);openNotes(pid,'page')};t.appendChild(r)})}}
   renderTrashBtn();
 }
 function rowEl(p,d,flat){
@@ -1813,17 +1847,17 @@ function _renderPage(){
   const ch=document.createElement('button');ch.id='pstyle';ch.className='pstyle';ch.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.7 0-.9-1-1.5-1-2.4 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5C21 6.5 17 3 12 3Z"/></svg><b></b>';ch.onclick=openTheme;
   const bar=document.createElement('div');bar.className='pbar';
   if(!p.cover){const cb=document.createElement('button');cb.className='pstyle';cb.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 15 5-4 4 3 3-2 6 4"/></svg><b>Add cover</b>';cb.onclick=openCover;bar.appendChild(cb)}
-  bar.appendChild(ch);w.appendChild(bar);updateStyleChip();
+  /* page theme now lives in the ☰ menu */
+  if(bar.children.length)w.appendChild(bar);updateStyleChip();
   if(p.kind==='db'){renderDB(p,w);return}
   if(p.kind==='gdb'){const box=document.createElement('div');w.appendChild(box);if(S.dbs[p.dbid])renderGDB(S.dbs[p.dbid],box,p.id,false);return}
   if(p.rowOf)renderRowProps(p,w);
-  const meta=document.createElement('div');meta.className='meta';meta.textContent=`${p.blocks.length} blocks · saved on this device`;w.appendChild(meta);
   let n=0;
   renderBlocks(p,w);
   if(!p.blocks.length){p.blocks.push(B('p',''));return renderPage()}
   const tail=document.createElement('div');tail.className='tail';tail.title='Tap to keep writing';
   tail.onclick=()=>{const last=p.blocks[p.blocks.length-1];if(last&&last.type==='p'&&!last.text)focusBlock(last.id);else{const nb=B('p','');p.blocks.push(nb);save();renderPage();focusBlock(nb.id)}};
-  w.insertAdjacentHTML('beforeend',`<div class="hint"><span><kbd>/</kbd> all blocks</span><span><kbd>#</kbd> heading</span><span><kbd>-</kbd> list</span><span><kbd>[]</kbd> checklist</span><span><kbd>&gt;</kbd> quote</span></div>`);
+  w.insertAdjacentHTML('beforeend',`<div class="hint"><span><kbd>/</kbd> all blocks</span><span><kbd>#</kbd> heading</span><span><kbd>-</kbd> list</span><span><kbd>[]</kbd> checklist</span><span><kbd>&gt;</kbd> quote</span></div><div class="meta">${p.blocks.length} block${p.blocks.length===1?'':'s'} · saved on this device</div>`);
   w.appendChild(tail);
 }
 let PT=null;try{const d=document.createElement('div');d.contentEditable='plaintext-only';PT=d.contentEditable==='plaintext-only'}catch(e){}
@@ -2500,77 +2534,121 @@ function pickDatabase(anchor,onPick){
   });
 }
 
-/* ---------- page notes ---------- */
+/* ---------- page notes: titled notes with rich text, a status, photos, and they outlive their page ---------- */
 const NOTE_COLORS=[['yellow','#f4d35e'],['green','#6cc08b'],['blue','#6ea8e6'],['pink','#e98bb5'],['purple','#a98be6'],['gray','#a3a8a5']];
+const NOTE_STATUS=[['','No status','gray'],['todo','To do','gray'],['doing','In progress','blue'],['wait','On hold','yellow'],['done','Done','green']];
 const noteHex=k=>(NOTE_COLORS.find(x=>x[0]===k)||NOTE_COLORS[0])[1];
 const notesArr=()=>S.notes||(S.notes=[]);
-const notesOf=pid=>notesArr().filter(n=>n.pid===pid&&pg(n.pid)&&!pg(n.pid).deleted).sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||b.updated-a.updated);
+const pageAlive=pid=>{const p=pg(pid);return !!(p&&!p.deleted)};
+const nSort=(a,b)=>(b.pin?1:0)-(a.pin?1:0)||b.updated-a.updated;
+const notesOf=pid=>notesArr().filter(n=>n.pid===pid&&pageAlive(pid)).sort(nSort);
+const allNotes=()=>notesArr();
 const NOTE_ICON='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M15 3v5h5M8 13h8M8 17h5"/></svg>';
-const NT={open:false,pid:null,tab:'page',q:'',color:'yellow'};
+const NT={open:false,pid:null,tab:'page',q:'',color:'yellow',edit:null};
+/* older notes were plain text: give them a title and rich content once */
+function noteFix(n){if(n.html==null){n.html=esc(n.text||'').replace(/\n/g,'<br>')}if(n.title==null){const first=(n.text||'').split('\n')[0].trim();n.title=first.slice(0,60)}if(!n.imgs)n.imgs={};return n}
+const notePlain=n=>{const d=document.createElement('div');d.innerHTML=n.html||'';d.querySelectorAll('.nph').forEach(x=>x.textContent=' ');return (d.textContent||'').replace(/\s+/g,' ').trim()};
+const noteTitle=n=>(n.title||'').trim()||notePlain(n).slice(0,48)||'Untitled note';
+const statusChip=s=>{const st=NOTE_STATUS.find(x=>x[0]===s);return st&&s?`<span class="opt o-${st[2]} nst">${st[1]}</span>`:''};
 function noteBtn(pid,cls){const b=document.createElement('button');b.className='pnotes '+(cls||'');b.dataset.npid=pid;b.title='Notes for this page';b.setAttribute('aria-label','Notes');
   const n=notesOf(pid).length;b.innerHTML=NOTE_ICON+(n?`<span class="nbadge">${n}</span>`:'');b.onclick=e=>{e.stopPropagation();openNotes(pid)};return b}
 function updNoteBadges(){renderTree();document.querySelectorAll('.pnotes[data-npid]').forEach(b=>{const n=notesOf(b.dataset.npid).length;let s=b.querySelector('.nbadge');if(n){if(!s){s=document.createElement('span');s.className='nbadge';b.appendChild(s)}s.textContent=n}else if(s)s.remove()})}
 const ago=t=>{const d=new Date(t),now=new Date();const same=d.toDateString()===now.toDateString();return same?d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:d.getFullYear()===now.getFullYear()?undefined:'numeric'})};
 function openNotes(pid,tab){
-  NT.open=true;NT.pid=pid||S.current;if(tab)NT.tab=tab;
+  NT.open=true;NT.pid=pid||S.current;if(tab)NT.tab=tab;NT.edit=null;
   let el=$('#npanel');
   if(!el){el=document.createElement('aside');el.className='npanel';el.id='npanel';el.setAttribute('aria-label','Notes');document.body.appendChild(el);
     const sc=document.createElement('div');sc.className='nscrim';sc.id='nscrim';sc.onclick=closeNotes;document.body.appendChild(sc)}
   el.hidden=false;$('#nscrim').hidden=!isPhone();drawNotes();renderTree();
-  if(!isPhone()&&NT.tab==='page')setTimeout(()=>el.querySelector('.ncomp textarea')?.focus(),60);
 }
-function closeNotes(){NT.open=false;const el=$('#npanel');if(el)el.hidden=true;const sc=$('#nscrim');if(sc)sc.hidden=true;renderTree()}
-function noteCard(n,showPage){
-  const d=document.createElement('div');d.className='ncard'+(n.pin?' pinned':'');d.style.setProperty('--nc',noteHex(n.color));
-  d.innerHTML=`<textarea class="ntext" rows="1" spellcheck="true" aria-label="Note"></textarea><div class="nfoot"><span class="ntime">${n.updated!==n.created?'Edited ':''}${ago(n.updated)}</span>
-    <span class="ncols">${NOTE_COLORS.map(([k,h])=>`<button class="ncol${n.color===k?' on':''}" data-c="${k}" style="--c:${h}" aria-label="${k} note"></button>`).join('')}</span>
-    <button class="nact" data-a="pin" title="${n.pin?'Unpin':'Pin to top'}" aria-label="Pin">${n.pin?'★':'☆'}</button><button class="nact" data-a="del" title="Delete note" aria-label="Delete note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>`;
-  const ta=d.querySelector('.ntext');ta.value=n.text;
-  const grow=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'};requestAnimationFrame(grow);
-  ta.oninput=()=>{n.text=ta.value;n.updated=Date.now();grow();save();d.querySelector('.ntime').textContent='Edited '+ago(n.updated)};
-  ta.onblur=()=>{if(!n.text.trim()){S.notes=notesArr().filter(x=>x!==n);save();drawNotes();updNoteBadges()}};
-  d.querySelectorAll('.ncol').forEach(b=>b.onclick=()=>{n.color=b.dataset.c;save();d.style.setProperty('--nc',noteHex(n.color));d.querySelectorAll('.ncol').forEach(x=>x.classList.toggle('on',x===b))});
-  d.querySelector('[data-a="pin"]').onclick=()=>{n.pin=!n.pin||undefined;save();drawNotes()};
-  d.querySelector('[data-a="del"]').onclick=()=>{S.notes=notesArr().filter(x=>x!==n);save();drawNotes();updNoteBadges();toast('Note deleted.',{label:'Undo',fn:()=>{notesArr().push(n);save();drawNotes();updNoteBadges()}})};
-  return d;
-}
+function closeNotes(){NT.open=false;NT.edit=null;const el=$('#npanel');if(el)el.hidden=true;const sc=$('#nscrim');if(sc)sc.hidden=true;renderTree()}
+/* the list: titles only; tap one to open it */
+function noteRow(n,showPage){noteFix(n);const r=document.createElement('button');r.className='nrow'+(n.pin?' pinned':'');r.style.setProperty('--nc',noteHex(n.color));
+  const ph=Object.keys(n.imgs||{}).length;
+  r.innerHTML=`<i class="ndot"></i><span class="nrt"><b>${esc(noteTitle(n))}</b><small>${ago(n.updated)}${ph?` \u00B7 \u{1F4F7} ${ph}`:''}${n.pin?' \u00B7 \u2605':''}</small></span>${statusChip(n.status)}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>`;
+  r.onclick=()=>{NT.edit=n.id;drawNotes()};return r}
 function drawNotes(){
-  const el=$('#npanel');if(!el||el.hidden)return;const p=pg(NT.pid)||cur();NT.pid=p.id;
-  const all=notesArr().filter(n=>pg(n.pid)&&!pg(n.pid).deleted);
-  el.innerHTML=`<header><h2>${NOTE_ICON}Notes</h2><button class="x" aria-label="Close notes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
-    <div class="seg ntabs"><button data-t="page" class="${NT.tab==='page'?'on':''}">This page</button><button data-t="all" class="${NT.tab==='all'?'on':''}">All notes${all.length?` · ${all.length}`:''}</button></div><div class="nbody"></div>`;
+  const el=$('#npanel');if(!el||el.hidden)return;const p=pg(NT.pid)&&!pg(NT.pid).deleted?pg(NT.pid):cur();NT.pid=p.id;
+  if(NT.edit){const n=notesArr().find(x=>x.id===NT.edit);if(n)return noteEditor(el,n);NT.edit=null}
+  const all=allNotes();
+  el.innerHTML=`<header><h2>${NOTE_ICON}Notes</h2><span class="nhsp"></span><button class="btn pri sm nadd" title="Add a note">+ Add note</button><button class="x" aria-label="Close notes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+    <div class="nsearch"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="nq" placeholder="Search notes" aria-label="Search notes" value="${esc(NT.q)}"></div>
+    <div class="seg ntabs"><button data-t="page" class="${NT.tab==='page'?'on':''}">This page${notesOf(p.id).length?` \u00B7 ${notesOf(p.id).length}`:''}</button><button data-t="all" class="${NT.tab==='all'?'on':''}">All notes${all.length?` \u00B7 ${all.length}`:''}</button></div><div class="nbody"></div>`;
   el.querySelector('.x').onclick=closeNotes;
+  el.querySelector('.nadd').onclick=()=>{const now=Date.now();const n={id:uid(),pid:p.id,ptitle:p.title||'Untitled',picon:p.icon,title:'',html:'',text:'',color:NT.color,status:'',imgs:{},created:now,updated:now,fresh:true};notesArr().push(n);NT.edit=n.id;NT.tab='page';save();drawNotes()};
   el.querySelectorAll('.ntabs button').forEach(b=>b.onclick=()=>{NT.tab=b.dataset.t;drawNotes();renderTree()});
-  const body=el.querySelector('.nbody');
-  if(NT.tab==='page'){
-    body.innerHTML=`<div class="npage"><span>${p.icon}</span><b>${esc(p.title||'Untitled')}</b></div>
-      <div class="ncomp" style="--nc:${noteHex(NT.color)}"><textarea rows="3" placeholder="Write a note for this page…"></textarea><div class="nfoot"><span class="ncols">${NOTE_COLORS.map(([k,h])=>`<button class="ncol${NT.color===k?' on':''}" data-c="${k}" style="--c:${h}" aria-label="${k}"></button>`).join('')}</span><button class="btn pri sm" data-a="add">Add note</button></div></div>
-      <div class="nlist"></div>`;
-    const comp=body.querySelector('.ncomp'),ta=comp.querySelector('textarea');
-    comp.querySelectorAll('.ncol').forEach(b=>b.onclick=()=>{NT.color=b.dataset.c;comp.style.setProperty('--nc',noteHex(NT.color));comp.querySelectorAll('.ncol').forEach(x=>x.classList.toggle('on',x===b));ta.focus()});
-    const add=()=>{const t=ta.value.trim();if(!t){ta.focus();return}const now=Date.now();notesArr().push({id:uid(),pid:p.id,text:t,color:NT.color,created:now,updated:now});save();drawNotes();updNoteBadges();setTimeout(()=>$('#npanel .ncomp textarea')?.focus(),0)};
-    comp.querySelector('[data-a="add"]').onclick=add;ta.onkeydown=e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();add()}};
-    const list=body.querySelector('.nlist'),ns=notesOf(p.id);
-    if(!ns.length)list.innerHTML='<p class="nempty">No notes on this page yet. They stay here, separate from the page content.</p>';
-    else ns.forEach(n=>list.appendChild(noteCard(n)));
-  }else{
-    body.innerHTML=`<input class="pq" placeholder="Search all notes" aria-label="Search notes" value="${esc(NT.q)}"><div class="nlist"></div>`;
-    const inp=body.querySelector('.pq'),list=body.querySelector('.nlist');
-    const paint=()=>{list.innerHTML='';const q=NT.q.trim().toLowerCase();
-      const hits=all.filter(n=>!q||n.text.toLowerCase().includes(q)||(pg(n.pid).title||'').toLowerCase().includes(q));
-      if(!hits.length){list.innerHTML=`<p class="nempty">${all.length?'No notes match your search.':'You have no notes yet. Open any page and tap the notes icon in its top-right corner.'}</p>`;return}
-      const groups={};hits.forEach(n=>(groups[n.pid]=groups[n.pid]||[]).push(n));
-      Object.entries(groups).sort((a,b)=>Math.max(...b[1].map(n=>n.updated))-Math.max(...a[1].map(n=>n.updated))).forEach(([pid,ns])=>{
-        const pp=pg(pid),g=document.createElement('section');g.className='ngroup';
-        const h=document.createElement('button');h.className='nghead';h.title='Open this page';h.innerHTML=`<span>${pp.icon}</span><b>${esc(pp.title||'Untitled')}</b><i>${ns.length}</i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>`;
-        h.onclick=()=>{NT.tab='page';NT.pid=pid;if(SPL||PEEK===pid)drawNotes();else{go(pid)}drawNotes()};
-        g.appendChild(h);ns.sort((a,b)=>(b.pin?1:0)-(a.pin?1:0)||b.updated-a.updated).forEach(n=>g.appendChild(noteCard(n,true)));list.appendChild(g)})};
-    inp.oninput=()=>{NT.q=inp.value;paint()};paint();
-  }
+  const body=el.querySelector('.nbody'),inp=el.querySelector('.nq');
+  const match=n=>{const q=NT.q.trim().toLowerCase();if(!q)return true;noteFix(n);const pp=pg(n.pid);return noteTitle(n).toLowerCase().includes(q)||notePlain(n).toLowerCase().includes(q)||((pp&&pp.title)||n.ptitle||'').toLowerCase().includes(q)||(NOTE_STATUS.find(s=>s[0]===n.status)||['',''])[1].toLowerCase().includes(q)};
+  const paint=()=>{body.innerHTML='';
+    if(NT.tab==='page'){body.insertAdjacentHTML('beforeend',`<div class="npage"><span>${p.icon}</span><b>${esc(p.title||'Untitled')}</b></div>`);
+      const ns=notesOf(p.id).filter(match);
+      if(!ns.length){body.insertAdjacentHTML('beforeend',`<p class="nempty">${NT.q?'No notes match your search.':'No notes on this page yet. Tap <b>+ Add note</b> above.'}</p>`);return}
+      ns.forEach(n=>body.appendChild(noteRow(n)));return}
+    const hits=all.filter(match);
+    if(!hits.length){body.innerHTML=`<p class="nempty">${all.length?'No notes match your search.':'You have no notes yet. Open any page and tap <b>+ Add note</b>.'}</p>`;return}
+    const groups={};hits.forEach(n=>(groups[n.pid]=groups[n.pid]||[]).push(n));
+    Object.entries(groups).sort((a,b)=>Math.max(...b[1].map(n=>n.updated))-Math.max(...a[1].map(n=>n.updated))).forEach(([pid,ns])=>{
+      const alive=pageAlive(pid),pp=pg(pid),g=document.createElement('section');g.className='ngroup';
+      const h=document.createElement('button');h.className='nghead'+(alive?'':' gone');h.title=alive?'Open this page':'This page was deleted. Its notes are kept here.';
+      h.innerHTML=`<span>${alive?pp.icon:(ns[0].picon||'\u{1F4C4}')}</span><b>${esc(alive?(pp.title||'Untitled'):(ns[0].ptitle||'Untitled'))}</b>${alive?'':'<em>deleted page</em>'}<i>${ns.length}</i>${alive?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>':''}`;
+      if(alive)h.onclick=()=>{NT.tab='page';NT.pid=pid;if(!(SPL||PEEK===pid))go(pid);drawNotes()};
+      g.appendChild(h);ns.sort(nSort).forEach(n=>g.appendChild(noteRow(n,true)));body.appendChild(g)})};
+  inp.oninput=()=>{NT.q=inp.value;paint()};paint();
+}
+/* one note: title, status, formatting bar, rich text, photos (shown as "Photo added" until tapped) */
+function noteEditor(el,n){noteFix(n);const pp=pg(n.pid),alive=pageAlive(n.pid);
+  const touch=()=>{n.updated=Date.now();delete n.fresh;if(alive){n.ptitle=pp.title||'Untitled';n.picon=pp.icon}save()};
+  el.innerHTML=`<header class="nedh"><button class="nback" aria-label="Back to the list"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button><span class="nfrom">${alive?`${pp.icon} ${esc(pp.title||'Untitled')}`:`${n.picon||'\u{1F4C4}'} ${esc(n.ptitle||'Untitled')} \u00B7 deleted page`}</span>
+      <button class="nact" data-a="pin" title="${n.pin?'Unpin':'Pin to top'}">${n.pin?'\u2605':'\u2606'}</button><button class="nact" data-a="del" title="Delete note" aria-label="Delete note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button><button class="x" aria-label="Close notes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+    <div class="nedw" style="--nc:${noteHex(n.color)}"><input class="ntitle" placeholder="Note title" value="${esc(n.title||'')}" aria-label="Note title">
+      <div class="nmeta"><div class="nstat">${NOTE_STATUS.map(([k,l,c])=>`<button data-s="${k}" class="${(n.status||'')===k?'on':''}">${k?`<span class="opt o-${c}">${l}</span>`:l}</button>`).join('')}</div>
+        <span class="ncols">${NOTE_COLORS.map(([k,h])=>`<button class="ncol${n.color===k?' on':''}" data-c="${k}" style="--c:${h}" aria-label="${k} note"></button>`).join('')}</span></div>
+      <div class="ntool" role="toolbar" aria-label="Formatting">
+        <button data-f="bold" title="Bold"><b>B</b></button><button data-f="italic" title="Italic"><i>I</i></button><button data-f="hl" title="Highlight"><span class="nhl">ab</span></button>
+        <button data-f="size" title="Text size">A<small>A</small></button><span class="ntsep"></span>
+        <button data-f="bullet" title="Bullet list">\u2022\u2261</button><button data-f="check" title="Checkbox">\u2611</button><button data-f="toggle" title="Toggle">\u25B8</button><span class="ntsep"></span>
+        <button data-f="photo" title="Add a photo">\u{1F4F7}</button></div>
+      <div class="nedit" contenteditable="true" spellcheck="true" data-ph="Write your note\u2026" aria-label="Note text"></div>
+      <small class="ntime">${n.fresh?'New note':`Edited ${ago(n.updated)}`}</small><input type="file" accept="image/*" hidden class="nfile"></div>`;
+  const ed=el.querySelector('.nedit'),ti=el.querySelector('.ntitle');ed.innerHTML=n.html||'';
+  const sync=()=>{n.html=ed.innerHTML;n.text=notePlain(n);touch()};
+  ti.oninput=()=>{n.title=ti.value;touch()};ti.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ed.focus()}};
+  ed.oninput=sync;
+  const back=()=>{if(!(n.title||'').trim()&&!notePlain(n)&&!Object.keys(n.imgs).length){S.notes=notesArr().filter(x=>x!==n);save()}NT.edit=null;drawNotes();updNoteBadges()};
+  el.querySelector('.nback').onclick=back;el.querySelector('.x').onclick=()=>{back();closeNotes()};
+  el.querySelector('[data-a="pin"]').onclick=e=>{n.pin=!n.pin||undefined;save();e.currentTarget.textContent=n.pin?'\u2605':'\u2606'};
+  el.querySelector('[data-a="del"]').onclick=async()=>{const ok=await askConfirm({title:'Delete this note?',body:`\u201C${esc(noteTitle(n))}\u201D will be removed.`,ok:'Delete',danger:true});if(!ok)return;
+    S.notes=notesArr().filter(x=>x!==n);save();NT.edit=null;drawNotes();updNoteBadges();toast('Note deleted.',{label:'Undo',fn:()=>{notesArr().push(n);save();drawNotes();updNoteBadges()}})};
+  el.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{n.status=b.dataset.s;touch();el.querySelectorAll('[data-s]').forEach(x=>x.classList.toggle('on',x===b))});
+  el.querySelectorAll('.ncol').forEach(b=>b.onclick=()=>{n.color=b.dataset.c;NT.color=n.color;touch();el.querySelector('.nedw').style.setProperty('--nc',noteHex(n.color));el.querySelectorAll('.ncol').forEach(x=>x.classList.toggle('on',x===b))});
+  /* formatting */
+  let saved=null;const keep=()=>{const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))saved=s.getRangeAt(0).cloneRange()};
+  const restore=()=>{ed.focus();if(saved){const s=getSelection();s.removeAllRanges();s.addRange(saved)}};
+  ed.addEventListener('keyup',keep);ed.addEventListener('mouseup',keep);ed.addEventListener('touchend',()=>setTimeout(keep,0));ed.addEventListener('blur',keep);
+  const insertHTML=h=>{restore();document.execCommand('insertHTML',false,h);sync()};
+  el.querySelectorAll('[data-f]').forEach(b=>{b.onmousedown=e=>e.preventDefault();b.onclick=()=>{const f=b.dataset.f;
+    if(f==='bold'||f==='italic'){restore();document.execCommand(f);sync()}
+    else if(f==='bullet'){restore();document.execCommand('insertUnorderedList');sync()}
+    else if(f==='hl'){restore();document.execCommand('styleWithCSS',false,true);const on=document.queryCommandValue('hiliteColor');const isOn=/rgb\(25[0-5], 2(2|3)\d, 1\d\d\)|#ffe/i.test(on);document.execCommand('hiliteColor',false,isOn?'transparent':'#ffe58a');document.execCommand('styleWithCSS',false,false);sync()}
+    else if(f==='size'){openPop(b,pop=>{pop.innerHTML='<div class="lb3">Text size</div>'+[['2','Small'],['3','Normal'],['5','Large'],['6','Heading']].map(([v,l])=>`<button class="ditem" data-z="${v}"><span style="font-size:${{2:12,3:14,5:18,6:22}[v]}px">${l}</span></button>`).join('');
+      pop.querySelectorAll('[data-z]').forEach(x=>x.onclick=()=>{POPCLOSE=null;closePop();restore();document.execCommand('fontSize',false,x.dataset.z);sync()})})}
+    else if(f==='check')insertHTML('<div class="nck"><span class="ckb" contenteditable="false" data-on="0"></span>&nbsp;</div>');
+    else if(f==='toggle')insertHTML('<details class="ntg" open><summary>Toggle</summary><div>&nbsp;</div></details><div><br></div>');
+    else if(f==='photo'){keep();el.querySelector('.nfile').click()}}});
+  el.querySelector('.nfile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;bnImg(f,src=>{const id=uid();n.imgs[id]=src;insertHTML(`<span class="nph" contenteditable="false" data-img="${id}">\u{1F4F7} Photo added</span>&nbsp;`);toast('Photo added. Tap \u201CPhoto added\u201D to see it.')})};
+  ed.addEventListener('click',e=>{const ck=e.target.closest('.ckb');if(ck){ck.dataset.on=ck.dataset.on==='1'?'0':'1';ck.closest('.nck')?.classList.toggle('done',ck.dataset.on==='1');sync();return}
+    const ph=e.target.closest('.nph');if(ph){const src=n.imgs[ph.dataset.img];if(src)openLightbox([src],0);else toast('This photo is missing.')}});
+  /* Enter inside a checkbox line starts a new checkbox line */
+  ed.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.shiftKey)return;const s=getSelection();const line=s.anchorNode&&(s.anchorNode.nodeType===1?s.anchorNode:s.anchorNode.parentElement).closest('.nck');
+    if(!line)return;e.preventDefault();
+    const nx=document.createElement('div');if(!line.textContent.replace(/\u00a0/g,'').trim()){nx.innerHTML='<br>';line.replaceWith(nx)}
+    else{nx.className='nck';nx.innerHTML='<span class="ckb" contenteditable="false" data-on="0"></span>\u00a0';line.after(nx)}
+    const r=document.createRange();r.setStart(nx.lastChild||nx,nx.lastChild&&nx.lastChild.nodeType===3?nx.lastChild.length:0);r.collapse(true);s.removeAllRanges();s.addRange(r);sync()});
+  if(n.fresh)setTimeout(()=>ti.focus(),60);
 }
 /* when you change pages, the "This page" tab follows */
-function notesFollow(id){if(NT.open&&NT.tab==='page'&&NT.pid!==id){NT.pid=id;drawNotes()}}
-addEventListener('keydown',e=>{if(e.key==='Escape'&&NT.open&&$('#pop').hidden&&!document.querySelector('.gadj-scrim')){if(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#npanel'))document.activeElement.blur();closeNotes()}});
+function notesFollow(id){if(NT.open&&NT.tab==='page'&&NT.pid!==id&&!NT.edit){NT.pid=id;drawNotes()}}
+addEventListener('keydown',e=>{if(e.key==='Escape'&&NT.open&&$('#pop').hidden&&!document.querySelector('.gadj-scrim')&&!document.querySelector('.lbox')){if(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#npanel'))document.activeElement.blur();if(NT.edit){NT.edit=null;drawNotes()}else closeNotes()}});
 
 /* ---------- saved databases in the sidebar ---------- */
 function savedDBList(){return Object.values(S.dbs).filter(db=>db.saved&&hostOfDB(db.id)).sort((a,b)=>dbTitle(a).localeCompare(dbTitle(b)))}
@@ -3069,7 +3147,7 @@ function openMenu(anchor){
   const items=[
     {a:'hub',i:'hub',l:'Ecosystem home'},'-',
     {a:'side',i:'side',l:phone?'Open sidebar':SPL?'Show sidebar':(S.ui?.sideHidden?'Show sidebar':'Hide sidebar'),k:phone||SPL?'':'Ctrl+\\'},'-',
-    {a:'theme',i:'theme',l:'Page theme'},
+    {a:'theme',i:'theme',l:hasPT(p)?'Page theme · custom':'Page theme'},
     {a:'cover',i:'cover',l:p.cover?'Change cover':'Add cover'},
     {a:'dup',i:'dup',l:'Duplicate page'},
     {a:'export',i:'export',l:'Export…'},'-',
@@ -3190,10 +3268,37 @@ $('#trClose').onclick=closeTrash;$('#trscrim').onclick=closeTrash;
 /* ---------- settings ---------- */
 const SDEF={autolock:'5',exportFmt:'pdf',paper:'a4',confirmDelete:true,pinHash:null};
 S.settings={...SDEF,...(S.settings||{})};
+/* ---------- app theme (Settings): light / dark / system and a few palettes. Pages with their own theme keep it. ---------- */
+const APP_THEMES=[
+  {id:'sage',n:'Sage',a:['#1F6F5C','#55B596']},
+  {id:'ocean',n:'Ocean',a:['#2563B8','#6EA8F0'],L:{bg:'#F2F5FA',surface:'#FFFFFF',side:'#E5EBF4',fg:'#152030',muted:'#5D6A7C',line:'#D3DCE8'},D:{bg:'#0E131A',surface:'#151C26',side:'#111821',fg:'#E2E9F3',muted:'#8E9AAB',line:'#263142'}},
+  {id:'rose',n:'Rose',a:['#B83E70','#EC8DB3'],L:{bg:'#FAF4F6',surface:'#FFFFFF',side:'#F2E6EB',fg:'#2A1820',muted:'#7C6670',line:'#EBD8E0'},D:{bg:'#160F12',surface:'#1E1519',side:'#1A1215',fg:'#F2E4EA',muted:'#A88F9A',line:'#36262E'}},
+  {id:'paper',n:'Paper',a:['#9A5B22','#E0A866'],L:{bg:'#F6F1E7',surface:'#FFFCF6',side:'#EEE6D7',fg:'#2B241A',muted:'#7A6E5C',line:'#E3D9C6'},D:{bg:'#15120D',surface:'#1D1913',side:'#19150F',fg:'#EEE5D4',muted:'#A49780',line:'#342C21'}},
+  {id:'violet',n:'Violet',a:['#6B4FD8','#A99BFF'],L:{bg:'#F5F4FB',surface:'#FFFFFF',side:'#EAE7F6',fg:'#1D1A2E',muted:'#696680',line:'#DCD8EE'},D:{bg:'#0F0E18',surface:'#161522',side:'#12111C',fg:'#E7E5F5',muted:'#9490AE',line:'#2A2840'}},
+  {id:'graphite',n:'Graphite',a:['#3F4652','#A8B1BF'],L:{bg:'#F4F5F6',surface:'#FFFFFF',side:'#E8EAED',fg:'#1B1E22',muted:'#686E77',line:'#D9DCE1'},D:{bg:'#111214',surface:'#18191C',side:'#141518',fg:'#E6E8EB',muted:'#959AA2',line:'#2B2D32'}}];
+const APPVARS=['--bg','--surface','--side','--fg','--muted','--line','--accent','--accent-fg','--accent-soft','--hover','--chip'];
+const appDark=()=>{const m=(S.settings.appTheme||{}).mode||'system';return m==='dark'||(m==='system'&&matchMedia('(prefers-color-scheme: dark)').matches)};
+function applyAppTheme(){const at=S.settings.appTheme||{},R=document.documentElement,st=R.style,mode=at.mode||'system';
+  if(mode==='system')R.removeAttribute('data-theme');else R.setAttribute('data-theme',mode);
+  APPVARS.forEach(k=>st.removeProperty(k));
+  const T=APP_THEMES.find(t=>t.id===at.palette);if(!T||T.id==='sage')return;
+  const dk=appDark(),P=dk?T.D:T.L,acc=T.a[dk?1:0];
+  Object.entries(P).forEach(([k,v])=>st.setProperty('--'+k,v));
+  st.setProperty('--accent',acc);st.setProperty('--accent-fg',lum(acc)>.45?'#111':'#fff');
+  st.setProperty('--accent-soft',`color-mix(in srgb,${acc} 18%,${P.surface})`);st.setProperty('--hover',`color-mix(in srgb,${acc} 9%,transparent)`);st.setProperty('--chip',`color-mix(in srgb,${P.fg} 6%,${P.surface})`)}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{applyAppTheme()})}catch(e){}
+function drawAppTheme(){const box=$('#sApp');if(!box)return;const at=S.settings.appTheme=S.settings.appTheme||{mode:'system',palette:'sage'};
+  box.innerHTML=`<span class="lb2">Mode</span><div class="seg" id="sMode">${[['light','Light'],['dark','Dark'],['system','Same as device']].map(([v,l])=>`<button data-v="${v}" class="${(at.mode||'system')===v?'on':''}">${l}</button>`).join('')}</div>
+    <span class="lb2" style="margin-top:12px">Suggested themes</span><div class="apal">${APP_THEMES.map(t=>{const L=t.L||{bg:'#F4F6F3',surface:'#FFFFFF',side:'#EAEDE8'},D=t.D||{bg:'#111412',surface:'#171B19',side:'#141816'},dk=appDark(),P=dk?D:L;
+      return `<button data-p="${t.id}" class="${(at.palette||'sage')===t.id?'on':''}"><span class="apsw" style="background:${P.bg}"><i style="background:${P.side}"></i><i style="background:${P.surface}"></i><b style="background:${t.a[dk?1:0]}"></b></span><span>${t.n}</span></button>`}).join('')}</div>
+    <p class="tsub" style="margin-top:8px">Changes the app around your pages. A page with its own Page theme keeps its look.</p>`;
+  box.querySelectorAll('#sMode button').forEach(b=>b.onclick=()=>{at.mode=b.dataset.v;save();applyAppTheme();drawAppTheme();applyTheme()});
+  box.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{at.palette=b.dataset.p;save();applyAppTheme();drawAppTheme();applyTheme()})}
+
 function openSettings(){closeDrawer();drawSettings();$('#spanel').hidden=false;$('#sscrim').hidden=false}
 function closeSettings(){$('#spanel').hidden=true;$('#sscrim').hidden=true}
 function drawSettings(){{const lb=S.settings.lastBackup,el=$('#sBackup');if(el)el.textContent=lb?`Last backup: ${new Date(lb).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})}`:'No backup yet.'}
-  const st=S.settings;
+  drawAppTheme();const st=S.settings;
   const seg=(sel,key)=>document.querySelectorAll(sel+' button').forEach(b=>{b.classList.toggle('on',b.dataset.v===st[key]);b.onclick=()=>{st[key]=b.dataset.v;save();drawSettings();if(key==='autolock')bumpIdle()}});
   seg('#sLock','autolock');seg('#sFmt','exportFmt');seg('#sPaper','paper');
   $('#sConfirm').checked=st.confirmDelete;
@@ -3472,18 +3577,18 @@ function rowText(r,max=320){let s='';for(const b of r.blocks||[]){if(b.text&&!['
 const newRowBtn=(db,hostId,rer,vals,label)=>{const b=document.createElement('button');b.className='newrow';b.textContent=label||'+ New';b.onclick=()=>{const r=addRow(db,hostId,vals||{});rer();openPeek(r.id)};return b};
 /* LIST */
 function gList(db,box,hostId,rer,V){const rows=viewRows(db,V),w=document.createElement('div');w.className='glist';
-  rows.forEach(r=>{const it=document.createElement('button');it.className='gli';it.innerHTML=`<span class="gli-ic">${r.icon||'\u1F4C4'}</span><b>${esc(r.title||'Untitled')}</b><span class="gli-m">${rowMeta(db,r,null,3)}</span>`;it.onclick=()=>openPeek(r.id);w.appendChild(it)});
+  rows.forEach(r=>{const it=document.createElement('button');it.className='gli';it.innerHTML=`<span class="gli-ic">${r.icon||'\u{1F4C4}'}</span><b>${esc(r.title||'Untitled')}</b><span class="gli-m">${rowMeta(db,r,null,3)}</span>`;it.onclick=()=>openPeek(r.id);w.appendChild(it)});
   if(!rows.length)w.innerHTML='<p class="tsub" style="padding:10px">No rows to show.</p>';w.appendChild(newRowBtn(db,hostId,rer));box.appendChild(w)}
 /* GALLERY */
 function gGallery(db,box,hostId,rer,V){const rows=viewRows(db,V),w=document.createElement('div');w.className='ggal s-'+(V.galSize||'m');const cov=(V.galCover||'cover')!=='none';
   rows.forEach(r=>{const c=document.createElement('button');c.className='ggc';const img=cov?rowImage(r):'';
-    const top=!cov?'':img?`<span class="ggc-img" style="background-image:url('${img}')"></span>`:r.cover?`<span class="ggc-img" style="background:${coverCSS(r.cover)}"></span>`:`<span class="ggc-img ggc-ic">${r.icon||'\u1F4C4'}</span>`;
-    c.innerHTML=`${top}<span class="ggc-b"><b>${cov?'':(r.icon||'\u1F4C4')+' '}${esc(r.title||'Untitled')}</b><span class="ggc-m">${rowMeta(db,r,null,4)}</span></span>`;c.onclick=()=>openPeek(r.id);w.appendChild(c)});
+    const top=!cov?'':img?`<span class="ggc-img" style="background-image:url('${img}')"></span>`:r.cover?`<span class="ggc-img" style="background:${coverCSS(r.cover)}"></span>`:`<span class="ggc-img ggc-ic">${r.icon||'\u{1F4C4}'}</span>`;
+    c.innerHTML=`${top}<span class="ggc-b"><b>${cov?'':(r.icon||'\u{1F4C4}')+' '}${esc(r.title||'Untitled')}</b><span class="ggc-m">${rowMeta(db,r,null,4)}</span></span>`;c.onclick=()=>openPeek(r.id);w.appendChild(c)});
   const add=document.createElement('button');add.className='ggc ggc-new';add.innerHTML='<span>+ New</span>';add.onclick=()=>{const r=addRow(db,hostId,{});rer();openPeek(r.id)};w.appendChild(add);box.appendChild(w)}
 /* FEED */
 function gFeed(db,box,hostId,rer,V){const rows=viewRows(db,V),w=document.createElement('div');w.className='gfeed';
   rows.forEach(r=>{const a=document.createElement('article');a.className='gfp';const img=rowImage(r),tx=rowText(r);
-    a.innerHTML=`<header><span class="gfp-ic">${r.icon||'\u1F4C4'}</span><b>${esc(r.title||'Untitled')}</b></header><div class="gfp-m">${rowMeta(db,r,null,6)}</div>${tx?`<p>${esc(tx)}</p>`:'<p class="tsub">No notes inside yet.</p>'}${img?`<img src="${img}" alt="">`:''}<button class="gfp-open">Open \u203A</button>`;
+    a.innerHTML=`<header><span class="gfp-ic">${r.icon||'\u{1F4C4}'}</span><b>${esc(r.title||'Untitled')}</b></header><div class="gfp-m">${rowMeta(db,r,null,6)}</div>${tx?`<p>${esc(tx)}</p>`:'<p class="tsub">No notes inside yet.</p>'}${img?`<img src="${img}" alt="">`:''}<button class="gfp-open">Open \u203A</button>`;
     a.querySelector('.gfp-open').onclick=()=>openPeek(r.id);a.querySelector('header').onclick=()=>openPeek(r.id);w.appendChild(a)});
   if(!rows.length)w.innerHTML='<p class="tsub" style="padding:10px">No rows to show.</p>';w.appendChild(newRowBtn(db,hostId,rer,{},'+ New post'));box.appendChild(w)}
 /* TIMELINE: bars from the start date to the end date; drag a bar to move it, drag its end to stretch it */
@@ -3502,7 +3607,7 @@ function gTimeline(db,box,hostId,rer,V){
   let head='<div class="tl-mo">';for(let d=new Date(a);d<=b;d=new Date(d.getFullYear(),d.getMonth()+1,1)){const n=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();head+=`<span style="left:${xOf(d)}px;width:${n*PX}px">${d.toLocaleString('en-US',{month:scale==='month'?'short':'long',year:'numeric'})}</span>`}head+='</div>';
   if(scale!=='month'){head+='<div class="tl-days">';for(let i=0;i<days;i++){const d=new Date(a.getTime()+i*day);if(scale==='day'||d.getDay()===1)head+=`<span style="left:${i*PX}px;width:${scale==='day'?PX:PX*7}px" class="${d.getDay()%6===0?'we':''}">${scale==='day'?d.getDate():d.getDate()}</span>`}head+='</div>'}
   const today=xOf(new Date(new Date().toDateString()));
-  wrap.innerHTML=`<div class="tl-names"><div class="tl-nh">${esc(db.name||'Rows')}</div>${dated.map(r=>`<button class="tl-n" data-id="${r.id}">${r.icon||'\u1F4C4'} ${esc(r.title||'Untitled')}</button>`).join('')}</div>
+  wrap.innerHTML=`<div class="tl-names"><div class="tl-nh">${esc(db.name||'Rows')}</div>${dated.map(r=>`<button class="tl-n" data-id="${r.id}">${r.icon||'\u{1F4C4}'} ${esc(r.title||'Untitled')}</button>`).join('')}</div>
     <div class="tl-sc"><div class="tl-in" style="width:${W}px"><div class="tl-h">${head}</div><div class="tl-rows">${scale==='day'?Array.from({length:days},(_,i)=>{const d=new Date(a.getTime()+i*day);return d.getDay()%6===0?`<i class="tl-we" style="left:${i*PX}px;width:${PX}px"></i>`:''}).join(''):''}<i class="tl-today" style="left:${today+PX/2}px"></i>
     ${dated.map(r=>{const s=D(r.props[dp.id]),e=D(endOf(r)),x=xOf(s),w2=Math.max(PX,xOf(e)-x+PX);const sp=db.props.find(p=>p.type==='select'&&r.props[p.id]);const col=sp?COLOR_HEX[optColor(sp,r.props[sp.id])]:'var(--accent)';
       return `<div class="tl-r"><div class="tl-b" data-id="${r.id}" style="left:${x}px;width:${w2}px;--bc:${col}"><span>${esc(r.title||'Untitled')}</span>${ep?'<i class="tl-g" title="Drag to change the end date"></i>':''}</div></div>`}).join('')}</div></div></div>`;
@@ -3574,7 +3679,7 @@ function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=do
       s+=`<g class="chpt" data-i="${i}"><rect x="${x}" y="${Math.min(y,y0)}" width="${bw-2}" height="${Math.max(1,Math.abs(y0-y))}" rx="3" fill="${col}"/></g>`})})}
     let lastX=-1e9;pts.forEach((q,i)=>{const gx=xOf(i);if(gx-lastX>=(narrow?70:62)){lastX=gx;s+=`<text x="${xOf(i)}" y="${H+T+20}" text-anchor="middle" class="chlab">${esc(String(xl(q.x)).slice(0,12))}</text>`}});
     w.innerHTML=`<div class="chscroll">${s}</svg></div><div class="chlegh">${ys.map((p,si)=>`<span><i style="background:${PAL[si%PAL.length]}"></i>${esc(p.name)}</span>`).join('')}<small>\u00B7 by ${esc(xName)}${c.ymin!==''&&c.ymin!=null||c.ymax!==''&&c.ymax!=null?` \u00B7 Y ${nfmt(lo)} to ${nfmt(hi)}`:''}</small></div><div class="chrows"></div>`;
-    w.querySelectorAll('.chpt').forEach(g=>g.addEventListener('click',()=>{const q=pts[+g.dataset.i];const bx=w.querySelector('.chrows');bx.innerHTML=`<div class="chrh"><b>${esc(q.r.title||'Untitled')}</b> \u00B7 ${ys.map((p,si)=>`${esc(p.name)} ${q.ys[si]==null?'\u2014':nfmt(q.ys[si])}`).join(' \u00B7 ')}<button class="lnk">Clear</button></div>`+(V.ro?'':`<button class="gli" data-id="${q.r.id}"><span class="gli-ic">${q.r.icon||'\u1F4C4'}</span><b>Open ${esc(q.r.title||'Untitled')}</b></button>`);
+    w.querySelectorAll('.chpt').forEach(g=>g.addEventListener('click',()=>{const q=pts[+g.dataset.i];const bx=w.querySelector('.chrows');bx.innerHTML=`<div class="chrh"><b>${esc(q.r.title||'Untitled')}</b> \u00B7 ${ys.map((p,si)=>`${esc(p.name)} ${q.ys[si]==null?'\u2014':nfmt(q.ys[si])}`).join(' \u00B7 ')}<button class="lnk">Clear</button></div>`+(V.ro?'':`<button class="gli" data-id="${q.r.id}"><span class="gli-ic">${q.r.icon||'\u{1F4C4}'}</span><b>Open ${esc(q.r.title||'Untitled')}</b></button>`);
       bx.querySelector('.lnk').onclick=()=>bx.innerHTML='';const o=bx.querySelector('[data-id]');if(o)o.onclick=()=>openPeek(o.dataset.id)}));
     box.appendChild(w);return}
   const {out,label,total,what,xName}=chartData(db,V);out.forEach((g,i)=>g.col=g.c||PAL[i%PAL.length]);
@@ -3599,7 +3704,7 @@ function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=do
     w.innerHTML=`<div class="chdonw">${s}<div class="chleg">${out.map((g,i)=>`<button class="chbar" data-i="${i}"><i style="background:${g.col}"></i><span>${esc(label(g.k))}</span><b>${nfmt(g.v)}</b><small>${Math.round(g.v/sum*100)}%</small></button>`).join('')}</div></div>`}
   if(type!=='number'&&out.length)w.insertAdjacentHTML('beforeend',`<p class="chcap">${esc(what[0].toUpperCase()+what.slice(1))} by ${esc(xName)} \u00B7 tap a bar to see its rows</p><div class="chrows"></div>`);
   w.querySelectorAll('.chbar').forEach(el=>el.addEventListener('click',()=>{const g=out[+el.dataset.i];const box2=w.querySelector('.chrows');w.querySelectorAll('.chbar').forEach(x=>x.classList.toggle('dim',x.dataset.i!==el.dataset.i));
-    box2.innerHTML=`<div class="chrh"><b>${esc(label(g.k))}</b> \u00B7 ${g.rows.length} row${g.rows.length===1?'':'s'}<button class="lnk">Clear</button></div>`+g.rows.map(r=>`<button class="gli" data-id="${r.id}"><span class="gli-ic">${r.icon||'\u1F4C4'}</span><b>${esc(r.title||'Untitled')}</b><span class="gli-m">${rowMeta(db,r,null,3)}</span></button>`).join('');
+    box2.innerHTML=`<div class="chrh"><b>${esc(label(g.k))}</b> \u00B7 ${g.rows.length} row${g.rows.length===1?'':'s'}<button class="lnk">Clear</button></div>`+g.rows.map(r=>`<button class="gli" data-id="${r.id}"><span class="gli-ic">${r.icon||'\u{1F4C4}'}</span><b>${esc(r.title||'Untitled')}</b><span class="gli-m">${rowMeta(db,r,null,3)}</span></button>`).join('');
     box2.querySelector('.lnk').onclick=()=>{box2.innerHTML='';w.querySelectorAll('.dim').forEach(x=>x.classList.remove('dim'))};if(!V.ro)box2.querySelectorAll('[data-id]').forEach(x=>x.onclick=()=>openPeek(x.dataset.id))}));
   box.appendChild(w)}
 /* chart part of the view settings */
@@ -3651,7 +3756,7 @@ function gMap(db,box,hostId,rer,V){
     ${Array.from({length:13},(_,i)=>`<path class="gm-grat" d="M${i*30*K},0V${180*K}"/>`).join('')}${Array.from({length:7},(_,i)=>`<path class="gm-grat" d="M0,${i*30*K}H${360*K}"/>`).join('')}
     <path class="gm-land" d="${MAPDATA.world}"/><path class="gm-land" d="${MAPDATA.ph}"/><g class="gm-pins"></g></svg>
     <div class="gm-zoom"><button data-z="1.6" aria-label="Zoom in">+</button><button data-z="0.625" aria-label="Zoom out">\u2212</button><button data-z="ph" title="Philippines">PH</button><button data-z="fit" title="Show all pins">\u2922</button></div><div class="gm-hint" hidden></div></div>
-    <div class="gm-side"><b>${on.length} on the map</b>${off.length?`<span class="tsub"> \u00B7 ${off.length} without a location</span>`:''}<div class="gm-list">${pts.map(p=>`<div class="gm-row"><button class="gm-go" data-id="${p.r.id}">${p.r.icon||'\u1F4C4'} ${esc(p.r.title||'Untitled')}<small>${p.ll?esc(String(p.r.props[mp.id])):'No location'}</small></button><button class="btn sec sm gm-set" data-id="${p.r.id}">${p.ll?'Move':'Place'}</button></div>`).join('')}</div></div>`;
+    <div class="gm-side"><b>${on.length} on the map</b>${off.length?`<span class="tsub"> \u00B7 ${off.length} without a location</span>`:''}<div class="gm-list">${pts.map(p=>`<div class="gm-row"><button class="gm-go" data-id="${p.r.id}">${p.r.icon||'\u{1F4C4}'} ${esc(p.r.title||'Untitled')}<small>${p.ll?esc(String(p.r.props[mp.id])):'No location'}</small></button><button class="btn sec sm gm-set" data-id="${p.r.id}">${p.ll?'Move':'Place'}</button></div>`).join('')}</div></div>`;
   box.appendChild(w);w.appendChild(newRowBtn(db,hostId,rer));
   const svg=w.querySelector('svg'),pins=w.querySelector('.gm-pins'),hint=w.querySelector('.gm-hint');
   const setVB=()=>{svg.setAttribute('viewBox',vb.join(' '));MAPV[key]=vb.slice();drawPins()};
@@ -3679,7 +3784,7 @@ function gMap(db,box,hostId,rer,V){
 
 /* ---------- Database widget: shows a saved database in any layout, view-only ---------- */
 function gTableRO(db,box,hostId,rer,V){const cols=dbCols(db),rows=viewRows(db,V),t=document.createElement('div');t.className='rotbl';
-  t.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c.pr?c.pr.name:'Name')}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>{if(!c.pr)return `<td class="nm" data-l="Name">${r.icon||'\u1F4C4'} ${esc(r.title||'Untitled')}</td>`;
+  t.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c.pr?c.pr.name:'Name')}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>{if(!c.pr)return `<td class="nm" data-l="Name">${r.icon||'\u{1F4C4}'} ${esc(r.title||'Untitled')}</td>`;
     const v=r.props[c.pr.id];let h='';if(c.pr.type==='select'&&v)h=chipH(c.pr,v);else if(c.pr.type==='multi'&&v)h=v.map(x=>chipH(c.pr,x)).join(' ');else if(c.pr.type==='check')h=v?'\u2611':'\u2610';else if(c.pr.type==='date'&&v)h=esc(fmtDateShort(v));else h=esc(fmtVal(db,c.pr,v,r));
     return `<td class="${c.pr.type==='number'||c.pr.type==='formula'?'n':''}${h?'':' empty'}" data-l="${esc(c.pr.name)}">${h}</td>`}).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}" class="tsub">No rows.</td></tr>`}</tbody></table>`;box.appendChild(t)}
 const RO_BLOCK='.gli,.ggc,.gcard,.cit,.tl-n,.tl-b,.gfp header,.gfp-open,.gm-set,.newrow,.ggc-new,.cadd,.gempty button';
@@ -4743,7 +4848,7 @@ $('#pinForm').onsubmit=async e=>{e.preventDefault();const c=$('#pinCur').value,n
   if(!/^[0-9]{4}$/.test(n)){err.textContent='New PIN must be exactly 4 digits.';return}
   if(n!==n2){err.textContent='The new PINs do not match.';return}
   S.settings.pinHash=await hashPin(n);persist();$('#pinForm').hidden=true;toast('PIN changed.')};
-renderTree();renderPage();renderTrashBtn();record();updStamp();setInterval(updStamp,60000);
+applyAppTheme();renderTree();renderPage();renderTrashBtn();record();updStamp();setInterval(updStamp,60000);
 /* ---------- ecosystem hub ---------- */
 const HUB={raf:0,clock:0,nodes:null};
 const MODS={
@@ -4758,7 +4863,7 @@ const MODS={
     list:['Repeating alarms (school days, trading time)','Labels and your own sounds','Reminders from Notes and Calendar dates','Next alarm shown on this home screen']}
 };
 function hubStats(){
-  const pages=S.pages.filter(p=>!p.deleted&&!p.rowOf).length,notes=(S.notes||[]).filter(n=>pg(n.pid)&&!pg(n.pid).deleted).length;
+  const pages=S.pages.filter(p=>!p.deleted&&!p.rowOf).length,notes=(S.notes||[]).length;
   $('#modNotes').textContent=`${pages} page${pages===1?'':'s'}${notes?` · ${notes} note${notes===1?'':'s'}`:''}`;
   $('#modBible').textContent='Psalm 119:105';
 }
@@ -5234,7 +5339,7 @@ function bnVersePick(el,done){const st=bibS();let t=st.t;el.hidden=false;
 function bnImg(file,cb){const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1400/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);cb(cv.toDataURL('image/jpeg',.8))};im.src=rd.result};rd.readAsDataURL(file)}
 /* add a verse to a note from anywhere: pick a note or start a new one */
 function bibPickNote(vb){const L=bnotes().slice().sort((a,b)=>b.up-a.up);
-  const s=bibSheet(`<header><b>Add ${esc(refLabel(vb,null))} to\u2026</b><button class="bsx" aria-label="Close">\u00D7</button></header><div class="bsbody"><button class="trrow" data-n="new"><span class="trab">\uFF0B</span><span class="trtx"><b>New note</b></span></button>${L.map(n=>`<button class="trrow" data-n="${n.id}"><span class="trab">\u1F4DD</span><span class="trtx"><b>${esc(n.title||'Untitled note')}</b><small>${bnDate(n.up)}</small></span></button>`).join('')}</div>`,'tall');
+  const s=bibSheet(`<header><b>Add ${esc(refLabel(vb,null))} to\u2026</b><button class="bsx" aria-label="Close">\u00D7</button></header><div class="bsbody"><button class="trrow" data-n="new"><span class="trab">\uFF0B</span><span class="trtx"><b>New note</b></span></button>${L.map(n=>`<button class="trrow" data-n="${n.id}"><span class="trab">\u{1F4DD}</span><span class="trtx"><b>${esc(n.title||'Untitled note')}</b><small>${bnDate(n.up)}</small></span></button>`).join('')}</div>`,'tall');
   s.querySelector('.bsx').onclick=closeBibSheet;
   s.querySelectorAll('[data-n]').forEach(x=>x.onclick=()=>{let n;if(x.dataset.n==='new'){n={id:uid(),title:refLabel(vb,null),blocks:[],at:Date.now(),up:Date.now()};bnotes().push(n)}else n=bnotes().find(y=>y.id===x.dataset.n);
     n.blocks.push(vb,{k:'txt',v:''});n.up=Date.now();save();closeBibSheet();openBibNotes(n.id);toast('Verse added to your note.')});
