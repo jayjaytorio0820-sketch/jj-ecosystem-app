@@ -1772,7 +1772,7 @@ const kids=id=>S.pages.filter(p=>p.parent===id&&!p.deleted&&!p.rowOf);
 function cur(){const c=pg(S.current);return c&&!c.deleted?c:(S.pages.find(x=>!x.deleted)||S.pages[0])}
 
 /* ---------- sidebar ---------- */
-function renderTree(){
+function renderTree(){syncGdbNames();
   const q=$('#q').value.trim().toLowerCase();
   const t=$('#tree');t.innerHTML='';
   if(q){
@@ -1844,7 +1844,7 @@ function _renderPage(){
   ic.onclick=()=>openIconPicker(ic,p);
   w.appendChild(ic);
   const t=document.createElement('div');t.className='ptitle';setCE(t);t.textContent=p.title;
-  t.oninput=()=>{p.title=txt(t);save();renderTree();crumbs()};
+  t.oninput=()=>{titlePage(p,txt(t));save();renderTree();crumbs()};
   t.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(p.kind==='db')return;if(!p.blocks.length)p.blocks.push(B('p',''));focusBlock(p.blocks[0].id,true)}};
   w.appendChild(t);
   const ch=document.createElement('button');ch.id='pstyle';ch.className='pstyle';ch.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.7 0-.9-1-1.5-1-2.4 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5C21 6.5 17 3 12 3Z"/></svg><b></b>';ch.onclick=openTheme;
@@ -2449,7 +2449,11 @@ function fval(db,pr,r,seen){
   seen.delete(pr.id);return v}
 function hostOfDB(dbid){return S.pages.find(p=>!p.deleted&&((p.kind==='gdb'&&p.dbid===dbid)||(p.blocks||[]).some(b=>b.type==='database'&&b.dbid===dbid&&!b.linked)))}
 function linkedCount(dbid){let n=0;S.pages.forEach(p=>{if(!p.deleted)(p.blocks||[]).forEach(b=>{if(b.type==='database'&&b.dbid===dbid&&b.linked)n++})});return n}
-function dbTitle(db){const h=hostOfDB(db.id);return db.name||(h&&h.kind==='gdb'?h.title:'')||'Untitled database'}
+function dbTitle(db){const h=hostOfDB(db.id);return (h&&h.kind==='gdb'&&h.title)||db.name||'Untitled database'}
+/* a full-page database and its page share one name */
+function nameDB(db,v){db.name=v;const h=hostOfDB(db.id);if(h&&h.kind==='gdb'){h.title=v;if(cur()&&cur().id===h.id){const t=document.querySelector('#page .ptitle');if(t&&document.activeElement!==t)t.textContent=v;crumbs()}}}
+function titlePage(p,v){p.title=v;if(p.kind==='gdb'&&S.dbs[p.dbid])S.dbs[p.dbid].name=v}
+function syncGdbNames(){S.pages.forEach(p=>{if(p.kind==='gdb'&&!p.deleted&&p.title&&S.dbs[p.dbid]&&S.dbs[p.dbid].name!==p.title)S.dbs[p.dbid].name=p.title})}
 function openFormulaEditor(anchor,db,pr,row,done){
   const sample=row||dbRowsAlive(db)[0];
   openPop(anchor,pop=>{pop.classList.add('fxpop');
@@ -2520,10 +2524,10 @@ function holdDrag(e,o){
 function saveDBPop(anchor,db,rer){
   openPop(anchor,pop=>{
     if(db.saved){pop.innerHTML=`<div class="lb3">Saved database</div><p class="tsub" style="padding:2px 8px 8px;max-width:260px">“${esc(dbTitle(db))}” can be added to any page as a Linked database.</p><div class="lb3">Name</div><input class="pq" value="${esc(db.name||'')}" placeholder="Database name" aria-label="Database name"><div class="dsep"></div><button class="ditem danger" data-a="un"><span>Remove from saved</span></button>`;
-      const inp=pop.querySelector('.pq');inp.oninput=()=>{db.name=inp.value;save();renderTree()};inp.onkeydown=e=>{if(e.key==='Enter')closePop()};
+      const inp=pop.querySelector('.pq');inp.oninput=()=>{nameDB(db,inp.value);save();renderTree()};inp.onkeydown=e=>{if(e.key==='Enter')closePop()};
       pop.querySelector('[data-a="un"]').onclick=()=>{const n=linkedCount(db.id);db.saved=false;save();closePop();renderTree();toast(n?`Removed from saved. The ${n} linked view${n>1?'s':''} you already added still work.`:'Removed from saved databases.')};return}
     pop.innerHTML=`<div class="lb3">Save this database</div><p class="tsub" style="padding:2px 8px 8px;max-width:260px">Saved databases show up when you add a <b>Linked database</b> on any page.</p><input class="pq" value="${esc(db.name||'')}" placeholder="Give it a name" aria-label="Database name"><button class="btn pri sm" data-a="save" style="margin:8px 6px 4px">Save database</button>`;
-    const inp=pop.querySelector('.pq');const go=()=>{const v=inp.value.trim();if(!v){inp.focus();toast('Give the database a name first.');return}db.name=v;db.saved=true;save();closePop();renderTree();toast(`“${v}” saved. Add it anywhere with Linked database.`)};
+    const inp=pop.querySelector('.pq');const go=()=>{const v=inp.value.trim();if(!v){inp.focus();toast('Give the database a name first.');return}nameDB(db,v);db.saved=true;save();closePop();renderTree();toast(`“${v}” saved. Add it anywhere with Linked database.`)};
     pop.querySelector('[data-a="save"]').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()};if(!isPhone())setTimeout(()=>inp.focus(),0);
   },rer);
 }
@@ -3839,7 +3843,7 @@ function renderGDB(db,box,hostId,inline,blk){
   box.innerHTML='';box.className='gdb'+(inline?' inline':'')+(linked?' linked':'');
   if(inline){
     const hd=document.createElement('div');hd.className='gdbhead';
-    const nm=document.createElement('div');nm.className='gdbname';setCE(nm);nm.dataset.ph='Untitled database';nm.textContent=db.name;nm.oninput=()=>{db.name=txt(nm);save()};
+    const nm=document.createElement('div');nm.className='gdbname';setCE(nm);nm.dataset.ph='Untitled database';nm.textContent=db.name;nm.oninput=()=>{nameDB(db,txt(nm));save()};
     nm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();nm.blur()}};
     const del=document.createElement('button');del.className='tool';del.title='Delete database';del.setAttribute('aria-label','Delete database');
     del.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
@@ -4461,7 +4465,7 @@ function renderPaneContent(p,body,pathEl,themeEl){
     body.appendChild(cv)}
   const ic=document.createElement('button');ic.className='pkicon'+(p.cover?' oncover':'');ic.textContent=p.icon;ic.title='Change icon';ic.onclick=()=>openIconPicker(ic,p);body.appendChild(ic);
   const t=document.createElement('div');t.className='ptitle pkt';setCE(t);t.textContent=p.title;
-  t.oninput=()=>{p.title=txt(t);save();renderTree();crumbs();pathEl.innerHTML=pathHTML(p)};
+  t.oninput=()=>{titlePage(p,txt(t));save();renderTree();crumbs();pathEl.innerHTML=pathHTML(p)};
   t.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(p.blocks&&p.blocks.length&&!p.kind)focusBlock(p.blocks[0].id,true)}};
   body.appendChild(t);
   const bar=document.createElement('div');bar.className='pbar';
