@@ -1902,7 +1902,7 @@ function blockEl(b,p,n){
   else if(T==='w_db')wDB(b,c);
   else if(T==='w_cal')wCal(b,c);
   else if(T==='database'){const db=S.dbs[b.dbid];if(db){const box=document.createElement('div');c.appendChild(box);renderGDB(db,box,p.id,true,b)}else c.innerHTML='<p class="tsub">This database was deleted.</p>'}
-  else if(T==='pagelink'){const lp=pg(b.pid);if(!lp||lp.deleted){c.innerHTML='';return w}const a=document.createElement('div');a.className='plink';a.tabIndex=0;a.innerHTML=`<span>${lp.icon}</span><span>${esc(lp.title||'Untitled')}</span>`;a.onclick=()=>openPeek(lp.id);a.onkeydown=e=>{if(e.key==='Enter')openPeek(lp.id)};a.title='Opens in a side panel';c.appendChild(a)}
+  else if(T==='pagelink'){const lp=pg(b.pid);if(!lp||lp.deleted){c.innerHTML='';return w}const a=document.createElement('div');a.className='plink';a.dataset.pid=lp.id;a.tabIndex=0;a.innerHTML=`<span>${lp.icon}</span><span class="plt">${esc(lp.title||'Untitled')}</span>`;a.onclick=()=>openPeek(lp.id);a.onkeydown=e=>{if(e.key==='Enter')openPeek(lp.id)};a.title='Opens in a side panel';c.appendChild(a)}
   if(b.ts&&hasSt(b.ts)&&TEXTUAL.includes(T))c.querySelectorAll('.ed').forEach(e=>{e.dataset.base=e.style.cssText;e.style.cssText+=stCSS(b.ts,false,true)});
   return w;
 }
@@ -2451,8 +2451,13 @@ function hostOfDB(dbid){return S.pages.find(p=>!p.deleted&&((p.kind==='gdb'&&p.d
 function linkedCount(dbid){let n=0;S.pages.forEach(p=>{if(!p.deleted)(p.blocks||[]).forEach(b=>{if(b.type==='database'&&b.dbid===dbid&&b.linked)n++})});return n}
 function dbTitle(db){const h=hostOfDB(db.id);return (h&&h.kind==='gdb'&&h.title)||db.name||'Untitled database'}
 /* a full-page database and its page share one name */
-function nameDB(db,v){db.name=v;const h=hostOfDB(db.id);if(h&&h.kind==='gdb'){h.title=v;if(cur()&&cur().id===h.id){const t=document.querySelector('#page .ptitle');if(t&&document.activeElement!==t)t.textContent=v;crumbs()}}}
-function titlePage(p,v){p.title=v;if(p.kind==='gdb'&&S.dbs[p.dbid])S.dbs[p.dbid].name=v}
+function nameDB(db,v){db.name=v;const h=hostOfDB(db.id);if(h&&h.kind==='gdb'){h.title=v;liveTitle(h);if(cur()&&cur().id===h.id){const t=document.querySelector('#page .ptitle');if(t&&document.activeElement!==t)t.textContent=v;crumbs()}}}
+function titlePage(p,v){p.title=v;if(p.kind==='gdb'&&S.dbs[p.dbid])S.dbs[p.dbid].name=v;liveTitle(p)}
+/* every place that shows this page's name changes as you type */
+function liveTitle(p){if(!p)return;const set=(el,t)=>{if(el!==document.activeElement&&el.textContent!==t)el.textContent=t};
+  document.querySelectorAll(`.plink[data-pid="${p.id}"] .plt`).forEach(el=>set(el,p.title||'Untitled'));
+  if(S.current===p.id){const el=document.querySelector('#page>.ptitle');if(el)set(el,p.title||'');crumbs()}if(typeof PEEK!=='undefined'&&PEEK===p.id){const el=document.querySelector('#pkBody .ptitle');if(el)set(el,p.title||'')}
+  if(p.kind==='gdb'&&S.dbs[p.dbid]){const db=S.dbs[p.dbid];document.querySelectorAll(`[data-dbname="${db.id}"]`).forEach(el=>set(el,el.classList.contains('wdb-nm')?dbTitle(db):(db.name||'')))}}
 function syncGdbNames(){S.pages.forEach(p=>{if(p.kind==='gdb'&&!p.deleted&&p.title&&S.dbs[p.dbid]&&S.dbs[p.dbid].name!==p.title)S.dbs[p.dbid].name=p.title})}
 function openFormulaEditor(anchor,db,pr,row,done){
   const sample=row||dbRowsAlive(db)[0];
@@ -3809,7 +3814,7 @@ function wDB(b,c){
     if(!db){lab.textContent='Database view';body.innerHTML=`<button class="gempty2">${lyIcon('chart',26)}<b>Choose a saved database</b><small>Shows it as a table, chart, board, map\u2026 View only, so nothing gets changed by accident.</small></button>`;
       body.firstChild.onclick=e=>pickDatabase(e.currentTarget,id=>{b.dbid=id;b.lv={view:'table'};save();draw();setTimeout(()=>{const ch=w.querySelector('.wdb-ly');if(ch)ch.click()},60)});return}
     w.querySelectorAll('.whead .wdb-ly,.whead .wdb-ro').forEach(x=>x.remove());const V=b.lv=b.lv||{view:'table'};vTabs(V);V.ro=true;const t=V.tabs.find(x=>x.id===V.tab);
-    lab.innerHTML=`<span class="wdb-nm">${esc(dbTitle(db))}</span>`;
+    lab.innerHTML=`<span class="wdb-nm" data-dbname="${db.id}">${esc(dbTitle(db))}</span>`;
     const ly=document.createElement('button');ly.className='wdb-ly';ly.title='Change the layout of this widget';ly.innerHTML=`${lyIcon(V.view,13)}<span>${esc(t.name)}</span>`;ly.onclick=()=>openViewSettings(ly,db,V,draw);lab.after(ly);
     const ro=document.createElement('span');ro.className='wdb-ro';ro.textContent='View only';ly.after(ro);
     const R={board:gBoard,calendar:gCal,timeline:gTimeline,list:gList,gallery:gGallery,chart:gChart,feed:gFeed,map:gMap}[V.view]||gTableRO;
@@ -3843,7 +3848,7 @@ function renderGDB(db,box,hostId,inline,blk){
   box.innerHTML='';box.className='gdb'+(inline?' inline':'')+(linked?' linked':'');
   if(inline){
     const hd=document.createElement('div');hd.className='gdbhead';
-    const nm=document.createElement('div');nm.className='gdbname';setCE(nm);nm.dataset.ph='Untitled database';nm.textContent=db.name;nm.oninput=()=>{nameDB(db,txt(nm));save()};
+    const nm=document.createElement('div');nm.className='gdbname';setCE(nm);nm.dataset.ph='Untitled database';nm.dataset.dbname=db.id;nm.textContent=db.name;nm.oninput=()=>{nameDB(db,txt(nm));save()};
     nm.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();nm.blur()}};
     const del=document.createElement('button');del.className='tool';del.title='Delete database';del.setAttribute('aria-label','Delete database');
     del.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>';
