@@ -1756,7 +1756,7 @@ function updStamp(){const el=document.getElementById('stamp');if(el){el.textCont
 function save(){S.updatedAt=Date.now();updStamp();clearTimeout(saveT);saveT=setTimeout(()=>{saveT=null;record();persist()},300);liveDB()}
 /* live database: widgets and linked views redraw by themselves when the data they show changes */
 let liveT=null,liveBusy=false;
-const dbSig=db=>{if(!db)return '';try{return JSON.stringify([db.props,db.titleAt||0,db.name,db.rows.map(id=>{const r=pg(id);return r?[r.id,r.title,r.icon,r.deleted?1:0,r.props,r.cover?1:0]:0})])}catch(e){return String(Math.random())}};
+const dbSig=db=>{if(!db)return '';try{return JSON.stringify([db.props,db.titleAt||0,db.name,db.titleName||"",db.rows.map(id=>{const r=pg(id);return r?[r.id,r.title,r.icon,r.deleted?1:0,r.props,r.cover?1:0]:0})])}catch(e){return String(Math.random())}};
 function liveDB(){if(liveBusy)return;clearTimeout(liveT);liveT=setTimeout(()=>{liveBusy=true;try{
   const ae=document.activeElement,cache={};
   document.querySelectorAll('.gdb,.wdbv').forEach(el=>{const L=el._live;if(!L||!el.isConnected)return;
@@ -2442,7 +2442,7 @@ function propRaw(db,q,r,seen){const v=r.props?r.props[q.id]:undefined;
 function fval(db,pr,r,seen){
   if(!pr||!r)return '';const ex=String(pr.expr||'').trim().replace(/^=/,'');if(!ex)return '';
   seen=seen||new Set();if(seen.has(pr.id))return FX.E('#CYCLE!');seen.add(pr.id);
-  const v=FX.evaluate(ex,{name:n=>{const k=n.toLowerCase();if(k==='name'||k==='title')return r.title||'';const q=db.props.find(x=>x.name.toLowerCase()===k);if(!q)return FX.E('#NAME?');return propRaw(db,q,r,new Set(seen))}});
+  const v=FX.evaluate(ex,{name:n=>{const k=n.toLowerCase();if(k==='name'||k==='title'||k===tName(db).toLowerCase())return r.title||'';const q=db.props.find(x=>x.name.toLowerCase()===k);if(!q)return FX.E('#NAME?');return propRaw(db,q,r,new Set(seen))}});
   seen.delete(pr.id);return v}
 function hostOfDB(dbid){return S.pages.find(p=>!p.deleted&&((p.kind==='gdb'&&p.dbid===dbid)||(p.blocks||[]).some(b=>b.type==='database'&&b.dbid===dbid&&!b.linked)))}
 function linkedCount(dbid){let n=0;S.pages.forEach(p=>{if(!p.deleted)(p.blocks||[]).forEach(b=>{if(b.type==='database'&&b.dbid===dbid&&b.linked)n++})});return n}
@@ -2450,7 +2450,7 @@ function dbTitle(db){const h=hostOfDB(db.id);return db.name||(h&&h.kind==='gdb'?
 function openFormulaEditor(anchor,db,pr,row,done){
   const sample=row||dbRowsAlive(db)[0];
   openPop(anchor,pop=>{pop.classList.add('fxpop');
-    const others=[{n:'Name'},...db.props.filter(x=>x!==pr).map(x=>({n:x.name,t:x.type}))];
+    const others=[{n:tName(db)},...db.props.filter(x=>x!==pr).map(x=>({n:x.name,t:x.type}))];
     pop.innerHTML=`<div class="lb3" style="font-size:12.5px;color:var(--fg)">ƒx Formula · ${esc(pr.name)}</div>
       <textarea class="fxin" rows="3" spellcheck="false" placeholder="Example: [Price] * [Qty]">${esc(pr.expr||'')}</textarea>
       <div class="fxprev"><span>${sample?`Result for “${esc(sample.title||'Untitled')}”`:'Result'}</span><b></b></div>
@@ -2469,14 +2469,14 @@ function openFormulaEditor(anchor,db,pr,row,done){
 }
 function openPropStyle(anchor,db,pr,rer){
   const holder=pr||(db.nameStyle=db.nameStyle||{},{style:db.nameStyle});if(pr)pr.style=pr.style||{};const st=pr?pr.style:db.nameStyle;
-  openPop(anchor,pop=>{pop.classList.add('stylepop');pop.innerHTML=`<div class="lb3" style="font-size:12.5px;color:var(--fg)">Column · ${esc(pr?pr.name:'Name')}</div>`+styleEditorHTML(st,{bg:true,align:true})+'<div class="dsep"></div><button class="ditem" data-reset="1"><span>Clear formatting</span></button>';
+  openPop(anchor,pop=>{pop.classList.add('stylepop');pop.innerHTML=`<div class="lb3" style="font-size:12.5px;color:var(--fg)">Column · ${esc(pr?pr.name:tName(db))}</div>`+styleEditorHTML(st,{bg:true,align:true})+'<div class="dsep"></div><button class="ditem" data-reset="1"><span>Clear formatting</span></button>';
     wireStyleEditor(pop,st,()=>save());pop.querySelector('[data-reset]').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);save();closePop()};
   },()=>{$('#pop').classList.remove('stylepop');rer()});
 }
 function openDCellMenu(anchor,db,r,pr,rer){
   const k=pr?pr.id:'title';r.cstyle=r.cstyle||{};r.cstyle[k]=r.cstyle[k]||{};const st=r.cstyle[k];
   openPop(anchor,pop=>{pop.classList.add('stylepop');
-    pop.innerHTML=`<div class="lb3" style="font-size:12.5px;color:var(--fg)">Cell · ${esc(r.title||'Untitled')} · ${esc(pr?pr.name:'Name')}</div>`+styleEditorHTML(st,{bg:true,align:true})+'<div class="dsep"></div><button class="ditem" data-a="clr"><span>Clear cell formatting</span></button>';
+    pop.innerHTML=`<div class="lb3" style="font-size:12.5px;color:var(--fg)">Cell · ${esc(r.title||'Untitled')} · ${esc(pr?pr.name:tName(db))}</div>`+styleEditorHTML(st,{bg:true,align:true})+'<div class="dsep"></div><button class="ditem" data-a="clr"><span>Clear cell formatting</span></button>';
     wireStyleEditor(pop,st,()=>{save();anchor.style.cssText=stCSS(pr?pr.style:db.nameStyle,true)+stCSS(r.rstyle,true)+stCSS(st,true)});
     pop.querySelector('[data-a="clr"]').onclick=()=>{delete r.cstyle[k];save();closePop()};
   },()=>{$('#pop').classList.remove('stylepop');if(r.cstyle&&!hasSt(r.cstyle[k]))delete r.cstyle[k];if(r.cstyle&&!Object.keys(r.cstyle).length)delete r.cstyle;save();rer()});
@@ -3376,7 +3376,7 @@ function viewRows(db,V){
 }
 const optColor=(pr,v)=>((pr.options||[]).find(o=>o.v===v)||{}).c||'gray';
 const chipH=(pr,v)=>`<span class="opt o-${optColor(pr,v)}">${esc(v)}</span>`;
-function gdbRows(db){const cols=dbCols(db);return [cols.map(c=>c.pr?c.pr.name:'Name'),...viewRows(db).map(r=>cols.map(c=>c.pr?fmtVal(db,c.pr,r.props[c.pr.id],r):(r.title||'Untitled')))]}
+function gdbRows(db){const cols=dbCols(db);return [cols.map(c=>c.pr?c.pr.name:tName(db)),...viewRows(db).map(r=>cols.map(c=>c.pr?fmtVal(db,c.pr,r.props[c.pr.id],r):(r.title||'Untitled')))]}
 const numCols=db=>dbCols(db).map((c,i)=>c.pr&&(c.pr.type==='number'||c.pr.type==='formula')?i:-1).filter(i=>i>=0);
 
 /* popover */
@@ -3481,7 +3481,8 @@ function convertProp(db,pr,t){
 function openPropMenu(anchor,db,pr,rer,V){
   V=V||db;
   openPop(anchor,pop=>{
-    if(!pr){pop.innerHTML='<div class="lb3">Name</div><button class="ditem" data-s="asc">Sort A → Z</button><button class="ditem" data-s="desc">Sort Z → A</button><div class="dsep"></div><button class="ditem" data-st="1"><span>Color &amp; text style</span></button>'}
+    if(!pr){pop.innerHTML=`<input class="pq" value="${esc(tName(db))}" aria-label="Column name" placeholder="Name">`+'<div class="lb3">Title column</div><button class="ditem" data-s="asc">Sort A → Z</button><button class="ditem" data-s="desc">Sort Z → A</button><div class="dsep"></div><button class="ditem" data-st="1"><span>Color &amp; text style</span></button>'}
+    if(!pr){const inp=pop.querySelector('.pq');inp.oninput=()=>{const v=inp.value.trim();if(v&&v!=='Name')db.titleName=inp.value;else delete db.titleName;save()};inp.onkeydown=e=>{if(e.key==='Enter')closePop()}}
     else{
       pop.innerHTML=`<input class="pq" value="${esc(pr.name)}" aria-label="Property name"><div class="lb3">Type</div>${PTYPES.map(([k,l,g])=>`<button class="ditem${pr.type===k?' on':''}" data-t="${k}"><span class="pti">${g}</span><span>${l}</span></button>`).join('')}<div class="dsep"></div>${pr.type==='formula'?'<button class="ditem" data-fx="1"><span>ƒx Edit formula</span></button>':''}<button class="ditem" data-st="1"><span>Color &amp; text style</span></button><button class="ditem" data-s="asc">Sort ascending</button><button class="ditem" data-s="desc">Sort descending</button><div class="dsep"></div><button class="ditem danger" data-del="1">Delete property</button>`;
       const inp=pop.querySelector('.pq');inp.oninput=()=>{pr.name=inp.value||'Untitled';save()};inp.onkeydown=e=>{if(e.key==='Enter')closePop()};
@@ -3647,7 +3648,7 @@ function chartData(db,V){const c=V.chart||{},rows=viewRows(db,V);const [ag,ap]=(
   const label=k=>xp&&xp.type==='date'&&/^\d{4}-\d{2}$/.test(k)?new Date(k+'-01T00:00').toLocaleString('en-US',{month:'short',year:'2-digit'}):k;
   const total=ag==='count'||!npr?rows.length:ag==='avg'?(()=>{const vs=rows.map(val).filter(v=>v!=null);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:0})():rows.map(val).filter(v=>v!=null).reduce((a,b)=>a+b,0);
   const what=!npr?'rows':`${ag==='avg'?'average':'total'} ${npr.name}`;
-  return {out,label,total,what,xName:xp?xp.name:'Name',type:c.type||'bar'}}
+  return {out,label,total,what,xName:xp?xp.name:tName(db),type:c.type||'bar'}}
 /* "Each row": X is the row name, a date or a number; every chosen number property is a series */
 function chartRows(db,V){const c=V.chart||{},rows=viewRows(db,V);const xk=c.rx||'title',xp=xk==='title'?null:propById(db,xk);
   let ys=(c.ys||[]).map(id=>propById(db,id)).filter(Boolean);if(!ys.length){const f=db.props.find(p=>p.type==='number'||p.type==='formula');if(f)ys=[f]}
@@ -3657,7 +3658,7 @@ function chartRows(db,V){const c=V.chart||{},rows=viewRows(db,V);const xk=c.rx||
     const lo=kind==='date'?(c.xmin?new Date(c.xmin+'T00:00').getTime():null):numOr(c.xmin,null),hi=kind==='date'?(c.xmax?new Date(c.xmax+'T00:00').getTime():null):numOr(c.xmax,null);
     if(lo!=null)pts=pts.filter(p=>p.x>=lo);if(hi!=null)pts=pts.filter(p=>p.x<=hi);
     const xl=kind==='date'?x=>new Date(x).toLocaleDateString('en-US',{month:'short',day:'numeric'}):x=>nfmt(x);return {pts,ys,kind,xl,lo,hi,xName:xp.name}}
-  return {pts,ys,kind,xl:x=>String(x),xName:xp?xp.name:'Name'}}
+  return {pts,ys,kind,xl:x=>String(x),xName:xp?xp.name:tName(db)}}
 const niceMax=v=>{if(v<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(v))),f=v/e;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e};
 function yDomain(c,vals){const lo=numOr(c.ymin,Math.min(0,...vals)),hi0=numOr(c.ymax,niceMax(Math.max(...vals,0)));return [lo,hi0>lo?hi0:lo+1]}
 function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=document.createElement('div');w.className='gchart t-'+type;
@@ -3715,11 +3716,11 @@ function chartSettingsHTML(db,V){const c=V.chart=V.chart||{},type=c.type||'bar',
   if(type==='line'||type==='bar')o+=`<div class="vsgrp"><div class="vsrow"><span>Data</span><div class="vseg"><button data-cm="" class="${rows?'':'on'}">Group &amp; total</button><button data-cm="rows" class="${rows?'on':''}">Each row</button></div></div></div>`;
   o+='<div class="vsgrp">';
   if(rows){const xk=c.rx||'title',xp=xk==='title'?null:propById(db,xk);
-    o+=`<div class="vsrow"><span>X axis</span>${sel('rx',[['title','Name'],...rxs.map(p=>[p.id,p.name])],xk)}</div>`;
+    o+=`<div class="vsrow"><span>X axis</span>${sel('rx',[['title',tName(db)],...rxs.map(p=>[p.id,p.name])],xk)}</div>`;
     o+=`<div class="vsrow vscol"><span>${type==='line'?'Lines':'Bars'} <small class="tsub">(properties to draw)</small></span><div class="chys">${ns.length?ns.map((p,i)=>{const on=(c.ys&&c.ys.length?c.ys:[ns[0].id]).includes(p.id);return `<label><input type="checkbox" data-y="${p.id}"${on?' checked':''}><i style="background:${PAL[(c.ys||[ns[0].id]).indexOf(p.id)%PAL.length]||'var(--line)'}"></i>${esc(p.name)}</label>`}).join(''):'<span class="tsub">Add a Number property first.</span>'}</div></div>`;
     if(xp&&(xp.type==='date'||xp.type==='number'||xp.type==='formula')){const t=xp.type==='date'?'date':'number';o+=`<div class="vsrow"><span>X range</span><span class="chrng"><input type="${t}" data-c="xmin" value="${esc(c.xmin||'')}" placeholder="From" aria-label="X from"><b>to</b><input type="${t}" data-c="xmax" value="${esc(c.xmax||'')}" placeholder="To" aria-label="X to"></span></div>`}}
   else if(type!=='number'){const xk=c.x||(db.props.find(p=>p.type==='select')||{}).id||'title',xp=xk==='title'?null:propById(db,xk);
-    o+=`<div class="vsrow"><span>${type==='donut'?'Slices by':'X axis'}</span>${sel('x',[['title','Name'],...xs.map(p=>[p.id,p.name])],xk)}</div>`;
+    o+=`<div class="vsrow"><span>${type==='donut'?'Slices by':'X axis'}</span>${sel('x',[['title',tName(db)],...xs.map(p=>[p.id,p.name])],xk)}</div>`;
     if(xp&&xp.type==='date'&&type!=='donut')o+=`<div class="vsrow"><span>X range</span><span class="chrng"><input type="month" data-c="xmin" value="${esc((c.xmin||'').slice(0,7))}" aria-label="From month"><b>to</b><input type="month" data-c="xmax" value="${esc((c.xmax||'').slice(0,7))}" aria-label="To month"></span></div>`}
   if(!rows)o+=`<div class="vsrow"><span>Value</span>${sel('agg',[['count','Count of rows'],...ns.flatMap(p=>[['sum:'+p.id,'Sum of '+p.name],['avg:'+p.id,'Average of '+p.name]])],c.agg||'count')}</div>`;
   if(!rows&&type!=='number'&&type!=='line')o+=`<div class="vsrow"><span>Order</span><div class="vseg">${[['','Default'],['desc','Biggest first'],['asc','Smallest first']].map(([k,l])=>`<button data-co="${k}" class="${(c.ord||'')===k?'on':''}">${l}</button>`).join('')}</div></div>`;
@@ -3784,7 +3785,7 @@ function gMap(db,box,hostId,rer,V){
 
 /* ---------- Database widget: shows a saved database in any layout, view-only ---------- */
 function gTableRO(db,box,hostId,rer,V){const cols=dbCols(db),rows=viewRows(db,V),t=document.createElement('div');t.className='rotbl';
-  t.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c.pr?c.pr.name:'Name')}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>{if(!c.pr)return `<td class="nm" data-l="Name">${r.icon||'\u{1F4C4}'} ${esc(r.title||'Untitled')}</td>`;
+  t.innerHTML=`<table><thead><tr>${cols.map(c=>`<th>${esc(c.pr?c.pr.name:tName(db))}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>{if(!c.pr)return `<td class="nm" data-l="${esc(tName(db))}">${r.icon||'\u{1F4C4}'} ${esc(r.title||'Untitled')}</td>`;
     const v=r.props[c.pr.id];let h='';if(c.pr.type==='select'&&v)h=chipH(c.pr,v);else if(c.pr.type==='multi'&&v)h=v.map(x=>chipH(c.pr,x)).join(' ');else if(c.pr.type==='check')h=v?'\u2611':'\u2610';else if(c.pr.type==='date'&&v)h=esc(fmtDateShort(v));else h=esc(fmtVal(db,c.pr,v,r));
     return `<td class="${c.pr.type==='number'||c.pr.type==='formula'?'n':''}${h?'':' empty'}" data-l="${esc(c.pr.name)}">${h}</td>`}).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}" class="tsub">No rows.</td></tr>`}</tbody></table>`;box.appendChild(t)}
 const RO_BLOCK='.gli,.ggc,.gcard,.cit,.tl-n,.tl-b,.gfp header,.gfp-open,.gm-set,.newrow,.ggc-new,.cadd,.gempty button';
@@ -3856,15 +3857,15 @@ function renderGDB(db,box,hostId,inline,blk){
   const f=V.filter&&V.filter.q;
   tool(f?`Filter: “${V.filter.q}”`:'Filter',!!f,b=>openPop(b,pop=>{
     const fl=V.filter||{prop:'title',q:''};
-    pop.innerHTML=`<div class="lb3">Show rows where</div><select class="psel" aria-label="Property">${[['title','Name'],...db.props.map(p=>[p.id,p.name])].map(([k,l])=>`<option value="${k}"${fl.prop===k?' selected':''}>${esc(l)}</option>`).join('')}</select><input class="pq" placeholder="contains…" aria-label="Contains" value="${esc(fl.q||'')}"><button class="ditem" data-clear="1"><span>Clear filter</span></button>`;
+    pop.innerHTML=`<div class="lb3">Show rows where</div><select class="psel" aria-label="Property">${[['title',tName(db)],...db.props.map(p=>[p.id,p.name])].map(([k,l])=>`<option value="${k}"${fl.prop===k?' selected':''}>${esc(l)}</option>`).join('')}</select><input class="pq" placeholder="contains…" aria-label="Contains" value="${esc(fl.q||'')}"><button class="ditem" data-clear="1"><span>Clear filter</span></button>`;
     const sel=pop.querySelector('select'),inp=pop.querySelector('.pq');
     const upd=()=>{V.filter={prop:sel.value,q:inp.value};save()};sel.onchange=upd;inp.oninput=upd;inp.onkeydown=e=>{if(e.key==='Enter')closePop()};
     pop.querySelector('[data-clear]').onclick=()=>{V.filter=null;save();closePop()};
     if(!isPhone())setTimeout(()=>inp.focus(),0);
   },rer));
-  const s=V.sort,sp=s&&(s.prop==='title'?'Name':(propById(db,s.prop)||{}).name);
+  const s=V.sort,sp=s&&(s.prop==='title'?tName(db):(propById(db,s.prop)||{}).name);
   tool(s&&sp?`Sort: ${sp} ${s.dir==='desc'?'↓':'↑'}`:'Sort',!!(s&&sp),b=>openPop(b,pop=>{
-    pop.innerHTML='<div class="lb3">Sort by</div>'+[['title','Name'],...db.props.map(p=>[p.id,p.name])].map(([k,l])=>`<div class="srow"><span>${esc(l)}</span><button class="tool${s&&s.prop===k&&s.dir==='asc'?' act':''}" data-k="${k}" data-d="asc" aria-label="Ascending">↑</button><button class="tool${s&&s.prop===k&&s.dir==='desc'?' act':''}" data-k="${k}" data-d="desc" aria-label="Descending">↓</button></div>`).join('')+(s?'<div class="dsep"></div><button class="ditem" data-clear="1"><span>Clear sort</span></button>':'');
+    pop.innerHTML='<div class="lb3">Sort by</div>'+[['title',tName(db)],...db.props.map(p=>[p.id,p.name])].map(([k,l])=>`<div class="srow"><span>${esc(l)}</span><button class="tool${s&&s.prop===k&&s.dir==='asc'?' act':''}" data-k="${k}" data-d="asc" aria-label="Ascending">↑</button><button class="tool${s&&s.prop===k&&s.dir==='desc'?' act':''}" data-k="${k}" data-d="desc" aria-label="Descending">↓</button></div>`).join('')+(s?'<div class="dsep"></div><button class="ditem" data-clear="1"><span>Clear sort</span></button>':'');
     pop.querySelectorAll('[data-k]').forEach(x=>x.onclick=()=>{V.sort={prop:x.dataset.k,dir:x.dataset.d};save();closePop()});
     const c=pop.querySelector('[data-clear]');if(c)c.onclick=()=>{V.sort=null;save();closePop()};
   },rer));
@@ -3895,6 +3896,7 @@ function hScroll(sc){
   requestAnimationFrame(upd);
 }
 /* columns in display order: the Name column can sit anywhere */
+function tName(db){return (db&&db.titleName)||'Name'}
 function dbCols(db){const c=db.props.map(pr=>({k:pr.id,pr}));const i=Math.max(0,Math.min(db.titleAt||0,c.length));c.splice(i,0,{k:'title',pr:null});return c}
 function gTable(db,box,hostId,rer,V){V=V||db;
   const sc=document.createElement('div');sc.className='dbscroll2';
@@ -3904,7 +3906,7 @@ function gTable(db,box,hostId,rer,V){V=V||db;
   const thg=document.createElement('th');thg.className='gripc';hr.appendChild(thg);
   cols.forEach((col,ci)=>{const pr=col.pr,th=document.createElement('th');th.dataset.col=col.k;if(pr)th.dataset.pid=pr.id;
     th.style.cssText=stCSS(pr?pr.style:db.nameStyle,true);
-    th.innerHTML=`<button title="Tap for options. Hold and drag to move."><span class="pti">${pr?ptIcon(pr.type):'Aa'}</span>${esc(pr?pr.name:'Name')}</button>`;
+    th.innerHTML=`<button title="Tap for options. Hold and drag to move."><span class="pti">${pr?ptIcon(pr.type):'Aa'}</span>${esc(pr?pr.name:tName(db))}</button>`;
     th.firstChild.onpointerdown=e=>holdDrag(e,{axis:'x',from:ci,box:t,els:()=>[...hr.querySelectorAll('th[data-col]')],src:[th],
       onClick:()=>openPropMenu(th.firstChild,db,pr,rer,V),
       onDrop:(from,to)=>{const o=cols.slice();const [m]=o.splice(from,1);o.splice(to,0,m);db.titleAt=o.findIndex(x=>x.k==='title');db.props=o.filter(x=>x.pr).map(x=>x.pr);save();rer();toast('Column moved.',{label:'Undo',fn:undo})}});
