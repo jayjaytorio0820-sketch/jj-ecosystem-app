@@ -758,6 +758,41 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .wcd em{display:flex;gap:2px;height:5px}
 .wcd em i,.wci i{width:5px;height:5px;border-radius:50%;background:var(--oc);display:block}
 .wcd.sel em i{background:var(--accent-fg)}
+.wtrk .whead{justify-content:flex-start;gap:6px}.wtrk .wgear{margin-left:auto}.wtrk .wlabel{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wtrk .trk-ic{font-size:26px;color:var(--muted)}
+.trk-need{padding:14px 4px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}.trk-need p{margin:0;color:var(--muted)}
+.tkg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.tkh{font-size:11px;color:var(--muted);text-align:center;padding:2px 0;text-transform:uppercase;letter-spacing:.04em}
+.tkd{position:relative;min-width:0;min-height:58px;padding:5px 4px 4px;border-radius:10px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:stretch;gap:2px;text-align:left;font-variant-numeric:tabular-nums;cursor:pointer;overflow:hidden}
+.tkd:hover{border-color:color-mix(in srgb,var(--fg) 25%,var(--line))}
+.tkd.out{opacity:.38}
+.tkn{font-size:12.5px;font-weight:600;line-height:1.1}
+.tkd.today .tkn{color:var(--accent-fg);background:var(--accent);border-radius:6px;padding:1px 5px;align-self:flex-start}
+.tkd.has{background:color-mix(in srgb,var(--oc) 16%,var(--surface));border-color:color-mix(in srgb,var(--oc) 45%,transparent)}
+.tkm{font-size:10.5px;font-weight:700;letter-spacing:.02em;color:color-mix(in srgb,var(--oc) 80%,var(--fg));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tkv{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:auto}
+.tkv.pos,.tkt .pos{color:#2e9a5b}.tkv.neg,.tkt .neg{color:#d1493f}
+.tkd.dot::after{content:"";position:absolute;right:6px;top:7px;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.tkx{position:absolute;right:4px;top:4px;font-style:normal;font-size:9.5px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:grid;place-items:center;background:var(--fg);color:var(--bg);padding:0 3px}
+@container (max-width:420px){.tkg{gap:2px}.tkd{min-height:46px;padding:3px 2px;border-radius:7px;align-items:center;text-align:center}.tkm{font-size:8.5px;max-width:100%}.tkv{font-size:9.5px;max-width:100%}.tkn{font-size:11.5px}.tkd.today .tkn{align-self:center}.tkh{font-size:9.5px}.tkx{display:none}}
+.tks{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;border-top:1px solid var(--line);margin-top:10px;padding-top:10px;font-size:13px}
+.tkc{display:inline-flex;align-items:center;gap:5px}.tkc b{font-variant-numeric:tabular-nums}
+.tkt{margin-left:auto;color:var(--muted)}.tkt b{color:var(--fg);font-variant-numeric:tabular-nums;margin-left:4px}
+.trk-set{display:flex;flex-direction:column;gap:6px;padding:2px 8px 6px;min-width:250px}
+.trk-set label{display:flex;align-items:center;gap:8px;justify-content:space-between;font-size:13.5px}.trk-set label>span{color:var(--muted);flex:none}
+.trk-set .psel,.trk-set .pq{max-width:160px;margin:0}.trk-chk{display:flex;align-items:center;gap:8px;font-size:13.5px;white-space:nowrap}.trk-chk input{width:16px;height:16px;margin:0;flex:none}.trk-chk label{display:inline!important}
+.trksetpop{width:min(300px,calc(100vw - 16px))}.trk-set{min-width:0}
+.trkpop{width:min(340px,calc(100vw - 16px))}
+.trk-hd{padding:4px 6px 8px;font-size:14px}
+.trk-e{border:1px solid var(--line);border-radius:12px;padding:8px;margin:0 2px 8px;display:flex;flex-direction:column;gap:8px}
+.trk-r1{display:flex;gap:4px;align-items:center}.trk-r1 .pq{margin:0;flex:1;min-width:0;padding:6px 8px}
+.trk-ops{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.trk-o{padding:2px;border-radius:8px;border:2px solid transparent;background:none;cursor:pointer}.trk-o.on{border-color:var(--fg)}
+.trk-o .opt{font-size:12.5px;padding:3px 10px}
+.trk-new{border:1px dashed var(--line);border-radius:8px;background:none;color:var(--fg);font:inherit;font-size:12.5px;padding:4px 8px;width:96px}
+.trk-val{display:flex;align-items:center;gap:8px;font-size:13px}.trk-val span{color:var(--muted);flex:none}.trk-val .pq{margin:0;flex:1;font-variant-numeric:tabular-nums}
+.trk-open{align-self:flex-start;background:none;border:0;color:var(--muted);font:inherit;font-size:12.5px;padding:0;cursor:pointer}
+.trkpop .trk-add{margin:2px 2px 4px}
 .wcl{border-top:1px solid var(--line);margin-top:10px;padding-top:10px;display:flex;flex-direction:column;gap:2px}
 .wcld{font-size:12.5px;color:var(--muted);margin-bottom:4px}
 .wci{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;text-align:left;font-size:14px}
@@ -1762,7 +1797,7 @@ let liveT=null,liveBusy=false;
 const dbSig=db=>{if(!db)return '';try{return JSON.stringify([db.props,db.titleAt||0,db.name,db.titleName||"",db.titleIcon||"",db.rows.map(id=>{const r=pg(id);return r?[r.id,r.title,r.icon,r.deleted?1:0,r.props,r.cover?1:0]:0})])}catch(e){return String(Math.random())}};
 function liveDB(){if(liveBusy)return;clearTimeout(liveT);liveT=setTimeout(()=>{liveBusy=true;try{
   const ae=document.activeElement,cache={};
-  document.querySelectorAll('.gdb,.wdbv').forEach(el=>{const L=el._live;if(!L||!el.isConnected)return;
+  document.querySelectorAll('.gdb,.wdbv,.wtrk').forEach(el=>{const L=el._live;if(!L||!el.isConnected)return;
     if(ae&&ae!==document.body&&el.contains(ae))return;            /* never redraw the one you are typing in */
     const sig=cache[L.dbid]??(cache[L.dbid]=dbSig(S.dbs[L.dbid]));if(el._sig===sig)return;el._sig=sig;
     const y=el.querySelector('.tl-sc')?.scrollLeft;try{L.rer()}catch(e){}const t=el.querySelector('.tl-sc');if(t&&y!=null)t.scrollLeft=y})
@@ -1901,6 +1936,7 @@ function blockEl(b,p,n){
   else if(T==='w_gallery')wGallery(b,c);
   else if(T==='w_db')wDB(b,c);
   else if(T==='w_cal')wCal(b,c);
+  else if(T==='w_track')wTrack(b,c);
   else if(T==='database'){const db=S.dbs[b.dbid];if(db){const box=document.createElement('div');c.appendChild(box);renderGDB(db,box,p.id,true,b)}else c.innerHTML='<p class="tsub">This database was deleted.</p>'}
   else if(T==='pagelink'){const lp=pg(b.pid);if(!lp||lp.deleted){c.innerHTML='';return w}const a=document.createElement('div');a.className='plink';a.dataset.pid=lp.id;a.tabIndex=0;a.innerHTML=`<span>${lp.icon}</span><span class="plt">${esc(lp.title||'Untitled')}</span>`;a.onclick=()=>openPeek(lp.id);a.onkeydown=e=>{if(e.key==='Enter')openPeek(lp.id)};a.title='Opens in a side panel';c.appendChild(a)}
   if(b.ts&&hasSt(b.ts)&&TEXTUAL.includes(T))c.querySelectorAll('.ed').forEach(e=>{e.dataset.base=e.style.cssText;e.style.cssText+=stCSS(b.ts,false,true)});
@@ -1947,7 +1983,7 @@ const TYPES=[
   {t:'p',l:'Text',h:'Plain paragraph',g:'Aa'},{t:'h1',l:'Heading 1',h:'Large section title',g:'H1'},{t:'h2',l:'Heading 2',h:'Medium title',g:'H2'},{t:'h3',l:'Heading 3',h:'Small title',g:'H3'},
   {t:'todo',l:'To-do list',h:'Checklist with checkboxes',g:'☐'},{t:'bullet',l:'Bulleted list',h:'Simple list',g:'•'},{t:'number',l:'Numbered list',h:'Numbered steps',g:'1.'},
   {t:'toggle',l:'Toggle',h:'Show or hide content',g:'▸'},{t:'callout',l:'Callout',h:'Highlighted note',g:'!'},{t:'quote',l:'Quote',h:'Quotation',g:'"'},
-  {t:'code',l:'Code',h:'Code snippet',g:'</>'},{t:'table',l:'Table',h:'Rows and columns',g:'▦'},{t:'divider',l:'Divider',h:'Visual separator',g:'—'},{t:'spacer',l:'Empty space',h:'Blank block to push others aside',g:'⬚'},{t:'page',l:'Page',h:'New page inside this one',g:'↳'},{t:'dbinline',l:'Database – Inline',h:'Table, board and calendar on this page',g:'▤'},{t:'dbpage',l:'Database – Full page',h:'A database as its own page',g:'▦'},{t:'dblink',l:'Linked database',h:'Show a database you already made',g:'⇢'},{t:'w_clock',l:'Clock widget',h:'Live time and date, any time zone',g:'◷'},{t:'w_gallery',l:'Gallery widget',h:'Photos in a grid or slideshow',g:'▣'},{t:'w_cal',l:'Calendar widget',h:'Month view with dates from your databases',g:'▦'},{t:'w_db',l:'Database widget',h:'View a saved database as a chart, table, board… (view only)',g:'◔'}];
+  {t:'code',l:'Code',h:'Code snippet',g:'</>'},{t:'table',l:'Table',h:'Rows and columns',g:'▦'},{t:'divider',l:'Divider',h:'Visual separator',g:'—'},{t:'spacer',l:'Empty space',h:'Blank block to push others aside',g:'⬚'},{t:'page',l:'Page',h:'New page inside this one',g:'↳'},{t:'dbinline',l:'Database – Inline',h:'Table, board and calendar on this page',g:'▤'},{t:'dbpage',l:'Database – Full page',h:'A database as its own page',g:'▦'},{t:'dblink',l:'Linked database',h:'Show a database you already made',g:'⇢'},{t:'w_clock',l:'Clock widget',h:'Live time and date, any time zone',g:'◷'},{t:'w_gallery',l:'Gallery widget',h:'Photos in a grid or slideshow',g:'▣'},{t:'w_cal',l:'Calendar widget',h:'Month view with dates from your databases',g:'▦'},{t:'w_db',l:'Database widget',h:'View a saved database as a chart, table, board… (view only)',g:'◔'},{t:'w_track',l:'Tracker calendar',h:'Mark each day (WIN / LOSS, Done…) and add a value, saved in a database',g:'▦'}];
 const SL={open:false,bid:null,filter:'',sel:0,items:[],plus:false};
 const narrow=()=>innerWidth<=820||matchMedia('(hover:none)').matches;
 function openSlash(bid,plus,turn){SL.open=true;SL.bid=bid;SL.filter='';SL.sel=0;SL.plus=plus;SL.turn=!!turn;SL.built=false;SL.cur=null;
@@ -3400,7 +3436,7 @@ const numCols=db=>dbCols(db).map((c,i)=>c.pr&&(c.pr.type==='number'||c.pr.type==
 let POPCLOSE=null;
 function openPop(anchor,build,onClose){
   const pop=$('#pop');if(!pop.hidden)closePop();
-  pop.innerHTML='';pop.style.width='';pop.style.maxHeight='';pop.hidden=false;$('#popscrim').hidden=false;POPCLOSE=onClose||null;
+  pop.className='pop';pop.innerHTML='';pop.style.width='';pop.style.maxHeight='';pop.hidden=false;$('#popscrim').hidden=false;POPCLOSE=onClose||null;
   build(pop);
   const phone=isPhone();pop.classList.toggle('sheet',phone);
   if(phone){pop.style.top='';pop.style.left='';return}
@@ -4158,10 +4194,10 @@ function unColumn(b,p){
 }
 
 /* ---------- widgets: clock, gallery, calendar ---------- */
-const WIDGETS=['w_clock','w_gallery','w_cal','w_db'];
+const WIDGETS=['w_clock','w_gallery','w_cal','w_db','w_track'];
 const TZS=[['local','This device'],['Asia/Manila','Manila'],['America/New_York','New York'],['Europe/London','London'],['Asia/Tokyo','Tokyo'],['Australia/Sydney','Sydney']];
 const GEAR='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>';
-function widgetDefaults(t){return t==='w_db'?{dbid:null,lv:{view:'table'}}:t==='w_clock'?{style:'digital',h24:false,sec:true,tz:'local'}:t==='w_gallery'?{imgs:[],layout:'slide',auto:0}:{wkStart:0,events:true,month:null}}
+function widgetDefaults(t){return t==='w_track'?{dbid:null,wkStart:0,month:null,plus:true}:t==='w_db'?{dbid:null,lv:{view:'table'}}:t==='w_clock'?{style:'digital',h24:false,sec:true,tz:'local'}:t==='w_gallery'?{imgs:[],layout:'slide',auto:0}:{wkStart:0,events:true,month:null}}
 function wShell(cls,label){const d=document.createElement('div');d.className='widget '+cls;d.innerHTML=`<div class="whead"><span class="wlabel">${label}</span><button class="wgear" aria-label="Widget settings" title="Widget settings">${GEAR}</button></div><div class="wbody"></div>`;return d}
 function optRow(label,on,attrs){return `<button class="ditem${on?' on':''}" ${attrs}><span>${label}</span>${on?'<span class="okm">✓</span>':''}</button>`}
 
@@ -4432,6 +4468,95 @@ function wCal(b,c){
     pop.querySelector('[data-e]').onclick=()=>{b.events=!b.events;save();closePop()};
   },renderPage);
   c.appendChild(w);
+}
+
+/* ---------- Tracker calendar: a month view over a saved database. Each day shows its mark (a Select) and value (a number) ---------- */
+function trkProps(db,b){const P=k=>b[k]&&propById(db,b[k]);
+  let dp=P('dp');if(!dp||dp.type!=='date')dp=db.props.find(x=>x.type==='date')||null;
+  let mp=P('mp');if(!mp||mp.type!=='select')mp=db.props.find(x=>x.type==='select')||null;
+  let vp=b.vp==='none'?null:P('vp');if(b.vp!=='none'&&(!vp||!isNumProp(db,vp)))vp=db.props.find(x=>x.type==='number'||x.type==='formula')||db.props.find(x=>isNumProp(db,x))||null;
+  return {dp,mp,vp}}
+const trkFmt=(v,b)=>(b.unit?b.unit:'')+nfmt(v);
+const trkSign=(v,b)=>(v>0&&b.plus?'+':'')+(v<0?'\u2212'+trkFmt(-v,b):trkFmt(v,b));
+function wTrack(b,c){
+  const w=wShell('wtrk','Tracker calendar'),body=w.querySelector('.wbody'),lab=w.querySelector('.wlabel');
+  const draw=()=>{const db=b.dbid&&S.dbs[b.dbid];body.innerHTML='';w._live=db?{dbid:db.id,rer:draw}:null;w._sig=dbSig(db);
+    if(!db){lab.textContent='Tracker calendar';body.innerHTML=`<button class="gempty2"><span class="trk-ic">\u25a6</span><b>Choose a saved database</b><small>Each day shows its mark (like WIN / LOSS, Done / Missed) and a value (like how much). Tap a day to add or change it.</small></button>`;
+      body.firstChild.onclick=e=>pickDatabase(e.currentTarget,id=>{b.dbid=id;delete b.dp;delete b.mp;delete b.vp;save();draw()});return}
+    lab.innerHTML=`<span class="wdb-nm" data-dbname="${db.id}">${esc(dbTitle(db))}</span>`;
+    const {dp,mp,vp}=trkProps(db,b);
+    if(!dp){body.innerHTML=`<div class="trk-need"><p>This calendar needs a <b>Date</b> property in \u201c${esc(dbTitle(db))}\u201d.</p><button class="btn sec sm">Add a Date property</button></div>`;
+      body.querySelector('button').onclick=()=>{const pr={id:uid(),name:'Date',type:'date'};db.props.push(pr);b.dp=pr.id;save();draw()};return}
+    const [Y,M]=(b.month||todayISO().slice(0,7)).split('-').map(Number),first=new Date(Y,M-1,1),ws=b.wkStart||0;
+    const start=new Date(Y,M-1,1-((first.getDay()-ws+7)%7)),today=todayISO(),mkey=`${Y}-${pad2(M)}`;
+    const by={};dbRowsAlive(db).forEach(r=>{const d=r.props[dp.id];if(d)(by[d]=by[d]||[]).push(r)});
+    const val=r=>vp?chNum(db,vp,r):null;
+    const wk=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],names=[...wk.slice(ws),...wk.slice(0,ws)];
+    let cells='';for(let i=0;i<42;i++){const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i),iso=isoOf(d),rs=by[iso]||[];
+      if(i===35&&d.getMonth()!==M-1)break;
+      const r0=rs[0],m=r0&&mp?r0.props[mp.id]:'',col=m?optColor(mp,m):'',vs=rs.map(val).filter(v=>v!=null),sum=vs.reduce((a,x)=>a+x,0);
+      cells+=`<button class="tkd${d.getMonth()!==M-1?' out':''}${iso===today?' today':''}${m?' has o-'+col:''}${rs.length&&!m?' dot':''}" data-d="${iso}"><span class="tkn">${d.getDate()}</span>${m?`<span class="tkm">${esc(m)}</span>`:''}${vs.length?`<span class="tkv${sum<0?' neg':sum>0?' pos':''}">${esc(trkSign(sum,b))}</span>`:''}${rs.length>1?`<i class="tkx">${rs.length}</i>`:''}</button>`}
+    /* month summary */
+    const mrows=Object.keys(by).filter(k=>k.slice(0,7)===mkey).flatMap(k=>by[k]);
+    const cnt={};if(mp)mrows.forEach(r=>{const m=r.props[mp.id];if(m)cnt[m]=(cnt[m]||0)+1});
+    const mv=mrows.map(val).filter(v=>v!=null),tot=mv.reduce((a,x)=>a+x,0);
+    const sum=`<div class="tks">${mp?(mp.options||[]).filter(o=>cnt[o.v]).map(o=>`<span class="tkc"><span class="opt o-${o.c}">${esc(o.v)}</span><b>${cnt[o.v]}</b></span>`).join(''):''}${mrows.length?'':'<span class="tsub">Nothing this month yet. Tap a day to add one.</span>'}${vp&&mv.length?`<span class="tkt">${esc(vp.name)} <b class="${tot<0?'neg':tot>0?'pos':''}">${esc(trkSign(tot,b))}</b></span>`:''}</div>`;
+    body.innerHTML=`<div class="wch"><button class="tool" data-m="-1" aria-label="Previous month">\u2039</button><b>${first.toLocaleString('en-US',{month:'long',year:'numeric'})}</b><button class="tool" data-m="1" aria-label="Next month">\u203a</button><button class="tool" data-m="0">Today</button></div>
+      <div class="tkg">${names.map(n=>`<span class="tkh">${n.slice(0,3)}</span>`).join('')}${cells}</div>${sum}`;
+    body.querySelectorAll('[data-m]').forEach(x=>x.onclick=()=>{const k=+x.dataset.m;if(!k)b.month=null;else{const d=new Date(Y,M-1+k,1);b.month=`${d.getFullYear()}-${pad2(d.getMonth()+1)}`}save();draw()});
+    body.querySelectorAll('.tkd').forEach(x=>x.onclick=()=>trkDay(x,db,b,x.dataset.d,draw));
+  };
+  w.querySelector('.wgear').onclick=e=>{const anchor=e.currentTarget;openPop(anchor,pop=>{const db=b.dbid&&S.dbs[b.dbid];
+    if(!db){pop.innerHTML='<div class="lb3">Tracker calendar</div><button class="ditem" data-a="pick"><span>Choose a database</span></button>';pop.querySelector('[data-a]').onclick=()=>{POPCLOSE=null;closePop();pickDatabase(anchor,id=>{b.dbid=id;save();draw()})};return}
+    const {dp,mp,vp}=trkProps(db,b),h=hostOfDB(db.id);
+    const sel=(k,list,cur,none)=>`<select class="psel" data-k="${k}">${none?`<option value="none"${cur?'':' selected'}>${none}</option>`:''}${list.map(p=>`<option value="${p.id}"${cur&&cur.id===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select>`;
+    const dps=db.props.filter(x=>x.type==='date'),mps=db.props.filter(x=>x.type==='select'),vps=db.props.filter(x=>isNumProp(db,x));
+    pop.classList.add('trksetpop');pop.innerHTML=`<div class="lb3">Tracker calendar</div>
+      <div class="trk-set"><label><span>Date</span>${sel('dp',dps,dp)}</label>
+      <label><span>Mark</span>${mps.length?sel('mp',mps,mp):'<button class="btn sec sm" data-add="mp">Add a Mark property</button>'}</label>
+      <label><span>Value</span>${sel('vp',vps,vp,'No value')}${vps.length?'':'<button class="btn sec sm" data-add="vp">Add a Value property</button>'}</label>
+      <label><span>Value sign</span><input class="pq" data-k="unit" value="${esc(b.unit||'')}" placeholder="e.g. $ or \u20b1" maxlength="3"></label>
+      <div class="trk-chk"><input type="checkbox" id="trkPlus" data-k="plus"${b.plus?' checked':''}><label for="trkPlus">Show + before gains</label></div></div>
+      <div class="lb3">Week starts on</div>${optRow('Sunday',!b.wkStart,'data-w="0"')}${optRow('Monday',b.wkStart===1,'data-w="1"')}
+      <div class="dsep"></div><button class="ditem" data-a="pick"><span>Change database</span></button>${h?`<button class="ditem" data-a="open"><span>Open \u201c${esc(h.title||'Untitled')}\u201d</span></button>`:''}`;
+    pop.querySelectorAll('select[data-k]').forEach(s=>s.onchange=()=>{b[s.dataset.k]=s.value;save();draw()});
+    const u=pop.querySelector('[data-k="unit"]');u.oninput=()=>{b.unit=u.value;save();draw()};
+    pop.querySelector('[data-k="plus"]').onchange=e=>{b.plus=e.target.checked;save();draw()};
+    pop.querySelectorAll('[data-w]').forEach(x=>x.onclick=()=>{b.wkStart=+x.dataset.w;save();closePop()});
+    pop.querySelectorAll('[data-add]').forEach(x=>x.onclick=()=>{let pr;if(x.dataset.add==='mp'){pr={id:uid(),name:'Mark',type:'select',options:[{v:'WIN',c:'green'},{v:'LOSS',c:'red'},{v:'BREAKEVEN',c:'gray'}]};b.mp=pr.id}else{pr={id:uid(),name:'Value',type:'number'};b.vp=pr.id}db.props.push(pr);save();closePop();draw();toast(`Added \u201c${pr.name}\u201d. Rename it or its options from the database.`)});
+    pop.querySelector('[data-a="pick"]').onclick=()=>{POPCLOSE=null;closePop();pickDatabase(anchor,id=>{if(id!==b.dbid){b.dbid=id;delete b.dp;delete b.mp;delete b.vp}save();draw()})};
+    const op=pop.querySelector('[data-a="open"]');if(op)op.onclick=()=>{POPCLOSE=null;closePop();go(h.id)};
+  },draw)};
+  draw();c.appendChild(w);
+}
+/* tap a day: see, add and change that day's entries right here */
+function trkDay(anchor,db,b,iso,rer){
+  const {dp,mp,vp}=trkProps(db,b),h=hostOfDB(db.id);
+  const made=new Set();
+  /* an empty day starts with one blank entry ready to fill */
+  if(!dbRowsAlive(db).some(r=>r.props[dp.id]===iso)){const r=addRow(db,h?h.id:null,{[dp.id]:iso});made.add(r.id)}
+  openPop(anchor,pop=>{pop.classList.add('trkpop');
+    const paint=()=>{const rs=dbRowsAlive(db).filter(r=>r.props[dp.id]===iso);
+      pop.innerHTML=`<div class="trk-hd"><b>${new Date(iso+'T00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</b></div>
+        ${rs.map(r=>`<div class="trk-e" data-id="${r.id}">
+          <div class="trk-r1"><input class="pq trk-t" value="${esc(r.title||'')}" placeholder="${esc(tName(db))} (optional)"><button class="tool trk-del" title="Delete entry" aria-label="Delete entry">${IC.trash}</button></div>
+          ${mp?`<div class="trk-ops">${(mp.options||[]).map(o=>`<button class="trk-o${r.props[mp.id]===o.v?' on':''}" data-v="${esc(o.v)}"><span class="opt o-${o.c}">${esc(o.v)}</span></button>`).join('')}<input class="trk-new" placeholder="+ New mark" aria-label="New mark"></div>`:''}
+          ${vp?`<label class="trk-val"><span>${esc(vp.name)}</span><input class="pq" inputmode="decimal" value="${esc(r.props[vp.id]==null?'':String(r.props[vp.id]))}" placeholder="0"${vp.type==='formula'?' disabled title="This is a formula"':''}></label>`:''}
+          <button class="trk-open">Open as page \u203a</button></div>`).join('')}
+        <button class="btn sec sm trk-add">+ Add ${rs.length?'another':'an'} entry</button>`;
+      pop.querySelector('.trk-add').onclick=()=>{const r=addRow(db,h?h.id:null,{[dp.id]:iso});made.add(r.id);save();paint();rer();const t=pop.querySelector(`[data-id="${r.id}"] .trk-val input`);if(t&&!isPhone())t.focus()};
+      pop.querySelectorAll('.trk-e').forEach(el=>{const r=pg(el.dataset.id);
+        el.querySelector('.trk-t').oninput=e=>{r.title=e.target.value;save()};
+        el.querySelector('.trk-del').onclick=()=>{trashRow(r,()=>{paint();rer()})};
+        el.querySelector('.trk-open').onclick=()=>{POPCLOSE=null;closePop();rer();openPeek(r.id)};
+        el.querySelectorAll('.trk-o').forEach(x=>x.onclick=()=>{const v=x.dataset.v;r.props[mp.id]=r.props[mp.id]===v?'':v;if(r.props[mp.id])b.lastMark=v;save();paint();rer()});
+        const nw=el.querySelector('.trk-new');if(nw)nw.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const v=nw.value.trim();if(!v)return;if(!mp.options.some(o=>o.v===v))mp.options.push({v,c:nextColor(mp)});r.props[mp.id]=v;b.lastMark=v;save();paint();rer()};
+        const vi=el.querySelector('.trk-val input');if(vi&&!vi.disabled)vi.oninput=()=>{const s=vi.value.trim().replace(/,/g,'');r.props[vp.id]=vp.type==='number'?(s===''||isNaN(+s)?'':+s):vi.value;save();rer()};
+      });
+    };
+    paint();
+  },()=>{/* an entry you opened but left empty is not kept */
+    made.forEach(id=>{const r=pg(id);if(r&&!r.deleted&&!(r.title||'').trim()&&!(mp&&r.props[mp.id])&&!(vp&&r.props[vp.id]!==''&&r.props[vp.id]!=null)){S.pages=S.pages.filter(x=>x!==r);db.rows=db.rows.filter(x=>x!==id)}});save();rer()});
 }
 
 /* ---------- side peek + multi-pane split view ---------- */
