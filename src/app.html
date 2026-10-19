@@ -3653,7 +3653,7 @@ function gTimeline(db,box,hostId,rer,V){
 const PAL=['#2f7fd6','#2e9a5b','#d9772b','#8a5cd6','#d1508f','#c99a17','#d1493f','#1aa0a8','#9a6b4a','#8a8f8c'];
 const nfmt=v=>Math.abs(v)>=1000?Math.round(v).toLocaleString('en-US'):(+(+v).toFixed(2)).toLocaleString('en-US');
 const numOr=(v,d)=>v===''||v==null||isNaN(+v)?d:+v;
-const chNum=(db,pr,r)=>{const v=pr.type==='formula'?fval(db,pr,r):r.props[pr.id];return typeof v==='number'?v:(v===''||v==null||isNaN(+v)?null:+v)};
+const isNumProp=(db,pr)=>{if(pr.type==='number'||pr.type==='formula')return true;if(pr.type!=='text')return false;const vs=dbRowsAlive(db).map(r=>r.props[pr.id]).filter(v=>v!==''&&v!=null);return vs.length>0&&vs.every(v=>String(v).trim()!==''&&!isNaN(+String(v).replace(/,/g,'')))},chNum=(db,pr,r)=>{const v=pr.type==='formula'?fval(db,pr,r):r.props[pr.id];if(typeof v==='number')return v;if(v===''||v==null)return null;const n=+String(v).replace(/,/g,'');return isNaN(n)?null:n};
 function chartData(db,V){const c=V.chart||{},rows=viewRows(db,V);const [ag,ap]=(c.agg||'count').split(':');const npr=ap&&propById(db,ap);
   const val=r=>npr?chNum(db,npr,r):1;
   const xk=c.x||(db.props.find(p=>p.type==='select')||{}).id||'title',xp=xk==='title'?null:propById(db,xk);
@@ -3669,8 +3669,8 @@ function chartData(db,V){const c=V.chart||{},rows=viewRows(db,V);const [ag,ap]=(
   return {out,label,total,what,xName:xp?xp.name:tName(db),type:c.type||'bar'}}
 /* "Each row": X is the row name, a date or a number; every chosen number property is a series */
 function chartRows(db,V){const c=V.chart||{},rows=viewRows(db,V);const xk=c.rx||'title',xp=xk==='title'?null:propById(db,xk);
-  let ys=(c.ys||[]).map(id=>propById(db,id)).filter(Boolean);if(!ys.length){const f=db.props.find(p=>p.type==='number'||p.type==='formula');if(f)ys=[f]}
-  const kind=!xp?'cat':xp.type==='date'?'date':xp.type==='number'||xp.type==='formula'?'num':'cat';
+  let ys=(c.ys||[]).map(id=>propById(db,id)).filter(Boolean);if(!ys.length){const f=db.props.find(p=>isNumProp(db,p));if(f)ys=[f]}
+  const kind=!xp?'cat':xp.type==='date'?'date':isNumProp(db,xp)?'num':'cat';
   let pts=rows.map(r=>{let x;if(kind==='date'){const v=r.props[xp.id];x=v?new Date(v+'T00:00').getTime():null}else if(kind==='num')x=chNum(db,xp,r);else x=xp?fmtVal(db,xp,r.props[xp.id],r)||'(none)':(r.title||'Untitled');return {r,x,ys:ys.map(p=>chNum(db,p,r))}});
   if(kind!=='cat'){pts=pts.filter(p=>p.x!=null).sort((a,b)=>a.x-b.x);
     const lo=kind==='date'?(c.xmin?new Date(c.xmin+'T00:00').getTime():null):numOr(c.xmin,null),hi=kind==='date'?(c.xmax?new Date(c.xmax+'T00:00').getTime():null):numOr(c.xmax,null);
@@ -3728,7 +3728,7 @@ function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=do
   box.appendChild(w)}
 /* chart part of the view settings */
 function chartSettingsHTML(db,V){const c=V.chart=V.chart||{},type=c.type||'bar',rows=c.mode==='rows'&&(type==='line'||type==='bar');
-  const xs=db.props,ns=db.props.filter(p=>p.type==='number'||p.type==='formula'),rxs=db.props;
+  const xs=db.props,ns=db.props.filter(p=>isNumProp(db,p)),rxs=db.props;
   const sel=(k,opts,cur)=>`<select data-c="${k}" class="psel">${opts.map(([v,l])=>`<option value="${v}"${(cur??'')===v?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
   let o=`<div class="vslbl">Chart type</div><div class="chtypes">${CHARTS.map(([k,l,ic])=>`<button data-ct="${k}" class="${type===k?'on':''}" title="${l}" aria-label="${l}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></button>`).join('')}</div>`;
   if(type==='line'||type==='bar')o+=`<div class="vsgrp"><div class="vsrow"><span>Data</span><div class="vseg"><button data-cm="" class="${rows?'':'on'}">Group &amp; total</button><button data-cm="rows" class="${rows?'on':''}">Each row</button></div></div></div>`;
@@ -3736,7 +3736,7 @@ function chartSettingsHTML(db,V){const c=V.chart=V.chart||{},type=c.type||'bar',
   if(rows){const xk=c.rx||'title',xp=xk==='title'?null:propById(db,xk);
     o+=`<div class="vsrow"><span>X axis</span>${sel('rx',[['title',tName(db)],...rxs.map(p=>[p.id,p.name])],xk)}</div>`;
     o+=`<div class="vsrow vscol"><span>${type==='line'?'Lines':'Bars'} <small class="tsub">(properties to draw)</small></span><div class="chys">${ns.length?ns.map((p,i)=>{const on=(c.ys&&c.ys.length?c.ys:[ns[0].id]).includes(p.id);return `<label><input type="checkbox" data-y="${p.id}"${on?' checked':''}><i style="background:${PAL[(c.ys||[ns[0].id]).indexOf(p.id)%PAL.length]||'var(--line)'}"></i>${esc(p.name)}</label>`}).join(''):'<span class="tsub">Add a Number property first.</span>'}</div></div>`;
-    if(xp&&(xp.type==='date'||xp.type==='number'||xp.type==='formula')){const t=xp.type==='date'?'date':'number';o+=`<div class="vsrow"><span>X range</span><span class="chrng"><input type="${t}" data-c="xmin" value="${esc(c.xmin||'')}" placeholder="From" aria-label="X from"><b>to</b><input type="${t}" data-c="xmax" value="${esc(c.xmax||'')}" placeholder="To" aria-label="X to"></span></div>`}}
+    if(xp&&(xp.type==='date'||isNumProp(db,xp))){const t=xp.type==='date'?'date':'number';o+=`<div class="vsrow"><span>X range</span><span class="chrng"><input type="${t}" data-c="xmin" value="${esc(c.xmin||'')}" placeholder="From" aria-label="X from"><b>to</b><input type="${t}" data-c="xmax" value="${esc(c.xmax||'')}" placeholder="To" aria-label="X to"></span></div>`}}
   else if(type!=='number'){const xk=c.x||(db.props.find(p=>p.type==='select')||{}).id||'title',xp=xk==='title'?null:propById(db,xk);
     o+=`<div class="vsrow"><span>${type==='donut'?'Slices by':'X axis'}</span>${sel('x',[['title',tName(db)],...xs.map(p=>[p.id,p.name])],xk)}</div>`;
     if(xp&&xp.type==='date'&&type!=='donut')o+=`<div class="vsrow"><span>X range</span><span class="chrng"><input type="month" data-c="xmin" value="${esc((c.xmin||'').slice(0,7))}" aria-label="From month"><b>to</b><input type="month" data-c="xmax" value="${esc((c.xmax||'').slice(0,7))}" aria-label="To month"></span></div>`}
@@ -3750,7 +3750,7 @@ function wireChartSettings(pop,db,V,redraw,live){const c=V.chart;
   pop.querySelectorAll('select[data-c]').forEach(s=>s.onchange=()=>{c[s.dataset.c]=s.value;if(s.dataset.c==='x'||s.dataset.c==='rx'){delete c.xmin;delete c.xmax}save();redraw();live()});
   pop.querySelectorAll('input[data-c]').forEach(i=>{i.oninput=()=>{c[i.dataset.c]=i.value;save();live()};i.onkeydown=e=>{if(e.key==='Enter')i.blur()}});
   pop.querySelectorAll('[data-co]').forEach(b=>b.onclick=()=>{c.ord=b.dataset.co;save();redraw();live()});
-  pop.querySelectorAll('[data-y]').forEach(x=>x.onchange=()=>{const ns=db.props.filter(p=>p.type==='number'||p.type==='formula');let ys=c.ys&&c.ys.length?c.ys.slice():(ns[0]?[ns[0].id]:[]);
+  pop.querySelectorAll('[data-y]').forEach(x=>x.onchange=()=>{const ns=db.props.filter(p=>isNumProp(db,p));let ys=c.ys&&c.ys.length?c.ys.slice():(ns[0]?[ns[0].id]:[]);
     if(x.checked){if(!ys.includes(x.dataset.y))ys.push(x.dataset.y)}else ys=ys.filter(y=>y!==x.dataset.y);c.ys=ys;save();redraw();live()})}
 
 /* MAP: offline world + detailed Philippines; places are "lat, lng" or a known place name */
