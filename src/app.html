@@ -794,6 +794,24 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .trk-open{align-self:flex-start;background:none;border:0;color:var(--muted);font:inherit;font-size:12.5px;padding:0;cursor:pointer}
 .trkpop .trk-add{margin:2px 2px 4px}
 .trk-hint{font-size:11.5px;color:var(--muted);margin-bottom:-4px}.trk-set label>span small{display:block;font-size:10.5px}
+.wszsec{border-top:1px solid var(--line);margin-top:6px;padding-top:2px}
+.wsz{display:flex;gap:4px;padding:2px 6px 6px;flex-wrap:wrap}
+.wsz button{flex:1 0 auto;min-width:34px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:12.5px;cursor:pointer}
+.wsz button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--bg));color:var(--fg);font-weight:600}
+.wszh{padding:0 8px 6px;margin:0;font-size:12px}
+.widget.wfix{display:flex;flex-direction:column;box-sizing:border-box}
+.widget.wfix>.whead{flex:none}
+.widget.wfix>.wbody,.widget.wfix.wdbv>.wbody{flex:1 1 auto;min-height:0;overflow:auto}
+.wfix.wtrk>.wbody,.wfix.wcal>.wbody{display:flex;flex-direction:column;overflow:hidden}
+.wfix .tkg{flex:1;min-height:0;grid-template-rows:auto;grid-auto-rows:minmax(0,1fr)}
+.wfix .tkd{min-height:0;container-type:size}
+@container (max-height:46px){.tkm{display:none}.tkv{margin-top:0}}
+@container (max-height:30px){.tkv{display:none}}
+.wfix .wcg{flex:1;min-height:0;grid-template-rows:auto;grid-auto-rows:minmax(0,1fr)}
+.wfix .wcd{aspect-ratio:auto;max-height:none;min-height:0}
+.wfix .wcl{flex:none;max-height:40%;overflow:auto}
+.wfix.wclock>.wbody,.wfix.wgal>.wbody{display:flex;flex-direction:column;justify-content:center}
+
 .wcl{border-top:1px solid var(--line);margin-top:10px;padding-top:10px;display:flex;flex-direction:column;gap:2px}
 .wcld{font-size:12.5px;color:var(--muted);margin-bottom:4px}
 .wci{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;text-align:left;font-size:14px}
@@ -1938,6 +1956,7 @@ function blockEl(b,p,n){
   else if(T==='w_db')wDB(b,c);
   else if(T==='w_cal')wCal(b,c);
   else if(T==='w_track')wTrack(b,c);
+  if(WIDGETS.includes(T)){const wel=c.querySelector('.widget');if(wel){wel._b=b;wel.dataset.wsize=b.wsize||'';wFitSoon()}}
   else if(T==='database'){const db=S.dbs[b.dbid];if(db){const box=document.createElement('div');c.appendChild(box);renderGDB(db,box,p.id,true,b)}else c.innerHTML='<p class="tsub">This database was deleted.</p>'}
   else if(T==='pagelink'){const lp=pg(b.pid);if(!lp||lp.deleted){c.innerHTML='';return w}const a=document.createElement('div');a.className='plink';a.dataset.pid=lp.id;a.tabIndex=0;a.innerHTML=`<span>${lp.icon}</span><span class="plt">${esc(lp.title||'Untitled')}</span>`;a.onclick=()=>openPeek(lp.id);a.onkeydown=e=>{if(e.key==='Enter')openPeek(lp.id)};a.title='Opens in a side panel';c.appendChild(a)}
   if(b.ts&&hasSt(b.ts)&&TEXTUAL.includes(T))c.querySelectorAll('.ed').forEach(e=>{e.dataset.base=e.style.cssText;e.style.cssText+=stCSS(b.ts,false,true)});
@@ -3438,7 +3457,7 @@ let POPCLOSE=null;
 function openPop(anchor,build,onClose){
   const pop=$('#pop');if(!pop.hidden)closePop();
   pop.className='pop';pop.innerHTML='';pop.style.width='';pop.style.maxHeight='';pop.hidden=false;$('#popscrim').hidden=false;POPCLOSE=onClose||null;
-  build(pop);
+  build(pop);if(WSZ_NEXT){const wb=WSZ_NEXT;WSZ_NEXT=null;if(pop.innerHTML)wSizeUI(pop,wb)}
   const phone=isPhone();pop.classList.toggle('sheet',phone);
   if(phone){pop.style.top='';pop.style.left='';return}
   const r=anchor.getBoundingClientRect(),w=pop.offsetWidth,h=pop.offsetHeight;
@@ -3716,16 +3735,19 @@ function chartRows(db,V){const c=V.chart||{},rows=viewRows(db,V);const xk=c.rx||
   return {pts,ys,kind,xl:x=>String(x),xName:xp?xp.name:tName(db)}}
 const niceMax=v=>{if(v<=0)return 1;const e=Math.pow(10,Math.floor(Math.log10(v))),f=v/e;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*e};
 function yDomain(c,vals){const lo=numOr(c.ymin,Math.min(0,...vals)),hi0=numOr(c.ymax,niceMax(Math.max(...vals,0)));return [lo,hi0>lo?hi0:lo+1]}
+const CHFIT=new WeakMap();
 function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=document.createElement('div');w.className='gchart t-'+type;
   const rowsMode=c.mode==='rows'&&(type==='line'||type==='bar');
-  const narrow=innerWidth<=640,BW=narrow?360:560,H=narrow?200:240,T=24;
+  let narrow=innerWidth<=640,BW=narrow?360:560,H=narrow?200:240,T=24;
+  /* a widget with a set size asks the chart to fit its height */
+  const fit=CHFIT.get(V),fitH=W=>{if(fit&&fit.w>0)H=Math.max(60,Math.round(fit.h*W/fit.w-T-44))};
   const axis=(W,lo,hi,fmt)=>{let s='';for(let t=0;t<=4;t++){const y=T+H*t/4;s+=`<line x1="44" x2="${W}" y1="${y}" y2="${y}" class="chgrid"/><text x="38" y="${y+4}" class="chax" text-anchor="end">${fmt(hi-(hi-lo)*t/4)}</text>`}return s};
   const clampY=(v,lo,hi)=>T+H-(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*H;
   if(rowsMode){const {pts,ys,kind,xl,lo:xlo,hi:xhi,xName}=chartRows(db,V);
     if(!ys.length){w.innerHTML='<p class="tsub" style="padding:16px">Add a Number property, then choose it in the view settings to draw it.</p>';box.appendChild(w);return}
     if(!pts.length){w.innerHTML='<p class="tsub" style="padding:16px">No rows in this range.</p>';box.appendChild(w);return}
     const vals=pts.flatMap(p=>p.ys).filter(v=>v!=null),[lo,hi]=yDomain(c,vals.length?vals:[0]);const n=pts.length;
-    const W=Math.max(BW,type==='bar'?n*(ys.length*16+18)+70:n*(kind==='cat'?64:12)+70);
+    const W=Math.max(BW,type==='bar'?n*(ys.length*16+18)+70:n*(kind==='cat'?64:12)+70);fitH(W);
     let xOf;if(kind==='cat'||type==='bar')xOf=i=>60+(n<2?(W-80)/2:i*(W-90)/(n-1));else{const a=xlo??pts[0].x,b=xhi??pts[n-1].x,span=b-a||1;xOf=i=>60+(pts[i].x-a)/span*(W-90)}
     let s=`<svg viewBox="0 0 ${W} ${H+T+44}" class="chsvg" style="min-width:${W>BW*1.4?Math.min(W*.7,1400):0}px">`+axis(W,lo,hi,nfmt);
     if(type==='line'){ys.forEach((p,si)=>{const col=PAL[si%PAL.length],seg=pts.map((q,i)=>q.ys[si]==null?null:[xOf(i),clampY(q.ys[si],lo,hi)]);
@@ -3742,12 +3764,12 @@ function gChart(db,box,hostId,rer,V){const c=V.chart||{},type=c.type||'bar',w=do
   const [lo,hi]=yDomain(c,out.map(g=>g.v));
   if(type==='number'){w.innerHTML=`<div class="chnum"><b>${nfmt(total)}</b><span>${esc(what)}</span></div>`}
   else if(!out.length){w.innerHTML='<p class="tsub" style="padding:16px">Nothing to chart yet. Add rows, or pick another X axis in the view settings.</p>'}
-  else if(type==='bar'){const n=out.length,gap=14,bw=Math.max(18,Math.min(90,(BW-64)/n-gap)),W=Math.max(BW,n*(bw+gap)+70),x0=56+Math.max(0,(W-66-n*(bw+gap))/2);
+  else if(type==='bar'){const n=out.length,gap=14,bw=Math.max(18,Math.min(90,(BW-64)/n-gap)),W=Math.max(BW,n*(bw+gap)+70),x0=56+Math.max(0,(W-66-n*(bw+gap))/2);fitH(W);
     let s=`<svg viewBox="0 0 ${W} ${H+T+40}" class="chsvg" style="min-width:${n>6?Math.min(n*52,1200):0}px">`+axis(W,lo,hi,nfmt);
     out.forEach((g,i)=>{const x=x0+i*(bw+gap),y0=clampY(Math.max(lo,0),lo,hi),y=clampY(g.v,lo,hi);s+=`<g class="chbar" data-i="${i}"><rect x="${x}" y="${Math.min(y,y0)}" width="${bw}" height="${Math.max(1,Math.abs(y0-y))}" rx="4" fill="${g.col}"/><text x="${x+bw/2}" y="${Math.min(y,y0)-5}" text-anchor="middle" class="chval">${nfmt(g.v)}</text><text x="${x+bw/2}" y="${H+T+20}" text-anchor="middle" class="chlab">${esc(String(label(g.k)).slice(0,14))}</text></g>`});
     w.innerHTML=`<div class="chscroll">${s}</svg></div>`}
   else if(type==='hbar'){const span=hi-lo;w.innerHTML=`<div class="chh">${out.map((g,i)=>`<button class="chhr chbar" data-i="${i}"><span class="chhl">${esc(label(g.k))}</span><span class="chht"><i style="width:${Math.max(0,Math.min(100,(g.v-lo)/span*100))}%;background:${g.col}"></i></span><b>${nfmt(g.v)}</b></button>`).join('')}</div>`}
-  else if(type==='line'){const n=out.length,W=Math.max(BW,n*70),x=i=>(n<2?W/2:64+i*(W-104)/(n-1));const pts=out.map((g,i)=>[x(i),clampY(g.v,lo,hi)]);
+  else if(type==='line'){const n=out.length,W=Math.max(BW,n*70),x=i=>(n<2?W/2:64+i*(W-104)/(n-1));fitH(W);const pts=out.map((g,i)=>[x(i),clampY(g.v,lo,hi)]);
     let s=`<svg viewBox="0 0 ${W} ${H+T+40}" class="chsvg" style="min-width:${n>8?Math.min(n*52,1200):0}px">`+axis(W,lo,hi,nfmt);
     s+=`<path d="M${pts[0][0]},${T+H} L${pts.map(p=>p.join(',')).join(' L')} L${pts[pts.length-1][0]},${T+H}Z" class="charea"/><path d="M${pts.map(p=>p.join(',')).join(' L')}" class="chline"/>`;
     out.forEach((g,i)=>{s+=`<g class="chbar" data-i="${i}"><circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="5" class="chdot"/><text x="${pts[i][0]}" y="${pts[i][1]-10}" text-anchor="middle" class="chval">${nfmt(g.v)}</text><text x="${pts[i][0]}" y="${H+T+20}" text-anchor="middle" class="chlab">${esc(String(label(g.k)).slice(0,12))}</text></g>`});
@@ -4509,7 +4531,7 @@ function wTrack(b,c){
     const mv=mrows.map(val).filter(v=>v!=null),tot=mv.reduce((a,x)=>a+x,0);
     const sum=`<div class="tks">${mp?(mp.options||[]).filter(o=>cnt[o.v]).map(o=>`<span class="tkc"><span class="opt o-${o.c}">${esc(o.v)}</span><b>${cnt[o.v]}</b></span>`).join(''):''}${mrows.length?'':'<span class="tsub">Nothing this month yet. Tap a day to add one.</span>'}${vp&&mv.length?`<span class="tkt">${esc(vp.name)} <b class="${tot<0?'neg':tot>0?'pos':''}">${esc(trkSign(tot,b))}</b></span>`:''}</div>`;
     body.innerHTML=`<div class="wch"><button class="tool" data-m="-1" aria-label="Previous month">\u2039</button><b>${first.toLocaleString('en-US',{month:'long',year:'numeric'})}</b><button class="tool" data-m="1" aria-label="Next month">\u203a</button><button class="tool" data-m="0">Today</button></div>
-      <div class="tkg">${names.map(n=>`<span class="tkh">${n.slice(0,3)}</span>`).join('')}${cells}</div>${sum}`;
+      <div class="tkg">${names.map(n=>`<span class="tkh">${n.slice(0,3)}</span>`).join('')}${cells}</div>${b.sum?sum:''}`;
     body.querySelectorAll('[data-m]').forEach(x=>x.onclick=()=>{const k=+x.dataset.m;if(!k)b.month=null;else{const d=new Date(Y,M-1+k,1);b.month=`${d.getFullYear()}-${pad2(d.getMonth()+1)}`}save();draw()});
     body.querySelectorAll('.tkd').forEach(x=>x.onclick=()=>trkDay(x,db,b,x.dataset.d,draw));
   };
@@ -4523,12 +4545,12 @@ function wTrack(b,c){
       <label><span>Mark <small class="tsub">Select / Multi-select</small></span>${mps.length?sel('mp',mps,mp):'<button class="btn sec sm" data-add="mp">Add a Mark property</button>'}</label>
       <label><span>Value <small class="tsub">Number</small></span>${sel('vp',vps,vp,'No value')}${vps.length?'':'<button class="btn sec sm" data-add="vp">Add a Value property</button>'}</label>
       <label><span>Value sign</span><input class="pq" data-k="unit" value="${esc(b.unit||'')}" placeholder="e.g. $ or \u20b1" maxlength="3"></label>
-      <div class="trk-chk"><input type="checkbox" id="trkPlus" data-k="plus"${b.plus?' checked':''}><label for="trkPlus">Show + before gains</label></div></div>
+      <div class="trk-chk"><input type="checkbox" id="trkPlus" data-k="plus"${b.plus?' checked':''}><label for="trkPlus">Show + before gains</label></div><div class="trk-chk"><input type="checkbox" id="trkSum" data-k="sum"${b.sum?' checked':''}><label for="trkSum">Show month totals below</label></div></div>
       <div class="lb3">Week starts on</div>${optRow('Sunday',!b.wkStart,'data-w="0"')}${optRow('Monday',b.wkStart===1,'data-w="1"')}
       <div class="dsep"></div><button class="ditem" data-a="pick"><span>Change database</span></button>${h?`<button class="ditem" data-a="open"><span>Open \u201c${esc(h.title||'Untitled')}\u201d</span></button>`:''}`;
     pop.querySelectorAll('select[data-k]').forEach(s=>s.onchange=()=>{b[s.dataset.k]=s.value;save();draw()});
     const u=pop.querySelector('[data-k="unit"]');u.oninput=()=>{b.unit=u.value;save();draw()};
-    pop.querySelector('[data-k="plus"]').onchange=e=>{b.plus=e.target.checked;save();draw()};
+    pop.querySelector('[data-k="plus"]').onchange=e=>{b.plus=e.target.checked;save();draw()};pop.querySelector('[data-k="sum"]').onchange=e=>{b.sum=e.target.checked;save();draw()};
     pop.querySelectorAll('[data-w]').forEach(x=>x.onclick=()=>{b.wkStart=+x.dataset.w;save();closePop()});
     pop.querySelectorAll('[data-add]').forEach(x=>x.onclick=()=>{let pr;if(x.dataset.add==='mp'){pr={id:uid(),name:'Mark',type:'select',options:[{v:'WIN',c:'green'},{v:'LOSS',c:'red'},{v:'BREAKEVEN',c:'gray'}]};b.mp=pr.id}else{pr={id:uid(),name:'Value',type:'number'};b.vp=pr.id}db.props.push(pr);save();closePop();draw();toast(`Added \u201c${pr.name}\u201d. Rename it or its options from the database.`)});
     pop.querySelector('[data-a="pick"]').onclick=()=>{POPCLOSE=null;closePop();pickDatabase(anchor,id=>{if(id!==b.dbid){b.dbid=id;delete b.dp;delete b.mp;delete b.vp}save();draw()})};
@@ -4566,6 +4588,32 @@ function trkDay(anchor,db,b,iso,rer){
   },()=>{/* an entry you opened but left empty is not kept */
     made.forEach(id=>{const r=pg(id);if(r&&!r.deleted&&!(r.title||'').trim()&&!trkMarks(mp,r).length&&!(vp&&r.props[vp.id]!==''&&r.props[vp.id]!=null)){S.pages=S.pages.filter(x=>x!==r);db.rows=db.rows.filter(x=>x!==id)}});save();rer()});
 }
+
+/* ---------- widget size: every widget can be Auto, a set height, or match the widgets beside it ---------- */
+const WSZ={s:300,m:400,l:520,xl:660},WSZ_L=[['','Auto'],['s','S'],['m','M'],['l','L'],['xl','XL'],['match','Match row']];
+let WSZ_NEXT=null,wfT=0;
+document.addEventListener('click',e=>{const g=e.target.closest&&e.target.closest('.wgear');WSZ_NEXT=g?(g.closest('.widget')||{})._b||null:null},true);
+function wSizeUI(pop,b){const sec=document.createElement('div');sec.className='wszsec';
+  const paint=()=>{sec.innerHTML='<div class="lb3">Size</div><div class="wsz">'+WSZ_L.map(([k,l])=>`<button data-z="${k}" class="${(b.wsize||'')===k?'on':''}"${k==='match'?' title="Same height as the widgets next to it in its row"':''}>${l}</button>`).join('')+'</div>'+((b.wsize||'')==='match'?'<p class="tsub wszh">Same height as the widget beside it. Give that one a size (or leave it on Auto).</p>':'');
+    sec.querySelectorAll('[data-z]').forEach(x=>x.onclick=ev=>{ev.stopPropagation();b.wsize=x.dataset.z||undefined;if(!b.wsize)delete b.wsize;save();document.querySelectorAll('.widget').forEach(w=>{if(w._b===b){w.dataset.wsize=b.wsize||'';w._fitN=0}});paint();wFit()})};
+  paint();pop.appendChild(sec)}
+function wFitSoon(){cancelAnimationFrame(wfT);wfT=requestAnimationFrame(()=>requestAnimationFrame(wFit))}
+function wFit(){
+  const ws=[...document.querySelectorAll('.widget[data-wsize]')];if(!ws.length)return;const phone=isPhone();
+  ws.forEach(w=>{const z=w.dataset.wsize;if(WSZ[z]){w.style.height=WSZ[z]+'px';w.classList.add('wfix')}else{w.style.height='';w.classList.remove('wfix')}});
+  /* "Match row": as tall as the tallest widget in the other columns of its row */
+  const mt=ws.filter(w=>w.dataset.wsize==='match');
+  if(!phone)mt.forEach(w=>{const row=w.closest('.colrow');if(!row)return;const others=[...row.querySelectorAll('.widget')].filter(x=>x!==w&&x.closest('.colrow')===row&&x.dataset.wsize!=='match');
+    const t=others.length?Math.max(...others.map(x=>x.offsetHeight)):0;if(t>0){w.style.height=t+'px';w.classList.add('wfix')}});
+  /* charts inside a sized database widget are redrawn to fill its height */
+  ws.forEach(w=>{if(!w.classList.contains('wdbv')||!w._b||!w._b.lv)return;const V=w._b.lv,body=w.querySelector('.wbody'),svg=body&&body.querySelector('.chsvg');
+    if(!w.classList.contains('wfix')){if(CHFIT.has(V)){CHFIT.delete(V);w._fitN=0;w._live&&w._live.rer()}return}
+    if(!svg)return;const r=svg.getBoundingClientRect(),bt=body.getBoundingClientRect().top,used=Math.max(...[...body.children].map(k=>k.getBoundingClientRect().bottom))-bt,extra=used-r.height,target=body.clientHeight-extra-4;
+    if(Math.abs(target-r.height)<6){w._fitN=0;return}if((w._fitN=(w._fitN||0)+1)>3)return;
+    CHFIT.set(V,{h:Math.max(60,target),w:r.width});w._live&&w._live.rer()});
+}
+addEventListener('resize',()=>{document.querySelectorAll('.widget').forEach(w=>w._fitN=0);wFitSoon()});
+new MutationObserver(ms=>{if(ms.some(m=>m.target.closest&&!m.target.closest('#pop')))wFitSoon()}).observe(document.body,{childList:true,subtree:true});
 
 /* ---------- side peek + multi-pane split view ---------- */
 let PEEK=null,SPL=null,XPID=null,SPL_PREV_SIDE=false;
