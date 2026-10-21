@@ -36,8 +36,6 @@ ${src}
 `;
 rmSync('www',{recursive:true,force:true});mkdirSync('www',{recursive:true});
 cpSync('web','www',{recursive:true});
-// Android's build strips a ".gz" ending from asset names (and unpacks the file), so the Bibles ship as .jgz
-for(const f of readdirSync('www/bibles'))if(f.endsWith('.json.gz'))renameSync(`www/bibles/${f}`,`www/bibles/${f.replace(/\.json\.gz$/,'.jgz')}`);
 writeFileSync('www/index.html',html);
 writeFileSync('www/shell.js',readFileSync('web/shell.js','utf8').replace('__VERSION__',version));
 writeFileSync('www/version.json',JSON.stringify({version,build:+build,built:new Date().toISOString()}));
