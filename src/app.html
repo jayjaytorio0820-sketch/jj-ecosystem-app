@@ -1749,7 +1749,7 @@ function blockEl(b,p,n){
   else if(T==='w_cal')wCal(b,c);
   else if(T==='w_track')wTrack(b,c);
   else if(T==='w_image')wImage(b,c);
-  if(WIDGETS.includes(T)){const wel=c.querySelector('.widget');if(wel){wel._b=b;wel.dataset.wsize=b.wsize||'';wFitSoon()}}
+  if(WIDGETS.includes(T)){const wel=c.querySelector('.widget');if(wel){wel._b=b;wel.dataset.wsize=b.wsize||'';wSizeNow(wel,b);wFitSoon()}}
   else if(T==='database'){const db=S.dbs[b.dbid];if(db){const box=document.createElement('div');c.appendChild(box);renderGDB(db,box,p.id,true,b)}else c.innerHTML='<p class="tsub">This database was deleted.</p>'}
   else if(T==='pagelink'){const lp=pg(b.pid);if(!lp||lp.deleted){c.innerHTML='';return w}const a=document.createElement('div');a.className='plink';a.dataset.pid=lp.id;a.tabIndex=0;a.innerHTML=`<span>${lp.icon}</span><span class="plt">${esc(lp.title||'Untitled')}</span>`;a.onclick=()=>openPeek(lp.id);a.onkeydown=e=>{if(e.key==='Enter')openPeek(lp.id)};a.title='Opens in a side panel';c.appendChild(a)}
   if(T==='toggle'){[['ts','.tgt'],['bs','.tgb']].forEach(([k,sel])=>{if(b[k]&&hasSt(b[k]))c.querySelectorAll(sel).forEach(e=>{e.dataset.base=e.style.cssText;e.style.cssText+=stCSS(b[k],false,true)})})}
@@ -4425,15 +4425,18 @@ function wSizeUI(pop,b){const sec=document.createElement('div');sec.className='w
   const paint=()=>{sec.innerHTML='<div class="lb3">Size</div><div class="wsz">'+WSZ_L.map(([k,l])=>`<button data-z="${k}" class="${(b.wsize||'')===k?'on':''}"${k==='match'?' title="Same height as the widgets next to it in its row"':''}>${l}</button>`).join('')+'</div>'+((b.wsize||'')==='match'?'<p class="tsub wszh">Same height as the widget beside it. Give that one a size (or leave it on Auto).</p>':'');
     sec.querySelectorAll('[data-z]').forEach(x=>x.onclick=ev=>{ev.stopPropagation();b.wsize=x.dataset.z||undefined;if(!b.wsize)delete b.wsize;save();document.querySelectorAll('.widget').forEach(w=>{if(w._b===b){w.dataset.wsize=b.wsize||'';w._fitN=0}});paint();wFit()})};
   paint();pop.appendChild(sec)}
+/* give a sized widget its height the moment it is drawn, so it never flashes small while the page redraws */
+const WLAST=new WeakMap();
+function wSizeNow(w,b){const z=b.wsize||'',h=WSZ[z]||(z==='free'&&b.fh)||(z==='match'&&WLAST.get(b));if(h){w.style.height=h+'px';w.classList.add('wfix')}}
 function wFitSoon(){cancelAnimationFrame(wfT);wfT=requestAnimationFrame(()=>requestAnimationFrame(wFit))}
 function wFit(){
   const ws=[...document.querySelectorAll('.widget[data-wsize]')];if(!ws.length)return;const phone=isPhone();
   ws.forEach(w=>{if(!WRO_SEEN.has(w)){WRO_SEEN.add(w);WRO.observe(w)}});
-  ws.forEach(w=>{const z=w.dataset.wsize;if(WSZ[z]){w.style.height=WSZ[z]+'px';w.classList.add('wfix')}else if(z==='free'&&w._b&&w._b.fh){w.style.height=w._b.fh+'px';w.classList.add('wfix')}else{w.style.height='';w.classList.remove('wfix')}});
+  ws.forEach(w=>{const z=w.dataset.wsize;if(z==='match')return;if(WSZ[z]){w.style.height=WSZ[z]+'px';w.classList.add('wfix')}else if(z==='free'&&w._b&&w._b.fh){w.style.height=w._b.fh+'px';w.classList.add('wfix')}else{w.style.height='';w.classList.remove('wfix')}});
   /* "Match row": as tall as the tallest widget in the other columns of its row */
   const mt=ws.filter(w=>w.dataset.wsize==='match');
-  if(!phone)mt.forEach(w=>{const row=w.closest('.colrow');if(!row)return;const others=[...row.querySelectorAll('.widget')].filter(x=>x!==w&&x.closest('.colrow')===row&&x.dataset.wsize!=='match');
-    const t=others.length?Math.max(...others.map(x=>x.offsetHeight)):0;if(t>0){w.style.height=t+'px';w.classList.add('wfix')}});
+  mt.forEach(w=>{const row=w.closest('.colrow');if(!row||phone){w.style.height='';w.classList.remove('wfix');return}const others=[...row.querySelectorAll('.widget')].filter(x=>x!==w&&x.closest('.colrow')===row&&x.dataset.wsize!=='match');
+    const t=others.length?Math.max(...others.map(x=>x.offsetHeight)):0;if(t>0){w.style.height=t+'px';w.classList.add('wfix');if(w._b)WLAST.set(w._b,t)}else{w.style.height='';w.classList.remove('wfix')}});
   /* charts inside a sized database widget are redrawn to fill its height */
   ws.forEach(w=>{if(!w.classList.contains('wdbv')||!w._b||!w._b.lv)return;const V=w._b.lv,body=w.querySelector('.wbody'),svg=body&&body.querySelector('.chsvg');
     if(!w.classList.contains('wfix')){if(CHFIT.has(V)){CHFIT.delete(V);w._fitN=0;w._live&&w._live.rer()}return}
