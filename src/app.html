@@ -4603,24 +4603,31 @@ function wImgResize(e,w,b){e.preventDefault();e.stopPropagation();const host=w.p
   addEventListener('pointermove',mv,{passive:false});addEventListener('pointerup',up);addEventListener('pointercancel',up)}
 
 /* ---------- keyboard guard: tapping into long text must not make the page jump ----------
-   When the on-screen keyboard opens, Android scrolls the whole (tall) text box into view and the page jumps.
-   We remember where the page was when you tapped, put it back, and only nudge it so the cursor is visible. */
-let KG=null;
+   On a tap, we put the cursor exactly where you tapped and focus the text WITHOUT letting the page scroll.
+   If the on-screen keyboard then shrinks the screen, the page only moves enough to keep the cursor visible. */
+let KG=null,KG_PT='mouse';
 const kgScroller=el=>el.closest('.pkbody')||document.scrollingElement;
-document.addEventListener('pointerdown',e=>{const t=e.target.closest&&e.target.closest('[contenteditable="true"],[contenteditable="plaintext-only"]');
-  if(!t||e.target.closest('#pop,.rtbar,.lbox')){KG=null;return}const sc=kgScroller(t);KG={sc,top:sc.scrollTop,t:Date.now(),moved:false}},true);
-document.addEventListener('touchmove',()=>{if(KG)KG.moved=true},{passive:true,capture:true});
-function kgFix(){if(!KG||KG.moved||Date.now()-KG.t>1500)return;const sc=KG.sc,s=getSelection();if(!s.rangeCount)return;
-  const ae=document.activeElement;if(!ae||!ae.isContentEditable)return;
-  if(Math.abs(sc.scrollTop-KG.top)<40)return;            /* no real jump: leave it */
-  sc.scrollTop=KG.top;                                     /* undo the jump */
-  let r=s.getRangeAt(0).getBoundingClientRect();if(!r||(!r.height&&!r.top)){const n=s.anchorNode;const el=n&&(n.nodeType===1?n:n.parentElement);if(el)r=el.getBoundingClientRect()}
-  const vv=window.visualViewport,bottom=(vv?vv.offsetTop+vv.height:innerHeight)-28,top=70;
-  if(r.bottom>bottom)sc.scrollTop+=r.bottom-bottom;else if(r.top<top)sc.scrollTop-=top-r.top;
-  KG.top=sc.scrollTop}
-const kgSoon=()=>{requestAnimationFrame(kgFix);setTimeout(kgFix,60);setTimeout(kgFix,180)};
-addEventListener('resize',kgSoon);if(window.visualViewport){visualViewport.addEventListener('resize',kgSoon)}
-document.addEventListener('scroll',e=>{if(KG&&!KG.moved&&Date.now()-KG.t<1500&&(e.target===document||e.target===KG.sc))kgSoon()},true);
+const kgEditable=t=>t&&t.closest&&t.closest('[contenteditable="true"],[contenteditable="plaintext-only"]');
+document.addEventListener('pointerdown',e=>{KG_PT=e.pointerType||'mouse'},true);
+document.addEventListener('mousedown',e=>{
+  if(KG_PT!=='touch'&&KG_PT!=='pen')return;               /* a mouse keeps its normal click and drag-select */
+  const ed=kgEditable(e.target);if(!ed||e.target.closest('#pop,.rtbar,.lbox,[contenteditable="false"],img,.rpl,.rtgk'))return;
+  let r=null;if(document.caretRangeFromPoint)r=document.caretRangeFromPoint(e.clientX,e.clientY);
+  else if(document.caretPositionFromPoint){const p=document.caretPositionFromPoint(e.clientX,e.clientY);if(p){r=document.createRange();r.setStart(p.offsetNode,p.offset);r.collapse(true)}}
+  if(!r||!ed.contains(r.startContainer))return;
+  e.preventDefault();
+  const sc=kgScroller(ed),top=sc.scrollTop;
+  ed.focus({preventScroll:true});const s=getSelection();s.removeAllRanges();s.addRange(r);
+  if(sc.scrollTop!==top)sc.scrollTop=top;
+  KG={sc,t:Date.now()};
+},true);
+/* the keyboard opened (screen got shorter): show the cursor, nothing more */
+function kgFix(){if(!KG||Date.now()-KG.t>2000)return;const ae=document.activeElement;if(!ae||!ae.isContentEditable)return;const s=getSelection();if(!s.rangeCount)return;
+  let r=s.getRangeAt(0).getBoundingClientRect();if(!r||(!r.height&&!r.top)){const n=s.anchorNode,el=n&&(n.nodeType===1?n:n.parentElement);if(el)r=el.getBoundingClientRect();else return}
+  const vv=window.visualViewport,bottom=(vv?vv.offsetTop+vv.height:innerHeight)-28,top=70,sc=KG.sc;
+  if(r.bottom>bottom)sc.scrollTop+=r.bottom-bottom;else if(r.top<top)sc.scrollTop-=top-r.top}
+const kgSoon=()=>{setTimeout(kgFix,80);setTimeout(kgFix,260)};
+addEventListener('resize',kgSoon);if(window.visualViewport)visualViewport.addEventListener('resize',kgSoon);
 
 /* ---------- side peek + multi-pane split view ---------- */
 let PEEK=null,SPL=null,XPID=null,SPL_PREV_SIDE=false;
