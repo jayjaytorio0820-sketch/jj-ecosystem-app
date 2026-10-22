@@ -1682,7 +1682,7 @@ function crumbs(){
 }
 function renderPage(){if(SPL){$('#page').innerHTML='';$('#cover').hidden=true;crumbs();renderPanes();renderPeek();return}_renderPage();renderPeek()}
 function _renderPage(){
-  closeSlash();crumbs();
+  closeSlash();if(typeof RTB!=='undefined'&&RTB)RTB.hidden=true;crumbs();
   const p=cur(),w=$('#page');w.innerHTML='';renderCover(p);
   w.appendChild(noteBtn(p.id,'onpage'));
   if(p.rowOf&&S.dbs[p.rowOf]){const hp=pg(p.parent);const bk=document.createElement('button');bk.className='backdb';bk.innerHTML=`← ${esc((hp&&hp.kind==='gdb'?hp.title:S.dbs[p.rowOf].name)||'Database')}`;bk.onclick=()=>go(p.parent);w.appendChild(bk)}
@@ -1733,12 +1733,12 @@ function blockEl(b,p,n){
   hd.onmousedown=e=>e.preventDefault();hd.onpointerdown=e=>startBlockDrag(e,b,p,hd);hd.onclick=()=>{if(hd.dataset.dragged)return;openBlockMenu(hd,b,p)};hd.title='Drag to move or make columns. Tap for options.';gw.appendChild(hd);
   const c=document.createElement('div');c.className='bc';c.style.minWidth='0';w.appendChild(c);
   const T=b.type;
-  if(['p','h1','h2','h3'].includes(T))c.appendChild(edEl(b,p));
-  else if(T==='bullet'||T==='number'){const li=document.createElement('div');li.className='li';li.innerHTML=T==='bullet'?'<span class="dot"></span>':`<span class="mk">${n}.</span>`;li.appendChild(edEl(b,p));c.appendChild(li)}
-  else if(T==='todo'){const li=document.createElement('div');li.className='li'+(b.checked?' done':'');const k=document.createElement('button');k.className='chk'+(b.checked?' on':'');k.setAttribute('aria-label','Mark as done');k.innerHTML=b.checked?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L19 7"/></svg>':'';k.onclick=()=>{b.checked=!b.checked;save();renderPage()};li.appendChild(k);li.appendChild(edEl(b,p));c.appendChild(li)}
+  if(['p','h1','h2','h3'].includes(T))c.appendChild(richEl(b,p));
+  else if(T==='bullet'||T==='number'){const li=document.createElement('div');li.className='li';li.innerHTML=T==='bullet'?'<span class="dot"></span>':`<span class="mk">${n}.</span>`;li.appendChild(richEl(b,p));c.appendChild(li)}
+  else if(T==='todo'){const li=document.createElement('div');li.className='li'+(b.checked?' done':'');const k=document.createElement('button');k.className='chk'+(b.checked?' on':'');k.setAttribute('aria-label','Mark as done');k.innerHTML=b.checked?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L19 7"/></svg>':'';k.onclick=()=>{b.checked=!b.checked;save();renderPage()};li.appendChild(k);li.appendChild(richEl(b,p));c.appendChild(li)}
   else if(T==='toggle'){const li=document.createElement('div');li.className='li';const k=document.createElement('button');k.className='tog'+(b.open?' open':'');k.setAttribute('aria-label','Expand toggle');k.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 6l6 6-6 6z"/></svg>';k.onclick=()=>{b.open=!b.open;save();renderPage()};li.appendChild(k);const e=richEl(b,p);e.classList.add('tgt');e.style.fontWeight='500';li.appendChild(e);c.appendChild(li);if(b.open){const bd=document.createElement('div');bd.className='tbody';const be=richEl(b,p,'body');be.classList.add('tgb');be.dataset.ph='Toggle content';bd.appendChild(be);const tl=document.createElement('div');tl.className='tgtools';[['\u{1F4F7} Photo',()=>rtAddPhoto(be)],['\u25B8 Toggle',()=>rtAddToggle(be)],['\u{1F517} Link a page',ev=>rtLinkPage(ev.currentTarget,be,null)]].forEach(([l,fn])=>{const x=document.createElement('button');x.className='tgphoto';x.textContent=l;x.onmousedown=ev=>ev.preventDefault();x.onclick=fn;tl.appendChild(x)});bd.appendChild(tl);c.appendChild(bd)}}
-  else if(T==='callout'){const d=document.createElement('div');d.className='callout'+(b.color?' o-'+b.color:'');const i=document.createElement('button');i.className='ci';i.textContent=b.icon||'💡';i.onclick=()=>{const o=['💡','⚠️','📌','✅','🔥'];b.icon=o[(o.indexOf(b.icon)+1)%o.length];save();i.textContent=b.icon};d.appendChild(i);const e=edEl(b,p);e.style.flex='1';e.style.minWidth='0';d.appendChild(e);c.appendChild(d)}
-  else if(T==='quote'){const d=document.createElement('div');d.className='qbox o-'+(b.color||'blue');d.appendChild(edEl(b,p));c.appendChild(d)}
+  else if(T==='callout'){const d=document.createElement('div');d.className='callout'+(b.color?' o-'+b.color:'');const i=document.createElement('button');i.className='ci';i.textContent=b.icon||'💡';i.onclick=()=>{const o=['💡','⚠️','📌','✅','🔥'];b.icon=o[(o.indexOf(b.icon)+1)%o.length];save();i.textContent=b.icon};d.appendChild(i);const e=richEl(b,p);e.style.flex='1';e.style.minWidth='0';d.appendChild(e);c.appendChild(d)}
+  else if(T==='quote'){const d=document.createElement('div');d.className='qbox o-'+(b.color||'blue');d.appendChild(richEl(b,p));c.appendChild(d)}
   else if(T==='code'){const d=document.createElement('div');d.className='code';d.innerHTML='<div class="lang">code</div>';d.appendChild(edEl(b,p));c.appendChild(d)}
   else if(T==='divider'){c.innerHTML='<div class="divider"></div>'}
   else if(T==='spacer'){c.innerHTML='<div class="spacer" title="Empty space. Drag ⋮⋮ to move it, or put blocks beside it."><span>Empty space</span></div>'}
@@ -1796,7 +1796,7 @@ function onKey(e,b,p,el){
 const TYPES=[
   {t:'p',l:'Text',h:'Plain paragraph',g:'Aa'},{t:'h1',l:'Heading 1',h:'Large section title',g:'H1'},{t:'h2',l:'Heading 2',h:'Medium title',g:'H2'},{t:'h3',l:'Heading 3',h:'Small title',g:'H3'},
   {t:'todo',l:'To-do list',h:'Checklist with checkboxes',g:'☐'},{t:'bullet',l:'Bulleted list',h:'Simple list',g:'•'},{t:'number',l:'Numbered list',h:'Numbered steps',g:'1.'},
-  {t:'toggle',l:'Toggle',h:'Show or hide content',g:'▸'},{t:'callout',l:'Callout',h:'Highlighted note',g:'!'},{t:'quote',l:'Quote',h:'Quotation',g:'"'},
+  {t:'toggle',l:'Toggle',h:'Show or hide content',g:'▸'},{t:'mention',l:'Link to page',h:'Link another page inside your text (or type @)',g:'↗'},{t:'callout',l:'Callout',h:'Highlighted note',g:'!'},{t:'quote',l:'Quote',h:'Quotation',g:'"'},
   {t:'code',l:'Code',h:'Code snippet',g:'</>'},{t:'table',l:'Table',h:'Rows and columns',g:'▦'},{t:'divider',l:'Divider',h:'Visual separator',g:'—'},{t:'spacer',l:'Empty space',h:'Blank block to push others aside',g:'⬚'},{t:'page',l:'Page',h:'New page inside this one',g:'↳'},{t:'dbinline',l:'Database – Inline',h:'Table, board and calendar on this page',g:'▤'},{t:'dbpage',l:'Database – Full page',h:'A database as its own page',g:'▦'},{t:'dblink',l:'Linked database',h:'Show a database you already made',g:'⇢'},{t:'w_clock',l:'Clock widget',h:'Live time and date, any time zone',g:'◷'},{t:'w_gallery',l:'Gallery widget',h:'Photos in a grid or slideshow',g:'▣'},{t:'w_cal',l:'Calendar widget',h:'Month view with dates from your databases',g:'▦'},{t:'w_db',l:'Database widget',h:'View a saved database as a chart, table, board… (view only)',g:'◔'},{t:'w_image',l:'Image',h:'A picture you can resize freely or match to your widgets',g:'▣'},{t:'w_track',l:'Tracker calendar',h:'Mark each day (WIN / LOSS, Done…) and add a value, saved in a database',g:'▦'}];
 const SL={open:false,bid:null,filter:'',sel:0,items:[],plus:false};
 const narrow=()=>innerWidth<=820||matchMedia('(hover:none)').matches;
@@ -1836,6 +1836,8 @@ function drawSlash(){
 function chooseSlash(t){
   const p=(SL.bid&&pageOfBlock(SL.bid))||cur(),plus=SL.plus,turn=SL.turn,b=p.blocks.find(x=>x.id===SL.bid);closeSlash();
   if(plus){const nb=B('p','');if(b)insertAfter(p,b,nb);else{p.blocks.push(nb);save()}applyType(nb,p,t);return}
+  if(t==='mention'){let tb=b;if(plus||!tb||!TEXTUAL.includes(tb.type)||tb.type==='code'){tb=B('p','');if(b)insertAfter(p,b,tb);else{p.blocks.push(tb);save()}}else{tb.text=(tb.text||'').replace(/^\/\S*/,'');tb.textH=''}save();renderPage();
+    requestAnimationFrame(()=>{const el=document.querySelector(`[data-bid="${tb.id}"] .ed.rich`);if(!el)return;el.focus();const r=document.createRange();r.selectNodeContents(el);r.collapse(false);el._range=r;rtLinkPage(el,el,null)});return}
   if(!b)return;if(turn&&b.type===t)return;const wasBlank=['spacer','divider'].includes(b.type);if(wasBlank)b.text='';
   if(!turn||['table','divider','spacer','dblink',...WIDGETS].includes(t))b.text='';applyType(b,p,t);
 }
@@ -4455,8 +4457,14 @@ function rtClean(html){const t=document.createElement('template');t.innerHTML=ht
 function richEl(b,p,field){
   field=field||'text';
   const el=document.createElement('div');el.className='ed rich';el.contentEditable='true';el.spellcheck=false;el.dataset.ph=PH[b.type]||'';
-  const hk=field+'H';el.innerHTML=b[hk]!=null?rtClean(b[hk]):esc(b[field]||'').replace(/\n/g,'<br>');
-  el.oninput=()=>{b[hk]=rtClean(el.innerHTML);b[field]=txt(el);if(!b[field].trim()&&!el.querySelector('img'))b[hk]='';save();if(field==='text')onTyped(b,p,el)};
+  const hk=field+'H',norm=x=>String(x||'').replace(/\s+/g,'');
+  /* formatted text is used only while it still matches the plain text (shortcuts like "# " change the plain text) */
+  let useH=false;if(b[hk]){const t=document.createElement('div');t.innerHTML=b[hk];useH=norm(t.textContent)===norm(b[field])||(!norm(b[field])&&t.querySelector('img'))}
+  el.innerHTML=useH?rtClean(b[hk]):esc(b[field]||'').replace(/\n/g,'<br>');
+  el.oninput=e=>{b[field]=txt(el);if(!b[field].trim()&&!el.querySelector('img,.rtg,.rpl')){b[hk]='';if(el.innerHTML&&el.innerHTML!=='<br>'||el.innerHTML==='<br>')el.innerHTML=''}else b[hk]=rtClean(el.innerHTML);save();if(field==='text')onTyped(b,p,el);
+    /* typing @ after a space (or at the start) picks a page to link */
+    if(e&&e.data==='@'){const s=getSelection();if(s.rangeCount){const r=s.getRangeAt(0),n=r.startContainer,o=r.startOffset;if(n.nodeType===3&&o>0&&(o===1||/\s/.test(n.textContent[o-2]))){const at=document.createRange();at.setStart(n,o-1);at.setEnd(n,o);rtLinkPage(el,el,at)}}}};
+  el.addEventListener('paste',e=>{const tx=(e.clipboardData||window.clipboardData).getData('text/plain');if(tx==null)return;e.preventDefault();document.execCommand('insertText',false,tx)});
   if(field==='text')el.onkeydown=e=>onKey(e,b,p,el);
   el.addEventListener('blur',()=>{const s=getSelection();if(s.rangeCount&&el.contains(s.anchorNode))el._range=s.getRangeAt(0).cloneRange()});
   el.addEventListener('keyup',()=>{const s=getSelection();if(s.rangeCount&&el.contains(s.anchorNode))el._range=s.getRangeAt(0).cloneRange()});
@@ -4516,7 +4524,9 @@ addEventListener('scroll',()=>{if(RTB&&!RTB.hidden)rtPlace()},true);
 /* ---------- inside a toggle: nested toggles and links to pages ---------- */
 function rtInsertNode(el,node){let r=el._range&&el.contains(el._range.startContainer)?el._range:null;
   if(r){r.collapse(false);r.insertNode(node)}else el.appendChild(node);
-  const nr=document.createRange();nr.setStartAfter(node);nr.collapse(true);el._range=nr;el.dispatchEvent(new Event('input'))}
+  const nr=document.createRange();nr.setStartAfter(node);nr.collapse(true);el._range=nr;el.dispatchEvent(new Event('input'));
+  /* keep typing right after what was put in */
+  if(node.nodeType===3||!node.classList.contains('rtg')){el.focus({preventScroll:true});const s=getSelection();s.removeAllRanges();s.addRange(nr)}}
 function rtAddToggle(el){const t=document.createElement('div');t.className='rtg';t.dataset.open='1';
   t.innerHTML='<span class="rtgk" contenteditable="false" title="Show or hide">\u25b8</span><div class="rtgt"></div><div class="rtgb"></div>';
   rtInsertNode(el,t);setTimeout(()=>{const tt=t.querySelector('.rtgt');tt.focus();const r=document.createRange();r.selectNodeContents(tt);r.collapse(true);const s=getSelection();s.removeAllRanges();s.addRange(r)},0)}
@@ -4530,7 +4540,7 @@ function rtLinkPage(anchor,el,selRange){const host=pageOfBlock((el.closest('[dat
       pop.querySelector('[data-new]').onclick=()=>{closePop();const np=newPage(host?host.id:null);np.title=q.trim()||'Untitled';if(host){host.open=true;if(host.blocks){const bi=host.blocks.findIndex(x=>x.type==='pagelink'&&x.pid===np.id);if(bi>=0)host.blocks.splice(bi,1)}}save();renderTree();put(np);toast(`Made the page \u201c${np.title}\u201d and linked it.`,{label:'Open',fn:()=>openPeek(np.id)})}};
     draw();if(!isPhone())setTimeout(()=>pop.querySelector('.pq').focus(),0)});
   const put=pg2=>{if(!pg2)return;const a=document.createElement('span');a.className='rpl';a.dataset.pid=pg2.id;
-    let txt0='';if(selRange&&!selRange.collapsed){txt0=selRange.toString();selRange.deleteContents();el._range=selRange}
+    let txt0='';if(selRange&&!selRange.collapsed){txt0=selRange.toString();if(txt0==='@')txt0='';selRange.deleteContents();el._range=selRange}
     a.textContent=txt0||pg2.title||'Untitled';rtInsertNode(el,a);rtInsertNode(el,document.createTextNode('\u00a0'))}}
 function rtLinkPop(a,el){const p2=pg(a.dataset.pid);
   openPop(a,pop=>{const opt=(k,l)=>`<button data-o="${k}" class="${a.dataset[k]==='0'?'':'on'}"><span>${l}</span></button>`;
