@@ -4524,6 +4524,23 @@ function rtPlace(){const bar=rtBar(),s=getSelection();if(!s.rangeCount||s.isColl
 document.addEventListener('selectionchange',()=>{const s=getSelection();if(s.rangeCount&&!s.isCollapsed&&rtEditor(s.anchorNode))rtPlace();else if(RTB&&!RTB.hidden&&!(document.activeElement&&RTB.contains(document.activeElement))){setTimeout(()=>{const t=getSelection();if(!(t.rangeCount&&!t.isCollapsed&&rtEditor(t.anchorNode))){RTB.hidden=true;RTB.querySelector('.rtmenu').hidden=true}},150)}});
 addEventListener('scroll',()=>{if(RTB&&!RTB.hidden)rtPlace()},true);
 
+/* ---------- highlights and text colours follow the theme: on a dark background they turn soft and the words stay readable ---------- */
+const RT_LIGHTER={'#8a8f8c':'#b9bebb','#d1493f':'#ff8f85','#d9772b':'#ffae6e','#c99a17':'#ffd866','#2e9a5b':'#72dc9d','#2f7fd6':'#82b8ff','#8a5cd6':'#c0a0ff','#d1508f':'#ff8ec4'};
+(function(){const rgb=h=>{const n=parseInt(h.slice(1),16);return `rgb(${n>>16&255}, ${n>>8&255}, ${n&255})`},rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`};
+  let css='.rich [style*="background-color"],.nedit [style*="background-color"]{color:#1d1f1e}\n.rich [style*="background-color"] .rpl{color:#1f5fb0}\n';
+  /* dark: a highlight becomes a soft tint of its colour, and the words keep the light text colour */
+  css+='.rt-dk [style*="background-color"]{color:#16181a}\n';
+  RT_HL.filter(x=>x[0]).forEach(([h])=>{css+=`.rt-dk [style*="background-color: ${rgb(h)}"]{background-color:${rgba(h,.26)}!important;color:inherit;box-shadow:inset 0 -2px 0 ${rgba(h,.55)}}\n`});
+  /* dark: the text colours get lighter versions */
+  Object.entries(RT_LIGHTER).forEach(([h,l])=>{const r=rgb(h);css+=`.rt-dk [style^="color: ${r}"],.rt-dk [style*="; color: ${r}"],.rt-dk font[color="${h}"]{color:${l}!important}\n`});
+  css+='.rt-dk .rpl:not([data-lb="0"]){color:#82b8ff}\n';
+  const st=document.createElement('style');st.id='rtTheme';st.textContent=css;document.head.appendChild(st)})();
+/* an editor is "dark" when its own text colour is light */
+function rtTheme(){document.querySelectorAll('.rich,.nedit').forEach(el=>{const m=getComputedStyle(el).color.match(/\d+/g);if(!m)return;const L=(.299*m[0]+.587*m[1]+.114*m[2])/255;el.classList.toggle('rt-dk',L>.6)})}
+let rtThT=0;const rtThemeSoon=()=>{cancelAnimationFrame(rtThT);rtThT=requestAnimationFrame(rtTheme)};
+new MutationObserver(ms=>{if(ms.some(m=>m.type==='attributes'||[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches('.rich,.nedit')||n.querySelector&&n.querySelector('.rich,.nedit')))))rtThemeSoon()}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['data-mode','data-theme','style','class']});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',rtThemeSoon);
+
 /* ---------- inside a toggle: nested toggles and links to pages ---------- */
 function rtInsertNode(el,node){let r=el._range&&el.contains(el._range.startContainer)?el._range:null;
   if(r){r.collapse(false);r.insertNode(node)}else el.appendChild(node);
