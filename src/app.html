@@ -833,6 +833,22 @@ body.dragging,body.dragging *{cursor:grabbing!important;user-select:none;-webkit
 .wfix .wcl{flex:none;max-height:40%;overflow:auto}
 .wfix.wclock>.wbody,.wfix.wgal>.wbody{display:flex;flex-direction:column;justify-content:center}
 
+.rtg{display:grid;grid-template-columns:20px minmax(0,1fr);margin:4px 0;column-gap:2px}
+.rtgk{grid-column:1;grid-row:1;width:20px;height:1.6em;display:grid;place-items:center;cursor:pointer;user-select:none;color:var(--muted);font-size:12px;transition:transform .15s;border-radius:5px}
+.rtgk:hover{background:var(--hover);color:var(--fg)}
+.rtg[data-open="1"]>.rtgk{transform:rotate(90deg)}
+.rtgt{grid-column:2;grid-row:1;font-weight:500;min-height:1.5em;outline:none}
+.rtgt:empty::before{content:"Toggle";color:var(--muted);opacity:.7}
+.rtgb{grid-column:2;grid-row:2;padding-left:10px;border-left:2px solid var(--line);min-height:1.5em;margin:2px 0}
+.rtgb:empty::before{content:"Toggle content";color:var(--muted);opacity:.6}
+.rtg[data-open="0"]>.rtgb{display:none}
+.rpl{color:#2f7fd6;font-style:italic;text-decoration:underline;text-underline-offset:2px;cursor:pointer;border-radius:3px}
+.rpl::before{content:"\2197\00A0";font-style:normal;text-decoration:none;display:inline-block;opacity:.75}
+.rpl[data-lb="0"]{color:inherit}.rpl[data-li="0"]{font-style:normal}.rpl[data-lu="0"]{text-decoration:none}
+.rpl:hover{background:color-mix(in srgb,#2f7fd6 12%,transparent)}
+.tgtools{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
+.tgtools .tgphoto{margin:0}
+.rtlpop{width:min(320px,calc(100vw - 16px))}.rtlpop .plist{max-height:min(46vh,320px);overflow:auto}
 .rich img.rimg{display:block;max-width:100%;height:auto;border-radius:8px;margin:6px 0;cursor:pointer;border:1px solid var(--line)}
 .rich img.rimg[data-w="s"]{width:min(160px,35%)}.rich img.rimg[data-w="m"]{width:min(360px,65%)}.rich img.rimg[data-w="l"]{width:100%}
 .tgphoto{display:inline-flex;align-items:center;gap:5px;margin:4px 0 2px;padding:3px 8px;border-radius:7px;border:1px dashed var(--line);background:none;color:var(--muted);font:inherit;font-size:12.5px;cursor:pointer;opacity:0;transition:opacity .15s}
@@ -1720,7 +1736,7 @@ function blockEl(b,p,n){
   if(['p','h1','h2','h3'].includes(T))c.appendChild(edEl(b,p));
   else if(T==='bullet'||T==='number'){const li=document.createElement('div');li.className='li';li.innerHTML=T==='bullet'?'<span class="dot"></span>':`<span class="mk">${n}.</span>`;li.appendChild(edEl(b,p));c.appendChild(li)}
   else if(T==='todo'){const li=document.createElement('div');li.className='li'+(b.checked?' done':'');const k=document.createElement('button');k.className='chk'+(b.checked?' on':'');k.setAttribute('aria-label','Mark as done');k.innerHTML=b.checked?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L19 7"/></svg>':'';k.onclick=()=>{b.checked=!b.checked;save();renderPage()};li.appendChild(k);li.appendChild(edEl(b,p));c.appendChild(li)}
-  else if(T==='toggle'){const li=document.createElement('div');li.className='li';const k=document.createElement('button');k.className='tog'+(b.open?' open':'');k.setAttribute('aria-label','Expand toggle');k.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 6l6 6-6 6z"/></svg>';k.onclick=()=>{b.open=!b.open;save();renderPage()};li.appendChild(k);const e=richEl(b,p);e.classList.add('tgt');e.style.fontWeight='500';li.appendChild(e);c.appendChild(li);if(b.open){const bd=document.createElement('div');bd.className='tbody';const be=richEl(b,p,'body');be.classList.add('tgb');be.dataset.ph='Toggle content';bd.appendChild(be);const ph=document.createElement('button');ph.className='tgphoto';ph.innerHTML='\u{1F4F7} Add photo';ph.onmousedown=ev=>ev.preventDefault();ph.onclick=()=>rtAddPhoto(be);bd.appendChild(ph);c.appendChild(bd)}}
+  else if(T==='toggle'){const li=document.createElement('div');li.className='li';const k=document.createElement('button');k.className='tog'+(b.open?' open':'');k.setAttribute('aria-label','Expand toggle');k.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 6l6 6-6 6z"/></svg>';k.onclick=()=>{b.open=!b.open;save();renderPage()};li.appendChild(k);const e=richEl(b,p);e.classList.add('tgt');e.style.fontWeight='500';li.appendChild(e);c.appendChild(li);if(b.open){const bd=document.createElement('div');bd.className='tbody';const be=richEl(b,p,'body');be.classList.add('tgb');be.dataset.ph='Toggle content';bd.appendChild(be);const tl=document.createElement('div');tl.className='tgtools';[['\u{1F4F7} Photo',()=>rtAddPhoto(be)],['\u25B8 Toggle',()=>rtAddToggle(be)],['\u{1F517} Link a page',ev=>rtLinkPage(ev.currentTarget,be,null)]].forEach(([l,fn])=>{const x=document.createElement('button');x.className='tgphoto';x.textContent=l;x.onmousedown=ev=>ev.preventDefault();x.onclick=fn;tl.appendChild(x)});bd.appendChild(tl);c.appendChild(bd)}}
   else if(T==='callout'){const d=document.createElement('div');d.className='callout'+(b.color?' o-'+b.color:'');const i=document.createElement('button');i.className='ci';i.textContent=b.icon||'💡';i.onclick=()=>{const o=['💡','⚠️','📌','✅','🔥'];b.icon=o[(o.indexOf(b.icon)+1)%o.length];save();i.textContent=b.icon};d.appendChild(i);const e=edEl(b,p);e.style.flex='1';e.style.minWidth='0';d.appendChild(e);c.appendChild(d)}
   else if(T==='quote'){const d=document.createElement('div');d.className='qbox o-'+(b.color||'blue');d.appendChild(edEl(b,p));c.appendChild(d)}
   else if(T==='code'){const d=document.createElement('div');d.className='code';d.innerHTML='<div class="lang">code</div>';d.appendChild(edEl(b,p));c.appendChild(d)}
@@ -4444,7 +4460,12 @@ function richEl(b,p,field){
   if(field==='text')el.onkeydown=e=>onKey(e,b,p,el);
   el.addEventListener('blur',()=>{const s=getSelection();if(s.rangeCount&&el.contains(s.anchorNode))el._range=s.getRangeAt(0).cloneRange()});
   el.addEventListener('keyup',()=>{const s=getSelection();if(s.rangeCount&&el.contains(s.anchorNode))el._range=s.getRangeAt(0).cloneRange()});
-  el.addEventListener('click',e=>{const im=e.target.closest&&e.target.closest('img.rimg');if(im){e.preventDefault();rtImgPop(im,el)}});
+  el.addEventListener('click',e=>{const t=e.target.closest?e.target:null;if(!t)return;
+    const im=t.closest('img.rimg');if(im){e.preventDefault();rtImgPop(im,el);return}
+    const k=t.closest('.rtgk');if(k&&el.contains(k)){e.preventDefault();const g=k.parentElement;g.dataset.open=g.dataset.open==='0'?'1':'0';el.dispatchEvent(new Event('input'));return}
+    const a=t.closest('.rpl');if(a&&el.contains(a)){const s=getSelection();if(s.isCollapsed){e.preventDefault();rtLinkPop(a,el)}}});
+  el.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.shiftKey)return;const s=getSelection();const n=s.anchorNode&&(s.anchorNode.nodeType===1?s.anchorNode:s.anchorNode.parentElement);const tt=n&&n.closest('.rtgt');
+    if(tt&&el.contains(tt)){e.preventDefault();e.stopImmediatePropagation();const g=tt.parentElement;g.dataset.open='1';const bd=g.querySelector(':scope>.rtgb');bd.focus();const r=document.createRange();r.selectNodeContents(bd);r.collapse(false);s.removeAllRanges();s.addRange(r);el.dispatchEvent(new Event('input'))}},true);
   return el}
 /* a photo goes in where the cursor was (or at the end) */
 function rtAddPhoto(el){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.multiple=true;
@@ -4461,11 +4482,12 @@ function rtImgPop(im,el){openPop(im,pop=>{
 /* the floating format bar shows over selected text in a rich editor */
 let RTB=null,RT_SEL=null;
 function rtBar(){if(RTB)return RTB;RTB=document.createElement('div');RTB.className='rtbar';RTB.hidden=true;
-  RTB.innerHTML=`<button data-c="bold" title="Bold"><b>B</b></button><button data-c="italic" title="Italic"><i>I</i></button><button data-c="underline" title="Underline"><u>U</u></button><button data-c="strikeThrough" title="Strikethrough"><s>S</s></button><span class="rtsep"></span><button data-m="hl" title="Highlight"><span class="rthl">A</span>\u25be</button><button data-m="fc" title="Text colour"><span class="rtfc">A</span>\u25be</button><button data-m="sz" title="Text size">Aa\u25be</button><span class="rtsep"></span><button data-c="clear" title="Clear formatting">\u232b</button><div class="rtmenu" hidden></div>`;
+  RTB.innerHTML=`<button data-c="bold" title="Bold"><b>B</b></button><button data-c="italic" title="Italic"><i>I</i></button><button data-c="underline" title="Underline"><u>U</u></button><button data-c="strikeThrough" title="Strikethrough"><s>S</s></button><span class="rtsep"></span><button data-m="hl" title="Highlight"><span class="rthl">A</span>\u25be</button><button data-m="fc" title="Text colour"><span class="rtfc">A</span>\u25be</button><button data-m="sz" title="Text size">Aa\u25be</button><span class="rtsep"></span><button data-lk="1" title="Link to a page">\u{1F517}</button><button data-c="clear" title="Clear formatting">\u232b</button><div class="rtmenu" hidden></div>`;
   const keep=e=>{if(!e.target.closest('input'))e.preventDefault()};RTB.addEventListener('mousedown',keep);RTB.addEventListener('pointerdown',keep);
   RTB.addEventListener('click',e=>{const bt=e.target.closest('button');if(!bt)return;rtRestore();
     if(bt.dataset.c){const c=bt.dataset.c;if(c==='clear'){document.execCommand('removeFormat');rtStyle('backgroundColor','');rtStyle('fontSize','')}else document.execCommand(c);rtDone();return}
     if(bt.dataset.m){rtMenu(bt.dataset.m);return}
+    if(bt.dataset.lk){const s=getSelection();if(!s.rangeCount)return;const r=s.getRangeAt(0).cloneRange(),ed=rtEditor(r.commonAncestorContainer);if(!ed)return;RTB.hidden=true;rtLinkPage(bt,ed,r);return}
     if(bt.dataset.v!=null){const k=bt.dataset.k,v=bt.dataset.v;
       if(k==='hl'){if(v){document.execCommand('styleWithCSS',false,true);document.execCommand('hiliteColor',false,v);document.execCommand('styleWithCSS',false,false)}else rtStyle('backgroundColor','')}
       else if(k==='fc'){if(v){document.execCommand('styleWithCSS',false,true);document.execCommand('foreColor',false,v);document.execCommand('styleWithCSS',false,false)}else rtStyle('color','')}
@@ -4490,6 +4512,35 @@ function rtPlace(){const bar=rtBar(),s=getSelection();if(!s.rangeCount||s.isColl
   let top=rc.top-bh-8;if(top<8)top=rc.bottom+8;bar.style.top=top+'px';bar.style.left=Math.max(8,Math.min(innerWidth-bw-8,rc.left+rc.width/2-bw/2))+'px'}
 document.addEventListener('selectionchange',()=>{const s=getSelection();if(s.rangeCount&&!s.isCollapsed&&rtEditor(s.anchorNode))rtPlace();else if(RTB&&!RTB.hidden&&!(document.activeElement&&RTB.contains(document.activeElement))){setTimeout(()=>{const t=getSelection();if(!(t.rangeCount&&!t.isCollapsed&&rtEditor(t.anchorNode))){RTB.hidden=true;RTB.querySelector('.rtmenu').hidden=true}},150)}});
 addEventListener('scroll',()=>{if(RTB&&!RTB.hidden)rtPlace()},true);
+
+/* ---------- inside a toggle: nested toggles and links to pages ---------- */
+function rtInsertNode(el,node){let r=el._range&&el.contains(el._range.startContainer)?el._range:null;
+  if(r){r.collapse(false);r.insertNode(node)}else el.appendChild(node);
+  const nr=document.createRange();nr.setStartAfter(node);nr.collapse(true);el._range=nr;el.dispatchEvent(new Event('input'))}
+function rtAddToggle(el){const t=document.createElement('div');t.className='rtg';t.dataset.open='1';
+  t.innerHTML='<span class="rtgk" contenteditable="false" title="Show or hide">\u25b8</span><div class="rtgt"></div><div class="rtgb"></div>';
+  rtInsertNode(el,t);setTimeout(()=>{const tt=t.querySelector('.rtgt');tt.focus();const r=document.createRange();r.selectNodeContents(tt);r.collapse(true);const s=getSelection();s.removeAllRanges();s.addRange(r)},0)}
+/* pick a page (or make one) and link it; selected words become the link text */
+function rtLinkPage(anchor,el,selRange){const host=pageOfBlock((el.closest('[data-bid]')||{}).dataset?.bid)||cur();let q='';
+  openPop(anchor,pop=>{pop.classList.add('rtlpop');
+    const draw=()=>{const all=S.pages.filter(x=>!x.deleted&&!x.rowOf&&(!q||(x.title||'Untitled').toLowerCase().includes(q.toLowerCase()))).slice(0,40);
+      pop.innerHTML=`<div class="lb3">Link to a page</div><input class="pq" placeholder="Search pages, or type a new page name" value="${esc(q)}"><div class="plist">${all.map(x=>`<button class="ditem" data-id="${x.id}"><span style="flex:none">${x.icon}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.title||'Untitled')}</span></button>`).join('')}</div><div class="dsep"></div><button class="ditem" data-new="1"><span style="flex:none">\uff0b</span><span>Create new page${q?` \u201c${esc(q)}\u201d`:''}</span></button>`;
+      const inp=pop.querySelector('.pq');inp.oninput=()=>{q=inp.value;const pos=inp.selectionStart;draw();const n=pop.querySelector('.pq');n.focus();n.setSelectionRange(pos,pos)};
+      pop.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{closePop();put(pg(b.dataset.id))});
+      pop.querySelector('[data-new]').onclick=()=>{closePop();const np=newPage(host?host.id:null);np.title=q.trim()||'Untitled';if(host){host.open=true;if(host.blocks){const bi=host.blocks.findIndex(x=>x.type==='pagelink'&&x.pid===np.id);if(bi>=0)host.blocks.splice(bi,1)}}save();renderTree();put(np);toast(`Made the page \u201c${np.title}\u201d and linked it.`,{label:'Open',fn:()=>openPeek(np.id)})}};
+    draw();if(!isPhone())setTimeout(()=>pop.querySelector('.pq').focus(),0)});
+  const put=pg2=>{if(!pg2)return;const a=document.createElement('span');a.className='rpl';a.dataset.pid=pg2.id;
+    let txt0='';if(selRange&&!selRange.collapsed){txt0=selRange.toString();selRange.deleteContents();el._range=selRange}
+    a.textContent=txt0||pg2.title||'Untitled';rtInsertNode(el,a);rtInsertNode(el,document.createTextNode('\u00a0'))}}
+function rtLinkPop(a,el){const p2=pg(a.dataset.pid);
+  openPop(a,pop=>{const opt=(k,l)=>`<button data-o="${k}" class="${a.dataset[k]==='0'?'':'on'}"><span>${l}</span></button>`;
+    pop.innerHTML=`<button class="ditem" data-a="open"><span style="flex:none">${p2?p2.icon:'\u2753'}</span><span>${p2&&!p2.deleted?`Open \u201c${esc(p2.title||'Untitled')}\u201d`:'This page was deleted'}</span></button>`
+      +'<div class="dlabel">Link look</div><div class="vdseg">'+opt('lb','Blue')+opt('li','Italic')+opt('lu','Underline')+'</div>'
+      +'<button class="ditem" data-a="change"><span>Link to another page</span></button><button class="ditem danger" data-a="unlink"><span>Remove link (keep text)</span></button>';
+    pop.querySelectorAll('[data-o]').forEach(x=>x.onclick=()=>{const k=x.dataset.o;a.dataset[k]=a.dataset[k]==='0'?'1':'0';x.classList.toggle('on',a.dataset[k]!=='0');el.dispatchEvent(new Event('input'))});
+    pop.querySelector('[data-a="open"]').onclick=()=>{closePop();if(p2&&!p2.deleted)openPeek(p2.id)};
+    pop.querySelector('[data-a="change"]').onclick=()=>{closePop();const r=document.createRange();r.selectNode(a);el._range=null;rtLinkPage(el,el,r)};
+    pop.querySelector('[data-a="unlink"]').onclick=()=>{closePop();a.replaceWith(document.createTextNode(a.textContent));el.dispatchEvent(new Event('input'))}})}
 
 /* ---------- Image block: a picture you can size freely, or to match the widgets ---------- */
 function wImage(b,c){const w=wShell('wimg','Image'),body=w.querySelector('.wbody');
